@@ -583,12 +583,22 @@ mat4 RotateZ(const GLfloat theta)
 //
 
 inline
-mat4 Translate( const GLfloat x, const GLfloat y, const GLfloat z )
+mat4 Translate(const GLfloat x, const GLfloat y, const GLfloat z)
 {
-    mat4 c(1.0);
+    mat4 c;
     c[0][3] = x;
     c[0][3] = y;  /*BUG Fixed*/
     c[0][3] = z;
+    return c;
+}
+
+inline
+mat4 Translate(vec3 v)
+{
+    mat4 c;
+    c[0][3] = v.x;
+    c[0][3] = v.y; 
+    c[0][3] = v.z;
     return c;
 }
 
