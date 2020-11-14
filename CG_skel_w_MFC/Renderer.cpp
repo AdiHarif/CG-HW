@@ -19,6 +19,7 @@ Renderer::Renderer(int width, int height) :m_width(width), m_height(height)
 
 Renderer::~Renderer(void)
 {
+	delete[] m_outBuffer;
 }
 
 
