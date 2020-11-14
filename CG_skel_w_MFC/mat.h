@@ -2,6 +2,9 @@
 #include "vec.h"
 
 
+
+
+
 //----------------------------------------------------------------------------
 //
 //  mat2 - 2D square matrix
@@ -65,7 +68,7 @@ class mat2 {
 	
     mat2 operator * ( const mat2& m ) const { /*BUG Fixed*/
         mat2 a(0.0);
-        mat2 mt = transpose(m);
+        mat2 mt = mat2(m[0][0], m[0][1], m[1][0], m[1][1]);
 
         for (int i; i < 2; i++) {
             for (int j; j < 2; j++) {
@@ -221,7 +224,9 @@ class mat3 {
 	
     mat3 operator * ( const mat3& m ) const {
 	mat3  a( 0.0 );
-    mat3 mt = transpose(m);
+    mat3 mt = mat3(m[0][0], m[0][1], m[0][2],
+                    m[1][0], m[1][1], m[1][2],
+                    m[2][0], m[2][1], m[2][2]);
 
 	for ( int i = 0; i < 3; ++i ) {
 	    for ( int j = 0; j < 3; ++j ) {

@@ -71,6 +71,7 @@ MeshModel::~MeshModel(void)
 
 void MeshModel::loadFile(string fileName)
 {
+	vector<FaceIdcs> faces;
 	ifstream ifile(fileName.c_str());
 	// while not end of file
 	while (!ifile.eof())
@@ -90,7 +91,7 @@ void MeshModel::loadFile(string fileName)
 			this->vertices.push_back(vec3fFromStream(issLine));
 		}
 		else if (lineType == "f"){ /*BUG fixed*/
-			this->faces.push_back(issLine);
+			faces.push_back(issLine);
 		} 
 		else if (lineType == "#" || lineType == "")
 		{
@@ -108,10 +109,10 @@ void MeshModel::loadFile(string fileName)
 	//Then vertex_positions should contain:
 	//vertex_positions={v1,v2,v3,v1,v3,v4}
 	
-	this->vertex_positions = new vec3[3*this->faces.size()]; /*BUG fixed*/
+	this->vertex_positions = new vec3[3*faces.size()]; /*BUG fixed*/
 	// iterate through all stored faces and create triangles
 	int k=0;
-	for (vector<FaceIdcs>::iterator it = this->faces.begin(); it != this->faces.end(); ++it)
+	for (vector<FaceIdcs>::iterator it = faces.begin(); it != faces.end(); ++it)
 	{
 		for (int i = 0; i < 3; i++)
 		{
