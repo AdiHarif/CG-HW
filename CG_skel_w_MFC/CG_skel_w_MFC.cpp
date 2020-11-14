@@ -117,7 +117,7 @@ void mainMenu(int id)
 
 void initMenu()
 {
-
+	//TODO: add view meme
 	int menuFile = glutCreateMenu(fileMenu);
 	glutAddMenuEntry("Open..",FILE_OPEN);
 	glutCreateMenu(mainMenu);

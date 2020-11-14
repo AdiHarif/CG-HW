@@ -67,6 +67,7 @@ MeshModel::MeshModel(string fileName)
 
 MeshModel::~MeshModel(void)
 {
+	delete[] vertex_positions;
 }
 
 void MeshModel::loadFile(string fileName)
