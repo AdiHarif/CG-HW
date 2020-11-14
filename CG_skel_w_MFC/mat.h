@@ -22,9 +22,9 @@ class mat2 {
     mat2( const vec2& a, const vec2& b )
 	{ _m[0] = a;  _m[1] = b;  }
 
-	/*BUG*/
+	/*BUG Fixed*/
     mat2( GLfloat m00, GLfloat m10, GLfloat m01, GLfloat m11 )
-	{ _m[0] = vec2( 0, 0 ); _m[1] = vec2( 0, 0 ); }
+	{ _m[0] = vec2( m00,  m01); _m[1] = vec2( m10, m11); }
 
     mat2( const mat2& m ) {
 	if ( *this != m ) {
@@ -49,7 +49,7 @@ class mat2 {
 
 	
     mat2 operator - ( const mat2& m ) const
-	{ return mat2( 0, 0 ); } /*BUG*/
+	{ return mat2(_m[0]-m[0], _m[1]-m[1]); } /*BUG Fixed*/
 
     mat2 operator * ( const GLfloat s ) const 
 	{ return mat2( s*_m[0], s*_m[1] ); }
@@ -63,12 +63,16 @@ class mat2 {
     friend mat2 operator * ( const GLfloat s, const mat2& m )
 	{ return m * s; }
 	
-    mat2 operator * ( const mat2& m ) const {
-	mat2  a( 0.0 );
+    mat2 operator * ( const mat2& m ) const { /*BUG Fixed*/
+        mat2 a(0.0);
+        mat2 mt = transpose(m);
 
-	/*BUG*/
-
-	return a;
+        for (int i; i < 2; i++) {
+            for (int j; j < 2; j++) {
+                a[i][j] = _m[i] * mt[j];
+            }
+        }
+        return a;
     }
 
     //
@@ -90,12 +94,9 @@ class mat2 {
 	return *this;
     }
 
-    mat2& operator *= ( const mat2& m ) {
-	mat2  a( 0.0 );
-
-	/*BUG*/
-
-	return *this = a;
+    mat2& operator *= ( const mat2& m ) {/*BUG Fixed*/
+        *this = (*this) * m;
+	    return *this;
     }
     
     mat2& operator /= ( const GLfloat s ) {
@@ -110,8 +111,7 @@ class mat2 {
     //
 
     vec2 operator * ( const vec2& v ) const {  // m * v
-	return vec2( _m[0][0]*v.x + _m[0][1]*v.y,
-		     _m[1][0]*v.x + _m[1][1]*v.y );
+        return vec2(_m[0] * v, _m[1] * v);
     }
 	
     //
@@ -139,11 +139,11 @@ class mat2 {
 //  --- Non-class mat2 Methods ---
 //
 
-inline
-mat2 matrixCompMult( const mat2& A, const mat2& B ) {
-    return mat2( A[0][0]*B[0][0], A[0][1]*B[0][1],
-		 A[1][0]*B[1][0], A[1][1]*B[1][1] );
-}
+//inline
+//mat2 matrixCompMult( const mat2& A, const mat2& B ) {
+//    return mat2( A[0][0]*B[0][0], A[0][1]*B[0][1],
+//		 A[1][0]*B[1][0], A[1][1]*B[1][1] );
+//}
 
 inline
 mat2 transpose( const mat2& A ) {
@@ -221,12 +221,11 @@ class mat3 {
 	
     mat3 operator * ( const mat3& m ) const {
 	mat3  a( 0.0 );
+    mat3 mt = transpose(m);
 
 	for ( int i = 0; i < 3; ++i ) {
 	    for ( int j = 0; j < 3; ++j ) {
-		for ( int k = 0; k < 3; ++k ) {
-		    a[i][j] += _m[i][k] * m[k][j];
-		}
+            a[i][j] = _m[i] * mt[j];
 	    }
 	}
 
@@ -278,9 +277,7 @@ class mat3 {
     //
 
     vec3 operator * ( const vec3& v ) const {  // m * v
-	return vec3( 0,
-		     0, /*BUG*/
-		     0 );
+        return vec3(_m[0] * v, _m[1] * v, _m[2] * v); /*BUG Fixed*/
     }
 	
     //
@@ -320,8 +317,10 @@ mat3 matrixCompMult( const mat3& A, const mat3& B ) {
 }
 
 inline
-mat3 transpose( const mat3& A ) {
-    return mat3( 0,0,0,0,0,0,0,0,0); /*BUG*/
+mat3 transpose( const mat3& A ) {/*BUG Fixed*/
+    return mat3(A[0][0], A[1][0], A[2][0],
+        A[0][1], A[1][1], A[2][1],
+        A[0][2], A[1][2], A[2][2]);
 }
 
 //----------------------------------------------------------------------------
@@ -537,14 +536,38 @@ vec4 mvmult( const mat4& a, const vec4& b )
 //
 
 inline
-mat4 RotateX( const GLfloat theta )
+mat4 RotateX(const GLfloat theta)
 {
-    GLfloat angle = (M_PI/180.0) * theta;
+    GLfloat angle = (M_PI / 180.0) * theta;
 
     mat4 c;
     c[2][2] = c[1][1] = cos(angle);
     c[2][1] = sin(angle);
     c[1][2] = -c[2][1];
+    return c;
+}
+
+inline
+mat4 RotateY(const GLfloat theta)
+{
+    GLfloat angle = (M_PI / 180.0) * theta;
+
+    mat4 c;
+    c[2][2] = c[0][0] = cos(angle);
+    c[2][0] = sin(angle);
+    c[0][2] = -c[2][0];
+    return c;
+}
+
+inline
+mat4 RotateZ(const GLfloat theta)
+{
+    GLfloat angle = (M_PI / 180.0) * theta;
+
+    mat4 c;
+    c[0][0] = c[1][1] = cos(angle);
+    c[1][0] = sin(angle);
+    c[0][1] = -c[1][0];
     return c;
 }
 
@@ -557,10 +580,10 @@ mat4 RotateX( const GLfloat theta )
 inline
 mat4 Translate( const GLfloat x, const GLfloat y, const GLfloat z )
 {
-    mat4 c;
-    c[0][0] = x;
-    c[0][0] = y;  /*BUG*/
-    c[0][0] = z;
+    mat4 c(1.0);
+    c[0][3] = x;
+    c[0][3] = y;  /*BUG Fixed*/
+    c[0][3] = z;
     return c;
 }
 
@@ -586,8 +609,8 @@ mat4 Scale( const GLfloat x, const GLfloat y, const GLfloat z )
 {
     mat4 c;
     c[0][0] = x;
-    c[0][0] = y; /*BUG*/
-    c[0][0] = z;
+    c[1][1] = y; /*BUG Fixed*/
+    c[2][2] = z;
     return c;
 }
 
