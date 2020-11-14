@@ -54,7 +54,7 @@ struct vec2 {
     vec2 operator * ( const GLfloat s ) const
 	{ return vec2( s*x, s*y ); }
 
-    vec2 operator * ( const vec2& v ) const //changed this to be regular inner multipication
+    GLfloat operator * ( const vec2& v ) const //changed this to be regular dot product
     { return (x * v.x) + (y * v.y); }
 
     friend vec2 operator * ( const GLfloat s, const vec2& v )
@@ -80,8 +80,8 @@ struct vec2 {
     vec2& operator *= ( const GLfloat s )
 	{ x *= s;  y *= s;   return *this; }
 
-    vec2& operator *= ( const vec2& v )
-	{ x *= v.x;  y *= v.y; return *this; }
+    //vec2& operator *= ( const vec2& v )
+	//{ x *= v.x;  y *= v.y; return *this; }
 
     vec2& operator /= ( const GLfloat s ) {
 
@@ -118,19 +118,19 @@ struct vec2 {
 //  Non-class vec2 Methods
 //
 
-inline
-GLfloat dot( const vec2& u, const vec2& v ) {
-    return 0; /*BUG*/
-}
+//inline
+//GLfloat dot( const vec2& u, const vec2& v ) {
+//    return 0; /*BUG*/
+//}
 
 inline
 GLfloat length( const vec2& v ) {
-    return std::sqrt( 0.0 ); /*BUG*/
+    return std::sqrt( v*v ); /*BUG Fixed*/
 }
 
 inline
 vec2 normalize( const vec2& v ) {
-    return v / 1; /*BUG*/
+    return v / length(v); /*BUG Fixed*/
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -182,8 +182,8 @@ struct vec3 {
     vec3 operator * ( const GLfloat s ) const
 	{ return vec3( s*x, s*y, s*z ); }
 
-    vec3 operator * ( const vec3& v ) const
-	{ return vec3( x*v.x, y*v.y, z*v.z ); }
+    GLfloat operator * ( const vec3& v ) const
+	{ return v*v; }
 
     friend vec3 operator * ( const GLfloat s, const vec3& v )
 	{ return v * s; }
@@ -206,10 +206,10 @@ struct vec3 {
 	{ x -= v.x;  y -= v.y;  z -= v.z;  return *this; }
 
     vec3& operator *= ( const GLfloat s )
-	{ x *= 0;  y *= 0;  z *= 0;  return *this; } /*BUG*/
+	{ x *= s;  y *= s;  z *= s;  return *this; } /*BUG Fixed*/
 
-    vec3& operator *= ( const vec3& v )
-	{ x *= v.x;  y *= v.y;  z *= v.z;  return *this; }
+    /*vec3& operator *= ( const vec3& v )
+	{ x *= v.x;  y *= v.y;  z *= v.z;  return *this; }*/
 
     vec3& operator /= ( const GLfloat s ) {
 
@@ -247,14 +247,14 @@ struct vec3 {
 //  Non-class vec3 Methods
 //
 
-inline
-GLfloat dot( const vec3& u, const vec3& v ) {
-    return u.x*v.x + u.y*v.y + u.z*v.z ;
-}
+//inline
+//GLfloat dot( const vec3& u, const vec3& v ) {
+//    return u.x*v.x + u.y*v.y + u.z*v.z ;
+//}
 
 inline
 GLfloat length( const vec3& v ) {
-    return std::sqrt( dot(v,v) );
+    return std::sqrt(v*v);
 }
 
 inline
@@ -265,9 +265,9 @@ vec3 normalize( const vec3& v ) {
 inline
 vec3 cross(const vec3& a, const vec3& b )
 {
-    return vec3( 0,
-		 0,  /*BUG*/
-		 0 );
+    return vec3((a.y*b.z)-(a.z*b.y),
+		        (a.z*b.x)-(a.x*b.z),  /*BUG Fixed*/
+		        (a.x*b.y)-(a.y*b.x) );
 }
 
 
@@ -325,8 +325,8 @@ struct vec4 {
     vec4 operator * ( const GLfloat s ) const
 	{ return vec4( s*x, s*y, s*z, s*w ); }
 
-    vec4 operator * ( const vec4& v ) const
-	{ return vec4( x*v.x, y*v.y, z*v.z, w*v.w ); }
+    GLfloat operator * ( const vec4& v ) const
+	{ return (x*v.x)+(y*v.y)+(z*v.z)+(w*v.w); }
 
     friend vec4 operator * ( const GLfloat s, const vec4& v )
 	{ return v * s; }
@@ -350,8 +350,8 @@ struct vec4 {
     vec4& operator *= ( const GLfloat s )
 	{ x *= s;  y *= s;  z *= s;  w *= s;  return *this; }
 
-    vec4& operator *= ( const vec4& v )
-	{ x *= v.x, y *= v.y, z *= v.z, w *= v.w;  return *this; }
+    /*vec4& operator *= ( const vec4& v )
+	{ x *= v.x, y *= v.y, z *= v.z, w *= v.w;  return *this; }*/
 
     vec4& operator /= ( const GLfloat s ) {
 
@@ -389,14 +389,14 @@ struct vec4 {
 //  Non-class vec4 Methods
 //
 
-inline
-GLfloat dot( const vec4& u, const vec4& v ) {
-    return u.x*v.x + u.y*v.y + u.z*v.z + u.w*v.w;
-}
+//inline
+//GLfloat dot( const vec4& u, const vec4& v ) {
+//    return u.x*v.x + u.y*v.y + u.z*v.z + u.w*v.w;
+//}
 
 inline
 GLfloat length( const vec4& v ) {
-    return std::sqrt( dot(v,v) );
+    return std::sqrt( v*v );
 }
 
 inline
