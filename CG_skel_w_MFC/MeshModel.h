@@ -10,6 +10,9 @@ class MeshModel : public Model
 {
 protected :
 	MeshModel() {}
+
+	vector<FaceIdcs> faces;
+	vector<vec3> vertices;
 	vec3 *vertex_positions;
 	//add more attributes
 	mat4 _world_transform;
