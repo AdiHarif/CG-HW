@@ -541,7 +541,7 @@ vec4 mvmult( const mat4& a, const vec4& b )
 //
 
 inline
-mat4 RotateX(const GLfloat theta)
+mat4 RotateXMat(const GLfloat theta)
 {
     GLfloat angle = (M_PI / 180.0) * theta;
 
@@ -553,7 +553,7 @@ mat4 RotateX(const GLfloat theta)
 }
 
 inline
-mat4 RotateY(const GLfloat theta)
+mat4 RotateYMat(const GLfloat theta)
 {
     GLfloat angle = (M_PI / 180.0) * theta;
 
@@ -565,7 +565,7 @@ mat4 RotateY(const GLfloat theta)
 }
 
 inline
-mat4 RotateZ(const GLfloat theta)
+mat4 RotateZMat(const GLfloat theta)
 {
     GLfloat angle = (M_PI / 180.0) * theta;
 
@@ -583,7 +583,7 @@ mat4 RotateZ(const GLfloat theta)
 //
 
 inline
-mat4 Translate(const GLfloat x, const GLfloat y, const GLfloat z)
+mat4 TranslateMat(const GLfloat x, const GLfloat y, const GLfloat z)
 {
     mat4 c;
     c[0][3] = x;
@@ -592,26 +592,17 @@ mat4 Translate(const GLfloat x, const GLfloat y, const GLfloat z)
     return c;
 }
 
+
 inline
-mat4 Translate(vec3 v)
+mat4 TranslateMat( const vec3& v )
 {
-    mat4 c;
-    c[0][3] = v.x;
-    c[0][3] = v.y; 
-    c[0][3] = v.z;
-    return c;
+    return TranslateMat( v.x, v.y, v.z );
 }
 
 inline
-mat4 Translate( const vec3& v )
+mat4 TranslateMat( const vec4& v )
 {
-    return Translate( v.x, v.y, v.z );
-}
-
-inline
-mat4 Translate( const vec4& v )
-{
-    return Translate( v.x, v.y, v.z );
+    return TranslateMat( v.x, v.y, v.z );
 }
 
 //----------------------------------------------------------------------------
@@ -620,7 +611,7 @@ mat4 Translate( const vec4& v )
 //
 
 inline
-mat4 Scale( const GLfloat x, const GLfloat y, const GLfloat z )
+mat4 ScaleMat( const GLfloat x, const GLfloat y, const GLfloat z )
 {
     mat4 c;
     c[0][0] = x;
@@ -630,9 +621,9 @@ mat4 Scale( const GLfloat x, const GLfloat y, const GLfloat z )
 }
 
 inline
-mat4 Scale( const vec3& v )
+mat4 ScaleMat( const vec3& v )
 {
-    return Scale( v.x, v.y, v.z );
+    return ScaleMat( v.x, v.y, v.z );
 }
 
 //----------------------------------------------------------------------------
