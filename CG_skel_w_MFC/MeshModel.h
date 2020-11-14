@@ -15,8 +15,10 @@ protected :
 	vector<vec3> vertices;
 	vec3 *vertex_positions;
 	//add more attributes
+	vec4 position;
 	mat4 _world_transform;
 	mat3 _normal_transform;
+
 
 public:
 
@@ -24,5 +26,10 @@ public:
 	~MeshModel(void);
 	void loadFile(string fileName);
 	void draw();
-	
+
+	void Translate(vec3);
+	void Scale(vec3);
+	void RotateX(GLfloat);
+	void RotateY(GLfloat);
+	void RotateZ(GLfloat);
 };

@@ -127,3 +127,37 @@ void MeshModel::draw()
 {
 	
 }
+
+
+void MeshModel::Translate(vec3 v) {
+	mat4 t = TranslateMat(v);
+	this->position = t * this->position;
+	this->_world_transform = t * this->_world_transform;
+}
+
+void MeshModel::Scale(vec3 v) {
+	mat4 s = ScaleMat(v);
+	mat4 t1 = TranslateMat(this->position);
+	mat4 t2 = TranslateMat(-this->position);
+	this->_world_transform = t1 * s * t2 * this->_world_transform;
+}
+void MeshModel::RotateX(GLfloat theta) {
+	mat4 r = RotateXMat(theta);
+	mat4 t1 = TranslateMat(this->position);
+	mat4 t2 = TranslateMat(-this->position);
+	this->_world_transform = t1 * r * t2 * this->_world_transform;
+}
+
+void MeshModel::RotateY(GLfloat theta) {
+	mat4 r = RotateYMat(theta);
+	mat4 t1 = TranslateMat(this->position);
+	mat4 t2 = TranslateMat(-this->position);
+	this->_world_transform = t1 * r * t2 * this->_world_transform;
+}
+
+void MeshModel::RotateZ(GLfloat theta) {
+	mat4 r = RotateZMat(theta);
+	mat4 t1 = TranslateMat(this->position);
+	mat4 t2 = TranslateMat(-this->position);
+	this->_world_transform = t1 * r * t2 * this->_world_transform;
+}
