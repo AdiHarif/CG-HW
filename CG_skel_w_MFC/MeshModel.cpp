@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 
+
 using namespace std;
 
 struct FaceIdcs
@@ -123,9 +124,9 @@ void MeshModel::loadFile(string fileName)
 }
 
 
-void MeshModel::draw()
+void MeshModel::draw(Renderer* renderer)
 {
-	
+	renderer->DrawTriangles(&(this->vertex_positions), NULL, _world_transform);
 }
 
 
@@ -141,6 +142,7 @@ void MeshModel::Scale(vec3 v) {
 	mat4 t2 = TranslateMat(-this->position);
 	this->_world_transform = t1 * s * t2 * this->_world_transform;
 }
+
 void MeshModel::RotateX(GLfloat theta) {
 	mat4 r = RotateXMat(theta);
 	mat4 t1 = TranslateMat(this->position);

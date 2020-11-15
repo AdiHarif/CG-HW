@@ -70,8 +70,8 @@ class mat2 {
         mat2 a(0.0);
         mat2 mt = mat2(m[0][0], m[0][1], m[1][0], m[1][1]);
 
-        for (int i; i < 2; i++) {
-            for (int j; j < 2; j++) {
+        for (int i=0; i < 2; i++) {
+            for (int j=0; j < 2; j++) {
                 a[i][j] = _m[i] * mt[j];
             }
         }

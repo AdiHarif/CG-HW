@@ -4,6 +4,8 @@
 #include "mat.h"
 #include <string>
 
+#include "Renderer.h"
+
 using namespace std;
 
 class MeshModel : public Model
@@ -13,7 +15,7 @@ protected :
 
 	//vector<FaceIdcs> faces;
 	vector<vec3> vertices;
-	vec3 *vertex_positions;
+	vector<vec3> vertex_positions;
 	//add more attributes
 	vec4 position;
 	mat4 _world_transform;
@@ -25,7 +27,7 @@ public:
 	MeshModel(string fileName);
 	~MeshModel(void);
 	void loadFile(string fileName);
-	void draw();
+	void draw(Renderer* renderer);
 
 	void Translate(vec3);
 	void Scale(vec3);
