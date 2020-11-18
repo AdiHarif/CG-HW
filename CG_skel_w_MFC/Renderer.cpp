@@ -183,6 +183,14 @@ void Renderer::clearColorBuffer() {
 	}
 }
 
+
+void Renderer::setSize(int width, int height) {
+	delete[] m_outBuffer;
+	m_width = width;
+	m_height = height;
+	m_outBuffer = new float[3 * m_width * m_height];
+	calcViewport();
+}
 //==========
 
 
