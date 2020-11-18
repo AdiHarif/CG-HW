@@ -1,0 +1,11 @@
+Todo, Todo, Todo todo todo todo todoooooo... Todododo
+
+Model:
+	drawVertexNormals
+	drawFacesNormals(?)
+
+Camera:
+	transformations
+
+General:
+	resize window
