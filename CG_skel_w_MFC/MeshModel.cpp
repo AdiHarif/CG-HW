@@ -70,6 +70,7 @@ vec4 vec4fFromStream(std::istream& aStream) {
 MeshModel::MeshModel(string fileName)
 {
 	loadFile(fileName);
+	position = vec4(0.0, 0.0, 0.0, 1.0);
 	mesh_color = { 0.0, 1.0, 0.0 };
 	vertex_normals_color = { 1.0, 0.0, 1.0 };
 	bb_color = { 1.0, 1.0, 1.0 };
