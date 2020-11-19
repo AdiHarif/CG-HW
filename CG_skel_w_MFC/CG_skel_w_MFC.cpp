@@ -149,7 +149,7 @@ void special(int key, int x, int y) {
 		scene->toggleFaceNormals();
 		break;
 	}
-
+	
 
 	scene->draw();
 }
@@ -162,6 +162,10 @@ void motion(int x, int y)
 	// update last x,y
 	last_x=x;
 	last_y=y;
+
+	scene->rotateY(-dx);
+	scene->rotateX(-dy);
+	scene->draw();
 }
 
 void fileMenu(int id)
