@@ -9,3 +9,4 @@ Camera:
 
 General:
 	resize window
+	I AM GLUT

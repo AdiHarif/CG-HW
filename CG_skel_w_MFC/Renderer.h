@@ -65,8 +65,8 @@ public:
 	void rasterizeLine(vec4 v1, vec4 v2, Color c);
 
 	void drawPoints(vector<vec4>& points, Color c);
+	void drawLines(vector<vec4>& points, Color c);
 	void drawTriangles(vector<vec4>& vertex_positions, Color c);
-	void drawVertexNormals(vector<vec4>& vertices, vector<vec4>& vertex_normals, Color c);
 
 	void SetDemoBuffer();
 	//==========

@@ -9,43 +9,7 @@
 
 using namespace std;
 
-struct FaceIdcs
-{
-	int v[4];
-	int vn[4];
-	int vt[4];
 
-	FaceIdcs()
-	{
-		for (int i=0; i<4; i++)
-			v[i] = vn[i] = vt[i] = 0;
-	}
-
-	FaceIdcs(std::istream & aStream)
-	{
-		for (int i=0; i<4; i++)
-			v[i] = vn[i] = vt[i] = 0;
-
-		char c;
-		for(int i = 0; i < 3; i++)
-		{
-			aStream >> std::ws >> v[i] >> std::ws;
-			if (aStream.peek() != '/')
-				continue;
-			aStream >> c >> std::ws;
-			if (aStream.peek() == '/')
-			{
-				aStream >> c >> std::ws >> vn[i];
-				continue;
-			}
-			else
-				aStream >> vt[i];
-			if (aStream.peek() != '/')
-				continue;
-			aStream >> c >> vn[i];
-		}
-	}
-};
 
 
 vec3 vec3fFromStream(std::istream & aStream)
@@ -85,7 +49,7 @@ MeshModel::~MeshModel(void)
 void MeshModel::loadFile(string fileName)
 {
 	vec4 min, max;
-	vector<FaceIdcs> faces;
+	//vector<FaceIdcs> faces;
 	ifstream ifile(fileName.c_str());
 	// while not end of file
 	while (!ifile.eof())
@@ -112,7 +76,7 @@ void MeshModel::loadFile(string fileName)
 			this->vertices.push_back(cur_v);
 			
 		}
-		else if (lineType == "f"){ /*BUG fixed*/
+		else if (lineType == "f"){ 
 			faces.push_back(issLine);
 		} 
 		else if (lineType == "vn") {
@@ -134,10 +98,8 @@ void MeshModel::loadFile(string fileName)
 	//Then vertex_positions should contain:
 	//vertex_positions={v1,v2,v3,v1,v3,v4}
 	
-
-
 	//setting model position:
-	this->position = vec4(0.0);
+	position = vec4(0.0);
 	//centering the model to (0,0,0):
 	vec4 middle_offset = vec4((min.x + max.x) / 2, (min.y + max.y) / 2, (min.z + max.z) / 2);
 	mat4 t = translateMat(-middle_offset);
@@ -151,8 +113,9 @@ void MeshModel::loadFile(string fileName)
 	{
 		for (int i = 0; i < 3; i++)
 		{
-			//this->vertex_positions[k++] = vec3(this->vertices[it->v[i]-1]); /*BUG fixed*/
-			this->vertex_positions.push_back(vec4(this->vertices[it->v[i] - 1]));
+			vertex_positions.push_back(vec4(vertices[it->v[i] - 1]));
+			vertex_normals_indexes.push_back(it->v[i] - 1);
+			vertex_normals_indexes.push_back(it->vn[i] - 1);
 		}
 	}
 
@@ -189,10 +152,11 @@ void MeshModel::drawEdges(mat4 tcw, Renderer* renderer) {
 void MeshModel::drawVertexNormals(mat4 tcw, Renderer* renderer) {
 	mat4 tcwm = tcw * _world_transform;
 	vector<vec4> vecs_to_draw;
-	for (vector<vec4>::iterator i = vertex_normals.begin(); i != vertex_normals.end(); i++) {
-		vecs_to_draw.push_back(tcwm * (*i));
+	for (int i = 0; i < vertex_normals_indexes.size(); i+=2) {
+		vecs_to_draw.push_back(tcwm * vertices[vertex_normals_indexes[i]]);
+		vecs_to_draw.push_back(tcwm * vertex_normals[vertex_normals_indexes[i + 1]]);
 	}
-	//renderer->(vecs_to_draw, vertex_normals_color);
+	renderer->drawLines(vecs_to_draw, vertex_normals_color);
 }
 
 void MeshModel::drawBoundingBox(mat4 tcw, Renderer* renderer) {
