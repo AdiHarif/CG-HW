@@ -1,14 +1,7 @@
 #include "Camera.h"
-void Camera::lookAt(const vec4& at) {
-    vec4 up = calcUp(at);
-    vec4 n = normalize(position - at);
-    vec4 u = normalize(cross(up, n));
-    vec4 v = normalize(cross(n, u));
-    vec4 t = vec4(0.0, 0.0, 0.0, 1.0);
-    mat4 c = mat4(u, v, n, t);
-    cTransform = c * translateMat(-position);
-}
 
+
+//===Inner Calculations===
 
 vec4 Camera::calcUp(vec4 at) {
     vec4 z = vec4(0.0, 0.0, 1.0, 1.0);
@@ -19,16 +12,36 @@ vec4 Camera::calcUp(vec4 at) {
     return cross(v, cross(z, v));
 }
 
+//==========
+
+
+//===C'tor===
+
 Camera::Camera(vec4 position) {
     this->position = position;
     lookAt(vec4(0.0));
     ortho(-3.0, 3.0, -3.0, 3.0, 3.0, -3.0);
 }
 
+//==========
 
-mat4 Camera::getTransform() { return cTransform; }
+
+//===Transformations Interface===
+
+void Camera::lookAt(const vec4& at) {
+    vec4 up = calcUp(at);
+    vec4 n = normalize(position - at);
+    vec4 u = normalize(cross(up, n));
+    vec4 v = normalize(cross(n, u));
+    vec4 t = vec4(0.0, 0.0, 0.0, 1.0);
+    mat4 c = mat4(u, v, n, t);
+    cTransform = c * translateMat(-position);
+}
+
+//==========
 
 
+//===Projections===
 void Camera::ortho(const float left, const float right,
     const float bottom, const float top,
     const float z_near, const float z_far) {
@@ -55,5 +68,13 @@ void Camera::frustum(const float left, const float right,
     n[2][3] = (2 * z_near * z_far) / (z_near - z_far);
     projection = p * n * s * h;
 }
+//===========
+
+
+//===Getters===
+
+mat4 Camera::getTransform() { return cTransform; }
 
 mat4 Camera::getProjection() { return projection; }
+
+//==========
