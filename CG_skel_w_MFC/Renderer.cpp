@@ -235,12 +235,6 @@ void Renderer::drawTriangles(vector<vec4>& vertex_positions, Color c) {
 	}
 }
 
-void Renderer::drawVertexNormals(vector<vec4>& vertices, vector<vec4>& vertex_normals, Color c) {
-	/*for (vector<vec4>::iterator i = vertex_normals.begin(); i != vertex_normals.end(); i++) {
-		rasterizeLine()
-	}*/
-}
-
 void Renderer::SetDemoBuffer()
 {
 	//vertical line
