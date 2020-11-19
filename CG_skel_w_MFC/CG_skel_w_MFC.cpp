@@ -60,28 +60,28 @@ void keyboard(unsigned char key, int x, int y)
 
 	//rotate:
 	case 'A':
-		scene->rotateY(ROTATE_THETA_DEF);
+		scene->rotateSelectionY(ROTATE_THETA_DEF);
 		break;
 	case 'a':
-		scene->rotateY(ROTATE_THETA_DEF);
+		scene->rotateSelectionY(ROTATE_THETA_DEF);
 		break;
 	case 'D':
-		scene->rotateY(-ROTATE_THETA_DEF);
+		scene->rotateSelectionY(-ROTATE_THETA_DEF);
 		break;
 	case 'd':
-		scene->rotateY(-ROTATE_THETA_DEF);
+		scene->rotateSelectionY(-ROTATE_THETA_DEF);
 		break;
 	case 'W':
-		scene->rotateX(ROTATE_THETA_DEF);
+		scene->rotateSelectionX(ROTATE_THETA_DEF);
 		break;
 	case 'w':
-		scene->rotateX(ROTATE_THETA_DEF);
+		scene->rotateSelectionX(ROTATE_THETA_DEF);
 		break;
 	case 'S':
-		scene->rotateX(-ROTATE_THETA_DEF);
+		scene->rotateSelectionX(-ROTATE_THETA_DEF);
 		break;
 	case 's':
-		scene->rotateX(-ROTATE_THETA_DEF);
+		scene->rotateSelectionX(-ROTATE_THETA_DEF);
 		break;
 	}
 	scene->draw();
@@ -105,11 +105,11 @@ void mouse(int button, int state, int x, int y)
 			break;
 		case SCROLL_UP:
 			//cout << "scroll up" << endl;
-			scene->scale(SCALE_UP_DEF);
+			scene->scaleSelection(SCALE_UP_DEF);
 			break;
 		case SCROLL_DOWN:
 			//cout << "scroll down" << endl;
-			scene->scale(SCALE_DOWN_DEF);
+			scene->scaleSelection(SCALE_DOWN_DEF);
 			break;
 	}
 
@@ -120,16 +120,16 @@ void special(int key, int x, int y) {
 	switch (key) {
 	//translate:
 	case GLUT_KEY_RIGHT:
-		scene->translate(vec4(TRANSLATE_DEF, 0, 0));
+		scene->translateSelection(vec4(TRANSLATE_DEF, 0, 0));
 		break;
 	case GLUT_KEY_LEFT:
-		scene->translate(vec4(-TRANSLATE_DEF, 0, 0));
+		scene->translateSelection(vec4(-TRANSLATE_DEF, 0, 0));
 		break;
 	case GLUT_KEY_UP:
-		scene->translate(vec4(0, TRANSLATE_DEF, 0));
+		scene->translateSelection(vec4(0, TRANSLATE_DEF, 0));
 		break;
 	case GLUT_KEY_DOWN:
-		scene->translate(vec4(0, -TRANSLATE_DEF, 0));
+		scene->translateSelection(vec4(0, -TRANSLATE_DEF, 0));
 		break;
 	
 	//toggles:
@@ -163,8 +163,8 @@ void motion(int x, int y)
 	last_x=x;
 	last_y=y;
 
-	scene->rotateY(-dx);
-	scene->rotateX(-dy);
+	scene->rotateSelectionY(-dx);
+	scene->rotateSelectionX(-dy);
 	scene->draw();
 }
 

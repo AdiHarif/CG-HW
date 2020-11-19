@@ -28,27 +28,43 @@ class Scene {
 	vector<Camera*> cameras;
 	Renderer *m_renderer;
 
+	int activeModel;
+	int activeLight;
+	int activeCamera;
+
 public:
-	Scene() {};
+	//===C'tors===
+	Scene() {}; //unimplemented
 	Scene(Renderer *renderer);
-	void loadOBJModel(string fileName);
+	//==========
+
+	//===Drawing Functions===
 	void draw();
 	void drawDemo();
-	void scale(double scale_factor);
-	void rotateX(double theta);
-	void rotateY(double theta);
-	void rotateZ(double theta);
-	void translate(vec4 vec);
+	//==========
+
+	//===Models Interface===
+	void loadOBJModel(string fileName);
+
+	void scaleSelection(double scale_factor);
+	void rotateSelectionX(double theta);
+	void rotateSelectionY(double theta);
+	void rotateSelectionZ(double theta);
+	void translateSelection(vec4 vec);
+	//==========
+
+	//===Display Toggles===
 	void toggleVertices();
 	void toggleEdges();
 	void toggleBB();
 	void toggleVertexNormals();
 	void toggleFaceNormals();
-	
+	//==========
+
+	//===Cameras Interface===
 	void addCamera(Camera* camera);
+	//==========
 
 
-	int activeModel;
-	int activeLight;
-	int activeCamera;
+
 };

@@ -6,6 +6,8 @@
 using namespace std;
 
 
+//===C'tors===
+
 Scene::Scene(Renderer *renderer) : m_renderer(renderer){
 	activeModel = -1;
 	activeCamera = -1;
@@ -13,17 +15,10 @@ Scene::Scene(Renderer *renderer) : m_renderer(renderer){
 	addCamera(def_cam);
 }
 
+//==========
 
 
-void Scene::loadOBJModel(string fileName)
-{
-	MeshModel *model = new MeshModel(fileName);
-	models.push_back(model);
-	//activeModel = models.size()-1;
-	//Camera* c = cameras[activeCamera];
-
-	//c->LookAt(model->getPosition());
-}
+//===Drawing Functions===
 
 void Scene::draw()
 {
@@ -51,9 +46,22 @@ void Scene::drawDemo()
 	m_renderer->swapBuffers();
 }
 
+//==========
 
 
-void Scene::scale(double scale_factor) {
+//===Models Interface===
+
+void Scene::loadOBJModel(string fileName)
+{
+	MeshModel *model = new MeshModel(fileName);
+	models.push_back(model);
+	//activeModel = models.size()-1;
+	//Camera* c = cameras[activeCamera];
+
+	//c->LookAt(model->getPosition());
+}
+
+void Scene::scaleSelection(double scale_factor) {
 	if (false) {	//TODO: scale selected model
 
 	}
@@ -65,7 +73,7 @@ void Scene::scale(double scale_factor) {
 	}
 }
 
-void Scene::rotateX(double theta) {
+void Scene::rotateSelectionX(double theta) {
 	if (false) {	//TODO: rotate selected model
 
 	}
@@ -77,7 +85,7 @@ void Scene::rotateX(double theta) {
 	}
 }
 
-void Scene::rotateY(double theta) {
+void Scene::rotateSelectionY(double theta) {
 	if (false) {	//TODO: rotate selected model
 
 	}
@@ -89,7 +97,7 @@ void Scene::rotateY(double theta) {
 	}
 }
 
-void Scene::rotateZ(double theta) {
+void Scene::rotateSelectionZ(double theta) {
 	if (false) {	//TODO: rotate selected model
 
 	}
@@ -101,7 +109,7 @@ void Scene::rotateZ(double theta) {
 	}
 }
 
-void Scene::translate(vec4 vec) {
+void Scene::translateSelection(vec4 vec) {
 	if (false) {	//TODO: translate selected model
 
 	}
@@ -112,6 +120,11 @@ void Scene::translate(vec4 vec) {
 		}
 	}
 }
+
+//==========
+
+
+//===Display Toggles===
 
 void Scene::toggleVertices() {
 	if (false) {	//TODO: toggle selected model
@@ -173,8 +186,14 @@ void Scene::toggleFaceNormals() {
 	}
 }
 
+//==========
+
+
+//===Cameras Interface===
 
 void Scene::addCamera(Camera* camera) {
 	cameras.push_back(camera);
 	activeCamera = cameras.size() - 1;
 }
+
+//==========
