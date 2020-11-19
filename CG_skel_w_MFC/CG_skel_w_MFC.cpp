@@ -43,12 +43,12 @@ bool lb_down,rb_down,mb_down;
 
 void display( void )
 {
-	scene->draw();
 }
 
 void reshape( int width, int height )
 {
-//update the renderer's buffers
+	renderer->setSize(width, height);
+	scene->draw();
 }
 
 void keyboard(unsigned char key, int x, int y)
@@ -84,7 +84,7 @@ void keyboard(unsigned char key, int x, int y)
 		scene->rotateX(-ROTATE_THETA_DEF);
 		break;
 	}
-	display();
+	scene->draw();
 }
 
 void mouse(int button, int state, int x, int y)
@@ -112,8 +112,8 @@ void mouse(int button, int state, int x, int y)
 			scene->scale(SCALE_DOWN_DEF);
 			break;
 	}
-	
-	display();
+
+	scene->draw();
 }
 
 void special(int key, int x, int y) {
@@ -151,7 +151,7 @@ void special(int key, int x, int y) {
 	}
 
 
-	display();
+	scene->draw();
 }
 
 void motion(int x, int y)

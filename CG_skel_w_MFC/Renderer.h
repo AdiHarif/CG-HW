@@ -56,6 +56,8 @@ public:
 	void swapBuffers();
 	void clearColorBuffer();
 	void clearDepthBuffer(); //unimplemented
+
+	void setSize(int width, int height);
 	//==========
 
 	//===Drawing Interface===
