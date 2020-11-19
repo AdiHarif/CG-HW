@@ -233,6 +233,12 @@ void Renderer::drawPoints(vector<vec4>& points, Color c){
 	}
 }
 
+void Renderer::drawLines(vector<vec4>& points, Color c) {
+	for (vector<vec4>::iterator i = points.begin(); i != points.end(); i+=2) {
+		rasterizeLine(*i, *(i + 1), c);
+	}
+}
+
 void Renderer::drawTriangles(vector<vec4>& vertex_positions, Color c) {
 	for (vector<vec4>::iterator i = vertex_positions.begin(); i != vertex_positions.end(); i+=3) {
 		rasterizeLine(*i, *(i + 1), c);

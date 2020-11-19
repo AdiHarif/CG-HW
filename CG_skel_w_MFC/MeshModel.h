@@ -16,16 +16,55 @@ typedef struct s_draw_pref {
 	bool f_draw_faces_normals = false;
 } DrawPref;
 
+struct FaceIdcs
+{
+	int v[4];
+	int vn[4];
+	int vt[4];
+
+	FaceIdcs()
+	{
+		for (int i = 0; i < 4; i++)
+			v[i] = vn[i] = vt[i] = 0;
+	}
+
+	FaceIdcs(std::istream& aStream)
+	{
+		for (int i = 0; i < 4; i++)
+			v[i] = vn[i] = vt[i] = 0;
+
+		char c;
+		for (int i = 0; i < 3; i++)
+		{
+			aStream >> std::ws >> v[i] >> std::ws;
+			if (aStream.peek() != '/')
+				continue;
+			aStream >> c >> std::ws;
+			if (aStream.peek() == '/')
+			{
+				aStream >> c >> std::ws >> vn[i];
+				continue;
+			}
+			else
+				aStream >> vt[i];
+			if (aStream.peek() != '/')
+				continue;
+			aStream >> c >> vn[i];
+		}
+	}
+};
+
 class MeshModel : public Model
 {
 protected :
 	MeshModel() {}
 
-	//vector<FaceIdcs> faces;
+	vector<FaceIdcs> faces;
 	vector<vec4> vertices;
 	vector<vec4> vertex_positions;
 	vector<vec4> vertex_normals;
 	vector<vec4> bounding_box_vertices;
+	vector<int> vertex_normals_indexes;
 	//add more attributes
 	vec4 position;
 	mat4 _world_transform;
