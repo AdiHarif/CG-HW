@@ -23,7 +23,7 @@ class Renderer
 
 
 	//===Buffer Functions===
-	void CreateBuffers(int width, int height);
+	void CreateBuffers();
 	void CreateLocalBuffer(); //unimplemented
 	//==========
 

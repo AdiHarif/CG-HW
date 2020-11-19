@@ -8,10 +8,8 @@
 
 
 //===Buffer Functions===
-void Renderer::CreateBuffers(int width, int height)
+void Renderer::CreateBuffers()
 {
-	m_width=width;
-	m_height=height;	
 	CreateOpenGLBuffer(); //Do not remove this line.
 	m_outBuffer = new float[3*m_width*m_height];
 }
@@ -145,7 +143,7 @@ void Renderer::CreateOpenGLBuffer()
 Renderer::Renderer(int width, int height) :m_width(width), m_height(height)
 {
 	InitOpenGLRendering();
-	CreateBuffers(width,height);
+	CreateBuffers();
 	calcViewport();
 }
 
@@ -188,7 +186,7 @@ void Renderer::setSize(int width, int height) {
 	delete[] m_outBuffer;
 	m_width = width;
 	m_height = height;
-	m_outBuffer = new float[3 * m_width * m_height];
+	CreateBuffers();
 	calcViewport();
 }
 //==========
