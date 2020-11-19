@@ -98,12 +98,17 @@ void MeshModel::loadFile(string fileName)
 	//Then vertex_positions should contain:
 	//vertex_positions={v1,v2,v3,v1,v3,v4}
 	
+	
+	this->initBoundingBox(min, max);
 	//setting model position:
 	position = vec4(0.0);
 	//centering the model to (0,0,0):
 	vec4 middle_offset = vec4((min.x + max.x) / 2, (min.y + max.y) / 2, (min.z + max.z) / 2);
 	mat4 t = translateMat(-middle_offset);
 	for (vector<vec4>::iterator i = vertices.begin(); i != vertices.end(); i++) {
+		(*i) = t * (*i);
+	}
+	for (vector<vec4>::iterator i = bounding_box_vertices.begin(); i != bounding_box_vertices.end(); i++) {
 		(*i) = t * (*i);
 	}
 
@@ -118,8 +123,6 @@ void MeshModel::loadFile(string fileName)
 			vertex_normals_indexes.push_back(it->vn[i] - 1);
 		}
 	}
-
-	this->initBoundingBox(min, max);
 
 }
 
