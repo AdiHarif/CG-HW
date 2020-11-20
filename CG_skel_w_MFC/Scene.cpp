@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Scene.h"
 #include "MeshModel.h"
+#include "PrimMeshModel.h"
 #include <string>
 
 using namespace std;
@@ -64,10 +65,15 @@ void Scene::loadOBJModel(string fileName)
 	MeshModel *model = new MeshModel(fileName);
 	models.push_back(model);
 	activateLastModel();
-	//activeModel = models.size()-1;
 	//Camera* c = cameras[activeCamera];
 
 	//c->LookAt(model->getPosition());
+}
+
+void Scene::loadPrimModel(string file_name) {
+	PrimMeshModel* model = new PrimMeshModel(file_name);
+	models.push_back(model);
+	activateLastModel();
 }
 
 void Scene::scaleSelection(double scale_factor) {

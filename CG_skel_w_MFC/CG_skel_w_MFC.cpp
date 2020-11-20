@@ -43,8 +43,10 @@
 Scene *scene;
 Renderer *renderer;
 
-int last_x,last_y;
-bool lb_down,rb_down,mb_down,first_movement=true;
+int last_x, last_y;
+bool lb_down, rb_down, mb_down;
+bool first_movement=true;
+int never_gonna = 0;
 
 //----------------------------------------------------------------------------
 // Callbacks
@@ -69,28 +71,28 @@ void keyboard(unsigned char key, int x, int y)
 
 	//rotate:
 	case 'A':
-		scene->rotateSelectionY(ROTATE_THETA_DEF);
+		scene->translateSelection(vec4(-TRANSLATE_DEF, 0, 0));
 		break;
 	case 'a':
-		scene->rotateSelectionY(ROTATE_THETA_DEF);
+		scene->translateSelection(vec4(-TRANSLATE_DEF, 0, 0));
 		break;
 	case 'D':
-		scene->rotateSelectionY(-ROTATE_THETA_DEF);
+		scene->translateSelection(vec4(TRANSLATE_DEF, 0, 0));
 		break;
 	case 'd':
-		scene->rotateSelectionY(-ROTATE_THETA_DEF);
+		scene->translateSelection(vec4(TRANSLATE_DEF, 0, 0));
 		break;
 	case 'W':
-		scene->rotateSelectionX(ROTATE_THETA_DEF);
+		scene->translateSelection(vec4(0, TRANSLATE_DEF, 0));
 		break;
 	case 'w':
-		scene->rotateSelectionX(ROTATE_THETA_DEF);
+		scene->translateSelection(vec4(0, TRANSLATE_DEF, 0));
 		break;
 	case 'S':
-		scene->rotateSelectionX(-ROTATE_THETA_DEF);
+		scene->translateSelection(vec4(0, -TRANSLATE_DEF, 0));
 		break;
 	case 's':
-		scene->rotateSelectionX(-ROTATE_THETA_DEF);
+		scene->translateSelection(vec4(0, -TRANSLATE_DEF, 0));
 		break;
 	case TAB:
 		scene->activateNextModel();
@@ -135,16 +137,16 @@ void special(int key, int x, int y) {
 	switch (key) {
 	//translate:
 	case GLUT_KEY_RIGHT:
-		scene->translateSelection(vec4(TRANSLATE_DEF, 0, 0));
+		scene->rotateSelectionY(-ROTATE_THETA_DEF);
 		break;
 	case GLUT_KEY_LEFT:
-		scene->translateSelection(vec4(-TRANSLATE_DEF, 0, 0));
+		scene->rotateSelectionY(ROTATE_THETA_DEF);
 		break;
 	case GLUT_KEY_UP:
-		scene->translateSelection(vec4(0, TRANSLATE_DEF, 0));
+		scene->rotateSelectionX(-ROTATE_THETA_DEF);
 		break;
 	case GLUT_KEY_DOWN:
-		scene->translateSelection(vec4(0, -TRANSLATE_DEF, 0));
+		scene->rotateSelectionX(ROTATE_THETA_DEF);
 		break;
 	
 	//toggles:
@@ -201,7 +203,7 @@ void fileMenu(int id)
 		}
 		break;
 	case FILE_PRIMITIVE_CUBE:
-		scene->loadOBJModel("cube.obj");
+		scene->loadPrimModel("cube.obj");
 		scene->draw();
 		break;
 	}
@@ -231,7 +233,13 @@ void mainMenu(int id)
 		scene->party();
 		break;
 	case MAIN_ABOUT:
-		AfxMessageBox(_T("Never gonna give you up"));
+		/*string sentences[6] = { "give you up", "let you down", "run around and desert you",
+								"make you cry", "say goodbye", "tell a lie and hurt you" };
+		string selected_sentence = sentences[(never_gonna++)%sentences->size()];
+		CString strMsg;
+		_T("%s"), (LPCTSTR)strMsg;
+		AfxMessageBox(strMsg);*/
+		AfxMessageBox("Never gonna give you up");
 		break;
 	}
 }

@@ -2,7 +2,7 @@ Todo, Todo, Todo todo todo todo todoooooo... Todododo
 
 Model:
 	drawVertexNormals
-	drawFacesNormals(?)
+	drawFacesNormals
 
 Camera:
 	transformations
