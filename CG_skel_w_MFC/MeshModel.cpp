@@ -35,7 +35,8 @@ MeshModel::MeshModel(string fileName)
 {
 	loadFile(fileName);
 	position = vec4(0.0, 0.0, 0.0, 1.0);
-	mesh_color = { 0.0, 1.0, 0.0 };
+	active_mesh_color = { 0.0, 1.0, 0.0 };
+	inactive_mesh_color = { 0.4, 0.4, 0.4 };
 	vertex_normals_color = { 1.0, 0.0, 1.0 };
 	bb_color = { 1.0, 1.0, 1.0 };
 	//scale(vec3(50, 50, 50));
@@ -140,7 +141,8 @@ void MeshModel::drawVertices(mat4 tcw, Renderer* renderer)
 	for (vector<vec4>::iterator i = vertices.begin(); i != vertices.end(); i++){
 		vecs_to_draw.push_back(tcwm*(*i));
 	}
-	renderer->drawPoints(vecs_to_draw, mesh_color);
+	Color color = is_active ? active_mesh_color : inactive_mesh_color;
+	renderer->drawPoints(vecs_to_draw, color);
 }
 
 void MeshModel::drawEdges(mat4 tcw, Renderer* renderer) {
@@ -149,7 +151,8 @@ void MeshModel::drawEdges(mat4 tcw, Renderer* renderer) {
 	for (vector<vec4>::iterator i = vertex_positions.begin(); i != vertex_positions.end(); i++) {
 		vecs_to_draw.push_back(tcwm * (*i));
 	}
-	renderer->drawTriangles(vecs_to_draw, mesh_color);
+	Color color = is_active ? active_mesh_color : inactive_mesh_color;
+	renderer->drawTriangles(vecs_to_draw, color);
 }
 
 void MeshModel::drawVertexNormals(mat4 tcw, Renderer* renderer) {
@@ -261,4 +264,11 @@ void MeshModel::toggleVertexNormals(){
 
 void MeshModel::toggleFaceNormals(){
 	draw_pref.f_draw_faces_normals = !draw_pref.f_draw_faces_normals;
+}
+
+bool MeshModel::getIsActive() {
+	return is_active;
+}
+void MeshModel::setIsActive(bool new_is_active) {
+	this->is_active = new_is_active;
 }

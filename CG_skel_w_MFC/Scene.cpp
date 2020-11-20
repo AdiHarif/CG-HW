@@ -9,14 +9,25 @@ using namespace std;
 //===C'tors===
 
 Scene::Scene(Renderer *renderer) : m_renderer(renderer){
-	activeModel = -1;
-	activeCamera = -1;
+	active_model = -1;
+	active_camera = -1;
 	Camera* def_cam =new Camera(vec4(0.0, 0.0, 10.0));
 	addCamera(def_cam);
 }
 
 //==========
 
+//===Getters/Setters===
+
+vector<Model*> Scene::getModels() {
+	return models;
+}
+
+int Scene::getActiveModelIndex() {
+	return active_model;
+}
+
+//==========
 
 //===Drawing Functions===
 
@@ -26,8 +37,8 @@ void Scene::draw()
 	// 2. Tell all models to draw themselves
 	m_renderer->clearColorBuffer();
 	mat4 tvp = m_renderer->getViewport();
-	mat4 tc = cameras[activeCamera]->getTransform();
-	mat4 tp = cameras[activeCamera]->getProjection();
+	mat4 tc = cameras[active_camera]->getTransform();
+	mat4 tp = cameras[active_camera]->getProjection();
 	mat4 t_tot = tvp* tp * tc;
 	for (vector<Model*>::iterator i = models.begin(); i!=models.end(); i++){
 		MeshModel* m = dynamic_cast<MeshModel*> ((*i));
@@ -55,6 +66,7 @@ void Scene::loadOBJModel(string fileName)
 {
 	MeshModel *model = new MeshModel(fileName);
 	models.push_back(model);
+	activateLastModel();
 	//activeModel = models.size()-1;
 	//Camera* c = cameras[activeCamera];
 
@@ -119,6 +131,50 @@ void Scene::translateSelection(vec4 vec) {
 			m->translate(vec);
 		}
 	}
+}
+
+void Scene::activateNextModel() {
+	if (models.size() == 1)	return;
+
+	MeshModel* m = NULL;
+	if (active_model == ALL_MODELS_ACTIVE) {
+		active_model = 0;
+		for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
+			m = dynamic_cast<MeshModel*> ((*i));
+			m->setIsActive(false);
+		}
+		m = dynamic_cast<MeshModel*> (this->models[0]);
+		m->setIsActive(true);
+		return;
+	}
+
+	if (active_model == models.size() - 1) {
+		for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
+			m = dynamic_cast<MeshModel*> ((*i));
+			m->setIsActive(true);
+		}
+		active_model = ALL_MODELS_ACTIVE;
+	}
+	else {
+		active_model = (active_model + 1) % models.size();
+		for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
+			m = dynamic_cast<MeshModel*> ((*i));
+			m->setIsActive(false);
+		}
+		m = dynamic_cast<MeshModel*> (this->models[active_model]);
+		m->setIsActive(true);
+	}
+}
+
+void Scene::activateLastModel() {
+	if (models.empty())	return;
+	MeshModel* m = NULL;
+	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
+		m = dynamic_cast<MeshModel*> ((*i));
+		m->setIsActive(false);
+	}
+	m->setIsActive(true);
+	active_model = models.size() - 1;
 }
 
 //==========
@@ -193,7 +249,7 @@ void Scene::toggleFaceNormals() {
 
 void Scene::addCamera(Camera* camera) {
 	cameras.push_back(camera);
-	activeCamera = cameras.size() - 1;
+	active_camera = cameras.size() - 1;
 }
 
 //==========

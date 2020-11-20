@@ -65,12 +65,15 @@ protected :
 	vector<vec4> vertex_normals;
 	vector<vec4> bounding_box_vertices;
 	vector<int> vertex_normals_indexes;
-	//add more attributes
+
 	vec4 position;
 	mat4 _world_transform;
 	mat3 _normal_transform;
 
-	Color mesh_color;
+	bool is_active;
+
+	Color active_mesh_color;
+	Color inactive_mesh_color;
 	Color vertex_normals_color;
 	Color faces_normals_color;
 	Color bb_color;
@@ -106,4 +109,7 @@ public:
 	void toggleBB();
 	void toggleVertexNormals();
 	void toggleFaceNormals();
+
+	bool getIsActive();
+	void setIsActive(bool new_is_active);
 };

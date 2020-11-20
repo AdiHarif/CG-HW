@@ -7,6 +7,7 @@
 #include "Color.h"
 #include "Camera.h"
 
+#define ALL_MODELS_ACTIVE -2
 
 using namespace std;
 
@@ -28,15 +29,21 @@ class Scene {
 	vector<Camera*> cameras;
 	Renderer *m_renderer;
 
-	int activeModel;
-	int activeLight;
-	int activeCamera;
+	int active_model;
+	int active_light;
+	int active_camera;
 
 public:
 	//===C'tors===
 	Scene() {}; //unimplemented
 	Scene(Renderer *renderer);
 	//==========
+
+	//===Getters/Setters===
+	vector<Model*> getModels();
+	int getActiveModelIndex();
+	//==========
+
 
 	//===Drawing Functions===
 	void draw();
@@ -52,8 +59,8 @@ public:
 	void rotateSelectionZ(double theta);
 	void translateSelection(vec4 vec);
 
-	Model getActiveModel();
 	void activateNextModel();
+	void activateLastModel();
 	//==========
 
 	//===Display Toggles===

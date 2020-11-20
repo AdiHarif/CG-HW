@@ -90,7 +90,7 @@ void keyboard(unsigned char key, int x, int y)
 		scene->rotateSelectionX(-ROTATE_THETA_DEF);
 		break;
 	case TAB:
-		
+		scene->activateNextModel();
 		break;
 	}
 	scene->draw();
