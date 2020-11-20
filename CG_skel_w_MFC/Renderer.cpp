@@ -181,6 +181,14 @@ void Renderer::clearColorBuffer() {
 	}
 }
 
+void Renderer::colorBackground(Color color) {
+	for (int i = 0; i < M_OUT_BUFFER_SIZE; i+=3) {
+		m_outBuffer[i] = color.r;
+		m_outBuffer[i + 1] = color.g;
+		m_outBuffer[i + 2] = color.b;
+	}
+}
+
 
 void Renderer::setSize(int width, int height) {
 	delete[] m_outBuffer;

@@ -55,6 +55,7 @@ public:
 	//===Buffer Interface
 	void swapBuffers();
 	void clearColorBuffer();
+	void colorBackground(Color color);
 	void clearDepthBuffer(); //unimplemented
 
 	void setSize(int width, int height);

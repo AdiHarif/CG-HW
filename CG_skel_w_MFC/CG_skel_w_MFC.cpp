@@ -25,8 +25,11 @@
 
 #define FILE_OPEN 1
 #define FILE_PRIMITIVE_CUBE 2
+#define CAMERA_ADD 1
+#define CAMERA_SELECT 2
 #define MAIN_DEMO 1
-#define MAIN_ABOUT 2
+#define MAIN_PARTY 2
+#define MAIN_ABOUT 3
 
 #define SCROLL_UP 3
 #define SCROLL_DOWN 4
@@ -204,12 +207,28 @@ void fileMenu(int id)
 	}
 }
 
+void cameraMenu(int id) {
+	CFileDialog dlg(TRUE, _T(".obj"), NULL, NULL, _T("*.obj|*.*"));
+	switch (id)
+	{
+	case CAMERA_ADD:
+		cout << "added camera" << endl;
+		break;
+	case CAMERA_SELECT:
+		cout << "selected camera" << endl;
+		break;
+	}
+}
+
 void mainMenu(int id)
 {
 	switch (id)
 	{
 	case MAIN_DEMO:
 		scene->drawDemo();
+		break;
+	case MAIN_PARTY:
+		scene->party();
 		break;
 	case MAIN_ABOUT:
 		AfxMessageBox(_T("Never gonna give you up"));
@@ -219,13 +238,20 @@ void mainMenu(int id)
 
 void initMenu()
 {
-	//TODO: add view meme
 	int menuFile = glutCreateMenu(fileMenu);
 	glutAddMenuEntry("Open...",FILE_OPEN);
 	glutAddMenuEntry("Add Primitive: Cube", FILE_PRIMITIVE_CUBE);
 	glutCreateMenu(mainMenu);
+
+	int menuCamera = glutCreateMenu(cameraMenu);
+	glutAddMenuEntry("Add Camera", CAMERA_ADD);
+	glutAddMenuEntry("Select Camera", CAMERA_SELECT);
+	glutCreateMenu(mainMenu);
+
 	glutAddSubMenu("Add Model",menuFile);
+	glutAddSubMenu("Camera", menuCamera);
 	glutAddMenuEntry("Demo",MAIN_DEMO);
+	glutAddMenuEntry("Party for 5 sec.",MAIN_PARTY);
 	glutAddMenuEntry("About",MAIN_ABOUT);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 }

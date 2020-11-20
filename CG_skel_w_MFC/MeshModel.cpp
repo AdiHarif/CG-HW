@@ -128,9 +128,9 @@ void MeshModel::loadFile(string fileName)
 }
 
 void MeshModel::draw(mat4 tcw, Renderer* renderer) {
-	if(draw_pref.f_draw_vertices)	drawVertices(tcw, renderer);
-	if(draw_pref.f_draw_edges)	drawEdges(tcw, renderer);
-	if(draw_pref.f_draw_bb)	drawBoundingBox(tcw, renderer);
+	if (draw_pref.f_draw_vertices)	drawVertices(tcw, renderer);
+	if (draw_pref.f_draw_edges)	drawEdges(tcw, renderer);
+	if (draw_pref.f_draw_bb)	drawBoundingBox(tcw, renderer);
 	if (draw_pref.f_draw_vertex_normals) drawVertexNormals(tcw, renderer);
 }
 
@@ -156,6 +156,7 @@ void MeshModel::drawEdges(mat4 tcw, Renderer* renderer) {
 }
 
 void MeshModel::drawVertexNormals(mat4 tcw, Renderer* renderer) {
+	if (vertex_normals.empty())	return;
 	mat4 tcwm = tcw * _world_transform;
 	vector<vec4> vecs_to_draw;
 	for (int i = 0; i < vertex_normals_indexes.size(); i+=2) {

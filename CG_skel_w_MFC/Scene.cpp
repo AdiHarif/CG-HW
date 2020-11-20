@@ -43,9 +43,6 @@ void Scene::draw()
 	for (vector<Model*>::iterator i = models.begin(); i!=models.end(); i++){
 		MeshModel* m = dynamic_cast<MeshModel*> ((*i));
 		m->draw(t_tot, m_renderer);
-		//m->drawVertices(t_tot, m_renderer);
-		//m->drawEdges(t_tot, m_renderer);
-		//m->drawBoundingBox(t_tot, m_renderer);
 	}
 
 	m_renderer->swapBuffers();
@@ -80,7 +77,9 @@ void Scene::scaleSelection(double scale_factor) {
 	else {	//scale world
 		for (int i = 0; i < this->models.size(); i++) {
 			MeshModel* m = dynamic_cast<MeshModel*> (this->models[i]);
-			m->scale(vec3(scale_factor));
+			if (m->getIsActive()) {
+				m->scale(vec3(scale_factor));
+			}
 		}
 	}
 }
@@ -92,7 +91,9 @@ void Scene::rotateSelectionX(double theta) {
 	else {	//rotate world
 		for (int i = 0; i < this->models.size(); i++) {
 			MeshModel* m = dynamic_cast<MeshModel*> (this->models[i]);
-			m->rotateX(theta);
+			if (m->getIsActive()) {
+				m->rotateX(theta);
+			}
 		}
 	}
 }
@@ -104,7 +105,9 @@ void Scene::rotateSelectionY(double theta) {
 	else {	//rotate world
 		for (int i = 0; i < this->models.size(); i++) {
 			MeshModel* m = dynamic_cast<MeshModel*> (this->models[i]);
-			m->rotateY(theta);
+			if (m->getIsActive()) {
+				m->rotateY(theta);
+			}
 		}
 	}
 }
@@ -116,7 +119,9 @@ void Scene::rotateSelectionZ(double theta) {
 	else {	//rotate world
 		for (int i = 0; i < this->models.size(); i++) {
 			MeshModel* m = dynamic_cast<MeshModel*> (this->models[i]);
-			m->rotateZ(theta);
+			if (m->getIsActive()) {
+				m->rotateZ(theta);
+			}
 		}
 	}
 }
@@ -128,7 +133,9 @@ void Scene::translateSelection(vec4 vec) {
 	else {	//translate world
 		for (int i = 0; i < this->models.size(); i++) {
 			MeshModel* m = dynamic_cast<MeshModel*> (this->models[i]);
-			m->translate(vec);
+			if (m->getIsActive()) {
+				m->translate(vec);
+			}
 		}
 	}
 }
@@ -139,28 +146,19 @@ void Scene::activateNextModel() {
 	MeshModel* m = NULL;
 	if (active_model == ALL_MODELS_ACTIVE) {
 		active_model = 0;
-		for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
-			m = dynamic_cast<MeshModel*> ((*i));
-			m->setIsActive(false);
-		}
+		changeAllModelsActiveness(false);
 		m = dynamic_cast<MeshModel*> (this->models[0]);
 		m->setIsActive(true);
 		return;
 	}
 
 	if (active_model == models.size() - 1) {
-		for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
-			m = dynamic_cast<MeshModel*> ((*i));
-			m->setIsActive(true);
-		}
+		changeAllModelsActiveness(true);
 		active_model = ALL_MODELS_ACTIVE;
 	}
 	else {
 		active_model = (active_model + 1) % models.size();
-		for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
-			m = dynamic_cast<MeshModel*> ((*i));
-			m->setIsActive(false);
-		}
+		changeAllModelsActiveness(false);
 		m = dynamic_cast<MeshModel*> (this->models[active_model]);
 		m->setIsActive(true);
 	}
@@ -175,6 +173,14 @@ void Scene::activateLastModel() {
 	}
 	m->setIsActive(true);
 	active_model = models.size() - 1;
+}
+
+void Scene::changeAllModelsActiveness(bool is_active) {
+	MeshModel* m = NULL;
+	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
+		m = dynamic_cast<MeshModel*> ((*i));
+		m->setIsActive(is_active);
+	}
 }
 
 //==========
@@ -252,4 +258,18 @@ void Scene::addCamera(Camera* camera) {
 	active_camera = cameras.size() - 1;
 }
 
+//==========
+
+//===Other===
+void Scene::party() {
+	for (int i = 0; i < 10; i++) {
+		double r = ((double)rand() / (RAND_MAX));
+		double g = ((double)rand() / (RAND_MAX));
+		double b = ((double)rand() / (RAND_MAX));
+		Color color = { r,g,b };
+		m_renderer->colorBackground(color);
+		m_renderer->swapBuffers();
+		Sleep(500);
+	}
+}
 //==========

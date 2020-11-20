@@ -6,7 +6,3 @@ Model:
 
 Camera:
 	transformations
-
-General:
-	resize window
-	I AM GLUT

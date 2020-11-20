@@ -61,6 +61,7 @@ public:
 
 	void activateNextModel();
 	void activateLastModel();
+	void changeAllModelsActiveness(bool is_active);
 	//==========
 
 	//===Display Toggles===
@@ -75,4 +76,7 @@ public:
 	void addCamera(Camera* camera);
 	//==========
 
+	//===Other===
+	void party();
+	//==========
 };
