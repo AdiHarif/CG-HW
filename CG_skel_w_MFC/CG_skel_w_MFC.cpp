@@ -27,9 +27,10 @@
 #define FILE_PRIMITIVE_CUBE 2
 #define CAMERA_ADD 1
 #define CAMERA_SELECT 2
-#define MAIN_DEMO 1
-#define MAIN_PARTY 2
-#define MAIN_ABOUT 3
+#define MAIN_CAMERA 1
+#define MAIN_DEMO 2
+#define MAIN_PARTY 3
+#define MAIN_ABOUT 4
 
 #define SCROLL_UP 3
 #define SCROLL_DOWN 4
@@ -93,6 +94,12 @@ void keyboard(unsigned char key, int x, int y)
 		break;
 	case 's':
 		scene->translateSelection(vec4(0, -TRANSLATE_DEF, 0));
+		break;
+	case ']':
+		scene->activateNextCamera();
+		break;
+	case '[':
+		scene->activatePrevCamera();
 		break;
 	case TAB:
 		scene->activateNextModel();
@@ -209,23 +216,36 @@ void fileMenu(int id)
 	}
 }
 
-void cameraMenu(int id) {
-	CFileDialog dlg(TRUE, _T(".obj"), NULL, NULL, _T("*.obj|*.*"));
-	switch (id)
-	{
-	case CAMERA_ADD:
-		cout << "added camera" << endl;
-		break;
-	case CAMERA_SELECT:
-		cout << "selected camera" << endl;
-		break;
-	}
-}
+//void cameraMenu(int id) {
+//	CFileDialog dlg(TRUE, _T(".obj"), NULL, NULL, _T("*.obj|*.*"));
+//	Camera* cam = NULL;
+//	switch (id)
+//	{
+//	case CAMERA_ADD:
+//		//TODO: change camera params
+//		//TODO: NOT WORKING
+//		cam = &Camera(vec4(5.0, 0.0, 0.0));
+//		scene->addCamera(cam);
+//		cout << "added camera";
+//		break;
+//	case CAMERA_SELECT:
+//		cout << "did not implement :/" << endl;
+//		break;
+//	}
+//}
 
 void mainMenu(int id)
 {
+	Camera* cam = NULL;
 	switch (id)
 	{
+	case MAIN_CAMERA:
+		//TODO: change camera params
+		//TODO: NOT WORKING
+		cam = &Camera(vec4(5.0, 0.0, 0.0));
+		scene->addCamera(cam);
+		cout << "added camera";
+		break;
 	case MAIN_DEMO:
 		scene->drawDemo();
 		break;
@@ -251,13 +271,14 @@ void initMenu()
 	glutAddMenuEntry("Add Primitive: Cube", FILE_PRIMITIVE_CUBE);
 	glutCreateMenu(mainMenu);
 
-	int menuCamera = glutCreateMenu(cameraMenu);
+	/*int menuCamera = glutCreateMenu(cameraMenu);
 	glutAddMenuEntry("Add Camera", CAMERA_ADD);
 	glutAddMenuEntry("Select Camera", CAMERA_SELECT);
-	glutCreateMenu(mainMenu);
+	glutCreateMenu(mainMenu);*/
 
 	glutAddSubMenu("Add Model",menuFile);
-	glutAddSubMenu("Camera", menuCamera);
+	//glutAddSubMenu("Camera", menuCamera);
+	glutAddMenuEntry("Add Camera", MAIN_CAMERA);
 	glutAddMenuEntry("Demo",MAIN_DEMO);
 	glutAddMenuEntry("Party for 5 sec.",MAIN_PARTY);
 	glutAddMenuEntry("About",MAIN_ABOUT);

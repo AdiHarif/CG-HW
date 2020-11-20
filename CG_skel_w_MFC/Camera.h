@@ -6,8 +6,9 @@
 class Camera {
 	mat4 cTransform;
 	mat4 projection;
-
 	vec4 position;
+	bool is_active;
+	vec4 up;
 
 	vec4 calcUp(vec4 at);
 
@@ -32,8 +33,10 @@ public:
 		const float z_near, const float z_far);
 	//===========
 
-	//===Getters===
+	//===Getters/Setters===
 	mat4 getTransform();
 	mat4 getProjection();
+	bool getIsActive();
+	void setIsActive(bool new_is_active);
 	//==========
 };

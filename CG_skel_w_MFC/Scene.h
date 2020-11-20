@@ -75,6 +75,11 @@ public:
 
 	//===Cameras Interface===
 	void addCamera(Camera* camera);
+	void activateNextCamera();
+	void activatePrevCamera();
+	void activateLastCamera();
+	void deactivateAllCameras();
+
 	//==========
 
 	//===Other===

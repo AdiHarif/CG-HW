@@ -10,7 +10,8 @@ vec4 Camera::calcUp(vec4 at) {
     vec4 v = at - position;
     if (v * z == 0) return z;
     if (length(cross(v, z)) < FLT_EPSILON)	return vec4(0.0, 1.0, 0.0, 1.0);
-    return cross(v, cross(z, v));
+    up = cross(v, cross(z, v));
+    return up;
 }
 
 //==========
@@ -78,4 +79,7 @@ mat4 Camera::getTransform() { return cTransform; }
 
 mat4 Camera::getProjection() { return projection; }
 
+bool Camera::getIsActive() { return is_active; }
+
+void Camera::setIsActive(bool new_is_active) { is_active = new_is_active; }
 //==========

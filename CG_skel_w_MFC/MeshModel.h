@@ -65,6 +65,8 @@ protected :
 	vector<vec4> vertex_normals;
 	vector<vec4> bounding_box_vertices;
 	vector<int> vertex_normals_indexes;
+	vector<vec4> faces_normals;
+	vector<vec4> faces_normals_locations;
 
 	vec4 position;
 	mat4 _world_transform;
@@ -88,8 +90,10 @@ public:
 	void drawVertices(mat4 tcw, Renderer* renderer);
 	void drawEdges(mat4 tcw, Renderer* renderer);
 	void drawVertexNormals(mat4 tcw, Renderer* renderer);
+	void drawFacesNormals(mat4 tcw, Renderer* renderer);
 	void drawBoundingBox(mat4 tcw, Renderer* renderer);
 	void initBoundingBox(vec4 min, vec4 max);
+	void computeFacesNormals();
 
 	MeshModel(string fileName);
 	~MeshModel(void);

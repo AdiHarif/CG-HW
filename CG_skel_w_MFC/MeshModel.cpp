@@ -34,10 +34,12 @@ vec4 vec4fFromStream(std::istream& aStream) {
 MeshModel::MeshModel(string fileName)
 {
 	loadFile(fileName);
+	computeFacesNormals();
 	position = vec4(0.0, 0.0, 0.0, 1.0);
 	active_mesh_color = { 0.0, 1.0, 0.0 };
 	inactive_mesh_color = { 0.4, 0.4, 0.4 };
 	vertex_normals_color = { 1.0, 0.0, 1.0 };
+	faces_normals_color = { 1.0, 0.0, 0.0 };
 	bb_color = { 1.0, 1.0, 1.0 };
 	//scale(vec3(50, 50, 50));
 }
@@ -100,7 +102,7 @@ void MeshModel::loadFile(string fileName)
 	//vertex_positions={v1,v2,v3,v1,v3,v4}
 	
 	
-	this->initBoundingBox(min, max);
+	initBoundingBox(min, max);
 	//setting model position:
 	position = vec4(0.0);
 	//centering the model to (0,0,0):
@@ -132,6 +134,7 @@ void MeshModel::draw(mat4 tcw, Renderer* renderer) {
 	if (draw_pref.f_draw_edges)	drawEdges(tcw, renderer);
 	if (draw_pref.f_draw_bb)	drawBoundingBox(tcw, renderer);
 	if (draw_pref.f_draw_vertex_normals) drawVertexNormals(tcw, renderer);
+	if (draw_pref.f_draw_faces_normals) drawFacesNormals(tcw, renderer);
 }
 
 void MeshModel::drawVertices(mat4 tcw, Renderer* renderer)
@@ -156,6 +159,7 @@ void MeshModel::drawEdges(mat4 tcw, Renderer* renderer) {
 }
 
 void MeshModel::drawVertexNormals(mat4 tcw, Renderer* renderer) {
+	//TODO: change transformations
 	if (vertex_normals.empty())	return;
 	mat4 tcwm = tcw * _world_transform;
 	vector<vec4> vecs_to_draw;
@@ -164,6 +168,18 @@ void MeshModel::drawVertexNormals(mat4 tcw, Renderer* renderer) {
 		vecs_to_draw.push_back(tcwm * vertex_normals[vertex_normals_indexes[i + 1]]);
 	}
 	renderer->drawLines(vecs_to_draw, vertex_normals_color);
+}
+
+void MeshModel::drawFacesNormals(mat4 tcw, Renderer* renderer) {
+	//TODO: change transformations
+	if (faces_normals.empty())	return;
+	mat4 tcwm = tcw * _world_transform;
+	vector<vec4> vecs_to_draw;
+	for (int i = 0; i < faces_normals.size(); i++) {
+		vecs_to_draw.push_back(faces_normals_locations[i]);
+		vecs_to_draw.push_back(tcwm * faces_normals[i]);
+	}
+	renderer->drawLines(vecs_to_draw, faces_normals_color);
 }
 
 void MeshModel::drawBoundingBox(mat4 tcw, Renderer* renderer) {
@@ -245,6 +261,24 @@ void MeshModel::initBoundingBox(vec4 min, vec4 max) {
 	this->bounding_box_vertices.push_back(vec4(max.x, min.y, max.z));
 	this->bounding_box_vertices.push_back(vec4(max.x, max.y, max.z));
 	this->bounding_box_vertices.push_back(vec4(min.x, max.y, max.z));
+}
+
+void MeshModel::computeFacesNormals() {
+	//TODO: transformations
+	for (vector<vec4>::iterator i = vertex_positions.begin(); i != vertex_positions.end(); i+=3) {
+
+		vec4 v0 = *(i + 1) - *(i);
+		vec4 v1 = *(i + 2) - *(i);
+		vec4 crs = cross(v0, v1);
+		vec4 normal = crs / length(crs);
+		faces_normals.push_back(normal);
+
+		vec4 center;
+		center.x = (((vec4)(*i)).x + ((vec4)(*(i + 1))).x + ((vec4)(*(i + 2))).x) / 3;
+		center.y = (((vec4)(*i)).y + ((vec4)(*(i + 1))).y + ((vec4)(*(i + 2))).y) / 3;
+		center.z = (((vec4)(*i)).z + ((vec4)(*(i + 1))).z + ((vec4)(*(i + 2))).z) / 3;
+		faces_normals_locations.push_back(center);
+	}
 }
 
 void MeshModel::toggleVertices(){

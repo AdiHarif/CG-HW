@@ -182,6 +182,7 @@ void Scene::activateLastModel() {
 }
 
 void Scene::changeAllModelsActiveness(bool is_active) {
+	if (models.empty())	return;
 	MeshModel* m = NULL;
 	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
 		m = dynamic_cast<MeshModel*> ((*i));
@@ -261,7 +262,49 @@ void Scene::toggleFaceNormals() {
 
 void Scene::addCamera(Camera* camera) {
 	cameras.push_back(camera);
+	activateLastCamera();
+}
+
+void Scene::activateNextCamera() {
+	cout << "next cam" << endl;
+	if (models.size() < 1)	return;
+
+	Camera* c = NULL;
+	active_camera = (active_model + 1) % models.size();
+	deactivateAllCameras();
+	c = dynamic_cast<Camera*> (this->cameras[active_camera]);
+	c->setIsActive(true);
+}
+
+void Scene::activatePrevCamera() {
+	cout << "prev cam" << endl;
+	if (models.size() < 1)	return;
+
+	Camera* c = NULL;
+	active_camera = (active_model - 1);
+	if (active_camera < 0)	active_camera += cameras.size();
+	deactivateAllCameras();
+	c = dynamic_cast<Camera*> (this->cameras[active_camera]);
+	c->setIsActive(true);
+}
+
+void Scene::activateLastCamera() {
+	if (cameras.empty())	return;
+	Camera* c = NULL;
+	for (vector<Camera*>::iterator i = cameras.begin(); i != cameras.end(); i++) {
+		c = dynamic_cast<Camera*> ((*i));
+		c->setIsActive(false);
+	}
+	c->setIsActive(true);
 	active_camera = cameras.size() - 1;
+}
+
+void Scene::deactivateAllCameras() {
+	Camera* c = NULL;
+	for (vector<Camera*>::iterator i = cameras.begin(); i != cameras.end(); i++) {
+		c = dynamic_cast<Camera*> ((*i));
+		c->setIsActive(false);
+	}
 }
 
 //==========
