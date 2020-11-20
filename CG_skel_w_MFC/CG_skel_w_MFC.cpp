@@ -24,8 +24,13 @@
 #define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
 
 #define FILE_OPEN 1
+#define FILE_PRIMITIVE_CUBE 2
 #define MAIN_DEMO 1
 #define MAIN_ABOUT 2
+
+#define SCROLL_UP 3
+#define SCROLL_DOWN 4
+#define TAB 9
 
 #define SCALE_UP_DEF 1.1
 #define SCALE_DOWN_DEF (1/1.1)
@@ -36,13 +41,14 @@ Scene *scene;
 Renderer *renderer;
 
 int last_x,last_y;
-bool lb_down,rb_down,mb_down;
+bool lb_down,rb_down,mb_down,first_movement=true;
 
 //----------------------------------------------------------------------------
 // Callbacks
 
 void display( void )
 {
+	
 }
 
 void reshape( int width, int height )
@@ -83,6 +89,9 @@ void keyboard(unsigned char key, int x, int y)
 	case 's':
 		scene->rotateSelectionX(-ROTATE_THETA_DEF);
 		break;
+	case TAB:
+		
+		break;
 	}
 	scene->draw();
 }
@@ -96,6 +105,9 @@ void mouse(int button, int state, int x, int y)
 	switch(button) {
 		case GLUT_LEFT_BUTTON:
 			lb_down = (state==GLUT_UP)?0:1;
+			if (!lb_down) {
+				first_movement = true;
+			}
 			break;
 		case GLUT_RIGHT_BUTTON:
 			rb_down = (state==GLUT_UP)?0:1;
@@ -162,25 +174,33 @@ void motion(int x, int y)
 	// update last x,y
 	last_x=x;
 	last_y=y;
-
-	scene->rotateSelectionY(-dx);
-	scene->rotateSelectionX(-dy);
-	scene->draw();
+	
+	if (first_movement) {
+		first_movement = false;
+	}
+	else {
+		scene->rotateSelectionY(-dx);
+		scene->rotateSelectionX(dy);
+		scene->draw();
+	}
 }
 
 void fileMenu(int id)
 {
-	switch (id)
-	{
-		case FILE_OPEN:
-			CFileDialog dlg(TRUE,_T(".obj"),NULL,NULL,_T("*.obj|*.*"));
-			if(dlg.DoModal()==IDOK)
-			{
-				std::string s((LPCTSTR)dlg.GetPathName());
-				scene->loadOBJModel((LPCTSTR)dlg.GetPathName());
-				scene->draw();
-			}
-			break;
+	CFileDialog dlg(TRUE, _T(".obj"), NULL, NULL, _T("*.obj|*.*"));
+	switch (id){
+	case FILE_OPEN:
+		if(dlg.DoModal()==IDOK)
+		{
+			std::string s((LPCTSTR)dlg.GetPathName());
+			scene->loadOBJModel((LPCTSTR)dlg.GetPathName());
+			scene->draw();
+		}
+		break;
+	case FILE_PRIMITIVE_CUBE:
+		scene->loadOBJModel("cube.obj");
+		scene->draw();
+		break;
 	}
 }
 
@@ -190,7 +210,6 @@ void mainMenu(int id)
 	{
 	case MAIN_DEMO:
 		scene->drawDemo();
-		//scene->draw();
 		break;
 	case MAIN_ABOUT:
 		AfxMessageBox(_T("Never gonna give you up"));
@@ -202,9 +221,10 @@ void initMenu()
 {
 	//TODO: add view meme
 	int menuFile = glutCreateMenu(fileMenu);
-	glutAddMenuEntry("Open..",FILE_OPEN);
+	glutAddMenuEntry("Open...",FILE_OPEN);
+	glutAddMenuEntry("Add Primitive: Cube", FILE_PRIMITIVE_CUBE);
 	glutCreateMenu(mainMenu);
-	glutAddSubMenu("File",menuFile);
+	glutAddSubMenu("Add Model",menuFile);
 	glutAddMenuEntry("Demo",MAIN_DEMO);
 	glutAddMenuEntry("About",MAIN_ABOUT);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
@@ -222,7 +242,7 @@ int my_main( int argc, char **argv )
 	glutInitWindowSize( 512, 512 );
 	glutInitContextVersion( 3, 2 );
 	glutInitContextProfile( GLUT_CORE_PROFILE );
-	glutCreateWindow( "CG" );
+	glutCreateWindow( "I AM GLUT" );
 	glewExperimental = GL_TRUE;
 	glewInit();
 	GLenum err = glewInit();

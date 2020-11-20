@@ -51,6 +51,9 @@ public:
 	void rotateSelectionY(double theta);
 	void rotateSelectionZ(double theta);
 	void translateSelection(vec4 vec);
+
+	Model getActiveModel();
+	void activateNextModel();
 	//==========
 
 	//===Display Toggles===
@@ -64,7 +67,5 @@ public:
 	//===Cameras Interface===
 	void addCamera(Camera* camera);
 	//==========
-
-
 
 };

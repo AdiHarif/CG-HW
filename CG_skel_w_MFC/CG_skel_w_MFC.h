@@ -1,6 +1,5 @@
 #pragma once
-#define SCROLL_UP 3
-#define SCROLL_DOWN 4
+
 #include "resource.h"
 
 void display( void );
