@@ -7,8 +7,11 @@ Model:
 
 Camera:
 	transformations
-	check frustum
 	implement perspective
 
 Scene:
 	change interface to transform the right thing on zoom
+
+
+Renderer:
+	add z cliping and improve current x,y cliping

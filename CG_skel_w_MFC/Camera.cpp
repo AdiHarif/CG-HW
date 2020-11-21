@@ -22,7 +22,7 @@ vec4 Camera::calcUp(vec4 at) {
 Camera::Camera(vec4 position) {
     this->position = position;
     lookAt(vec4(0.0));
-    ortho(-3.0, 3.0, -3.0, 3.0, 3.0, -3.0);
+    ortho(-3.0, 3.0, -3.0, 3.0, -5.0, -15.0);
 }
 
 //==========
@@ -32,9 +32,13 @@ Camera::Camera(vec4 position) {
 
 void Camera::lookAt(const vec4& at) {
     up = calcUp(at);
-    vec4 n = normalize(position - at);
+    vec4 look_dir = position - at;
+    look_dir.w = 0;
+    vec4 n = normalize(look_dir);
     vec4 u = normalize(cross(up, n));
+    u.w = 0;
     vec4 v = normalize(cross(n, u));
+    v.w = 0;
     vec4 t = vec4(0.0, 0.0, 0.0, 1.0);
     mat4 c = mat4(u, v, n, t);
     tc = c * translateMat(-position);
@@ -57,11 +61,9 @@ void Camera::ortho(const float left, const float right,
 
     projection = p_ortho;
 
-    mat4 p;
-    p[2][2] = 0;
     mat4 t = translateMat(-(right + left) / 2, -(bottom + top) / 2, (z_near + z_far) / 2);
     mat4 s = scaleMat(2 / (right - left), 2 / (top - bottom), 2 / (z_near - z_far));
-    tp = p * s * t;
+    tp = s * t;
 }
 
 
@@ -78,16 +80,17 @@ void Camera::frustum(const float left, const float right,
 
     projection = p_persp;
 
-    mat4 p;
-    p[2][2] = 0;
     mat4 h;
     h[0][2] = (left + right) / 2;
     h[1][2] = (top + bottom) / 2;
-    mat4 s = scaleMat((2 * z_near) / (right - left), (2 * z_near) / (top - bottom), 1.0);
+    mat4 s = scaleMat(-(2 * z_near) / (right - left), -(2 * z_near) / (top - bottom), 1.0);
     mat4 n;
     n[2][2] = (z_near + z_far) / (z_near - z_far);
     n[2][3] = (2 * z_near * z_far) / (z_near - z_far);
-    tp = p * n * s * h;
+    n[3][2] = -1;
+    n[3][3] = 0;
+    tp = n * s * h;
+    std::cout << tp << std::endl;
 }
 
 void Camera::toggleProjection() {

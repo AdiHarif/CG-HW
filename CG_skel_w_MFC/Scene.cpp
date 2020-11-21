@@ -52,6 +52,10 @@ void Scene::draw()
 		m->draw(m_renderer);
 	}
 
+	vector<vec4> tmp;
+	tmp.push_back(vec4(0,0,0,1));
+	m_renderer->drawPoints(tmp, mat4(1), Color({ 1,0,0 }));
+
 	m_renderer->swapBuffers();
 }
 

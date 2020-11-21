@@ -121,6 +121,7 @@ bool Renderer::isLineLegal(Line l) {
 }
 
 Pixel Renderer::viewPort(Vertex v) {
+	v = v / v.w;
 	Pixel p = {
 		(int)std::round((m_width * (v.x + 1)) / 2),
 		(int)std::round((m_height * (v.y + 1)) / 2)
