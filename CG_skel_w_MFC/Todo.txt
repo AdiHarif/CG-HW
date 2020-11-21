@@ -9,7 +9,6 @@ Camera:
 	transformations
 	check frustum
 	implement perspective
-	remove is_active 
 
 Scene:
 	change interface to transform the right thing on zoom

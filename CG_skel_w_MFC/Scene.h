@@ -58,6 +58,7 @@ public:
 	//===Models Interface===
 	void loadOBJModel(string fileName);
 	void loadPrimModel(string file_name);
+	void removeModel(int model);
 
 	void scaleSelection(double scale_factor);
 	void rotateSelectionX(double theta);
