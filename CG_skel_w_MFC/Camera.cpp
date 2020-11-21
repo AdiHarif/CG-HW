@@ -31,7 +31,7 @@ Camera::Camera(vec4 position) {
 //===Transformations Interface===
 
 void Camera::lookAt(const vec4& at) {
-    vec4 up = calcUp(at);
+    up = calcUp(at);
     vec4 n = normalize(position - at);
     vec4 u = normalize(cross(up, n));
     vec4 v = normalize(cross(n, u));

@@ -244,7 +244,7 @@ void mainMenu(int id)
 	case MAIN_CAMERA:
 		//TODO: change camera params
 		//TODO: NOT WORKING
-		cam = &Camera(vec4(0.0, 0.0, 10.0));
+		cam = new Camera(vec4(10.0, 0.0, 0.0));
 		scene->addCamera(cam);
 		cout << scene->getActiveCameraIndex() << endl;
 		scene->draw();

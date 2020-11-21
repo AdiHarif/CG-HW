@@ -77,7 +77,8 @@ void Scene::loadOBJModel(string fileName)
 }
 
 void Scene::loadPrimModel(string file_name) {
-	PrimMeshModel* model = new PrimMeshModel(file_name);
+	//PrimMeshModel* model = new PrimMeshModel(file_name);
+	PrimMeshModel* model = new PrimMeshModel();
 	models.push_back(model);
 	activateLastModel();
 }
