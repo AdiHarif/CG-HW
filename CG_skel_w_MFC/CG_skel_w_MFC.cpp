@@ -73,26 +73,18 @@ void keyboard(unsigned char key, int x, int y)
 
 	//rotate:
 	case 'A':
-		scene->translateSelection(vec4(-TRANSLATE_DEF, 0, 0));
-		break;
 	case 'a':
 		scene->translateSelection(vec4(-TRANSLATE_DEF, 0, 0));
 		break;
 	case 'D':
-		scene->translateSelection(vec4(TRANSLATE_DEF, 0, 0));
-		break;
 	case 'd':
 		scene->translateSelection(vec4(TRANSLATE_DEF, 0, 0));
 		break;
 	case 'W':
-		scene->translateSelection(vec4(0, TRANSLATE_DEF, 0));
-		break;
 	case 'w':
 		scene->translateSelection(vec4(0, TRANSLATE_DEF, 0));
 		break;
 	case 'S':
-		scene->translateSelection(vec4(0, -TRANSLATE_DEF, 0));
-		break;
 	case 's':
 		scene->translateSelection(vec4(0, -TRANSLATE_DEF, 0));
 		break;
@@ -107,8 +99,8 @@ void keyboard(unsigned char key, int x, int y)
 	case TAB:
 		scene->activateNextModel();
 		break;
-	case 'p':
 	case 'P':
+	case 'p':
 		scene->toggleCameraProjection();
 		break;
 	case DEL:
