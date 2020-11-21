@@ -32,7 +32,27 @@ public:
 		faces.push_back(FaceIdcs(vec4(4, 3, 8)));
 		faces.push_back(FaceIdcs(vec4(5, 1, 8)));
 
-		initBoundingBox(vec4(-1.0, -1.0, -1.0), vec4(1.0, 1.0, 1.0));
+		vec4 min = vec4(-1.0, -1.0, -1.0);
+		vec4 max = vec4(1.0, 1.0, 1.0);
+		initBoundingBox(min, max);
+		//setting model position:
+		position = vec4(0.0);
+		//centering the model to (0,0,0):
+		vec4 middle_offset = vec4((min.x + max.x) / 2, (min.y + max.y) / 2, (min.z + max.z) / 2);
+		mat4 t = translateMat(-middle_offset);
+		for (vector<vec4>::iterator i = vertices.begin(); i != vertices.end(); i++) {
+			(*i) = t * (*i);
+		}
+		for (vector<vec4>::iterator i = bounding_box_vertices.begin(); i != bounding_box_vertices.end(); i++) {
+			(*i) = t * (*i);
+		}
+
+		for (vector<FaceIdcs>::iterator it = faces.begin(); it != faces.end(); ++it) {
+			for (int i = 0; i < 3; i++)
+			{
+				vertex_positions.push_back(vec4(vertices[it->v[i] - 1]));
+			}
+		}
 
 		computeFacesNormals();
 		position = vec4(0.0, 0.0, 0.0, 1.0);

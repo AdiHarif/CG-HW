@@ -126,7 +126,6 @@ void MeshModel::loadFile(string fileName)
 			vertex_normals_indexes.push_back(it->vn[i] - 1);
 		}
 	}
-
 }
 
 void MeshModel::draw(Renderer* renderer) {
