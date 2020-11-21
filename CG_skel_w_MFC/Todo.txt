@@ -3,6 +3,13 @@ Todo, Todo, Todo todo todo todo todoooooo... Todododo
 Model:
 	drawVertexNormals
 	drawFacesNormals
+	remove is_active 
 
 Camera:
 	transformations
+	check frustum
+	implement perspective
+	remove is_active 
+
+Scene:
+	change interface to transform the right thing on zoom

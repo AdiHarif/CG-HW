@@ -16,6 +16,7 @@ typedef struct s_draw_pref {
 	bool f_draw_faces_normals = false;
 } DrawPref;
 
+
 struct FaceIdcs
 {
 	int v[4];
@@ -86,12 +87,12 @@ protected :
 
 
 public:
-	void draw(mat4 tcw, Renderer* renderer);
-	void drawVertices(mat4 tcw, Renderer* renderer);
-	void drawEdges(mat4 tcw, Renderer* renderer);
-	void drawVertexNormals(mat4 tcw, Renderer* renderer);
-	void drawFacesNormals(mat4 tcw, Renderer* renderer);
-	void drawBoundingBox(mat4 tcw, Renderer* renderer);
+	void draw(Renderer* renderer);
+	void drawVertices(Renderer* renderer);
+	void drawEdges(Renderer* renderer);
+	void drawVertexNormals(Renderer* renderer);
+	void drawFacesNormals( Renderer* renderer);
+	void drawBoundingBox(Renderer* renderer);
 	void initBoundingBox(vec4 min, vec4 max);
 	void computeFacesNormals();
 

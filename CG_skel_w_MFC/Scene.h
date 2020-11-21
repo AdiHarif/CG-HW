@@ -33,6 +33,12 @@ class Scene {
 	int active_light;
 	int active_camera;
 
+	mat4 tw;
+
+	//===Inner Getters===
+	Camera* getActiveCamera();
+	//==========
+
 public:
 	//===C'tors===
 	Scene() {}; //unimplemented

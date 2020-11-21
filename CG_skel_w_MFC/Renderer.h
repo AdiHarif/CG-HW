@@ -13,13 +13,50 @@
 #define DEFAULT_HEIGHT 512
 
 using namespace std;
+
+typedef struct Pixel {
+	int x;
+	int y;
+
+	Pixel(int x, int y) : x(x), y(y) {}
+
+	Pixel(const Pixel& p) {
+		x = p.x;
+		y = p.y;
+	}
+
+};
+
+typedef struct Line {
+	Pixel start;
+	Pixel end;
+
+	Line(Pixel p1, Pixel p2) : start(p1), end(p2) {}
+
+	Line(const Line& l) : start(l.start), end(l.end) {}
+};
+
+typedef vec4 Vertex;
+
+typedef struct Edge {
+	Vertex start;
+	Vertex end;
+
+	Edge(Vertex start, Vertex end) : start(start), end(end) {}
+};
+
+
+
 class Renderer
 {
 	float *m_outBuffer; // 3*width*height
 	float *m_zbuffer; // width*height
 	int m_width, m_height;
 
-	mat4 viewport;
+	mat4 tw;
+	mat4 tc;
+	mat4 tp;
+
 
 
 	//===Buffer Functions===
@@ -28,15 +65,25 @@ class Renderer
 	//==========
 
 
-	//===Transformations Calcs
-	void calcViewport();
-	//==========
-
-
 	//===Inner Drawing Functions===
-	void drawLineModerate(vec4 v0, vec4 v1, Color c);
-	void drawLineSteep(vec4 v0, vec4 v1, Color c);
+	void rasterizePoint(Pixel p, Color c);
+	void rasterizeLine(Line l, Color c);
+	void drawLineModerate(Line l, Color c);
+	void drawLineSteep(Line l, Color c);
 	//==========
+
+
+	//===Inner Calculations===
+	bool isPixelLegal(Pixel p);
+	bool isLineLegal(Line l);
+	Pixel viewPort(Vertex v);
+
+	vector<Pixel> transformVertices(vector<Vertex>& vertices, mat4 tm);
+	vector<Line> transformEdges(vector<vec4>& edges, mat4 tm); //Legacy, should delete this in the future.
+	vector<Line> transformEdges(vector<Edge>& edges, mat4 tm);
+	vector<Line> transformFaces(vector<vec4>& faces, mat4 tm); //TODO change this to work with face struct
+	//==========
+
 
 
 	//////////////////////////////
@@ -62,23 +109,18 @@ public:
 	//==========
 
 	//===Drawing Interface===
-	void rasterizePoint(vec4 v, Color c);
-	void rasterizeLine(vec4 v1, vec4 v2, Color c);
-
-	void drawPoints(vector<vec4>& points, Color c);
-	void drawLines(vector<vec4>& points, Color c);
-	void drawTriangles(vector<vec4>& vertex_positions, Color c);
+	void drawPoints(vector<Vertex>& points, mat4 tm, Color c);
+	void drawLines(vector<vec4>& points, mat4 tm, Color c); //Legacy, shoud delete in the future
+	void drawLines(vector<Edge>& edges, mat4 tm, Color c);
+	void drawTriangles(vector<vec4>& vertex_positions, mat4 tm, Color c);
 
 	void SetDemoBuffer();
 	//==========
 
-	//===Getters===
-	mat4 getViewport();
-	//==========
 
 	//===Transformation Setters===
-	void setCameraTransform(const mat4& cTransform); //unimplemented
-	void setProjection(const mat4& projection); //unimplemented
-	void setObjectMatrices(const mat4& oTransform, const mat3& nTransform); //unimplemented
+	void setCameraTransform(const mat4& tc);
+	void setProjection(const mat4& tc);
+	void setWorldTransform(const mat4& tw);
 	//==========
 };

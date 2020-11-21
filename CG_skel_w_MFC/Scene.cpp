@@ -7,6 +7,12 @@
 using namespace std;
 
 
+//===Inner Getters===
+Camera* Scene::getActiveCamera() {
+	return cameras[active_camera];
+}
+//==========
+
 //===C'tors===
 
 Scene::Scene(Renderer *renderer) : m_renderer(renderer){
@@ -34,16 +40,16 @@ int Scene::getActiveModelIndex() {
 
 void Scene::draw()
 {
-	// 1. Send the renderer the current camera transform and the projection
-	// 2. Tell all models to draw themselves
 	m_renderer->clearColorBuffer();
-	mat4 tvp = m_renderer->getViewport();
-	mat4 tc = cameras[active_camera]->getTransform();
-	mat4 tp = cameras[active_camera]->getProjection();
-	mat4 t_tot = tvp* tp * tc;
+	// 1. Send the renderer the current camera transform and the projection
+	m_renderer->setCameraTransform(getActiveCamera()->getTransform());
+	m_renderer->setProjection(getActiveCamera()->getProjection());
+	m_renderer->setWorldTransform(tw);
+
+	// 2. Tell all models to draw themselves
 	for (vector<Model*>::iterator i = models.begin(); i!=models.end(); i++){
 		MeshModel* m = dynamic_cast<MeshModel*> ((*i));
-		m->draw(t_tot, m_renderer);
+		m->draw(m_renderer);
 	}
 
 	m_renderer->swapBuffers();

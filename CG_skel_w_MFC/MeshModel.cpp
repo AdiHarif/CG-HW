@@ -129,77 +129,64 @@ void MeshModel::loadFile(string fileName)
 
 }
 
-void MeshModel::draw(mat4 tcw, Renderer* renderer) {
-	if (draw_pref.f_draw_vertices)	drawVertices(tcw, renderer);
-	if (draw_pref.f_draw_edges)	drawEdges(tcw, renderer);
-	if (draw_pref.f_draw_bb)	drawBoundingBox(tcw, renderer);
-	if (draw_pref.f_draw_vertex_normals) drawVertexNormals(tcw, renderer);
-	if (draw_pref.f_draw_faces_normals) drawFacesNormals(tcw, renderer);
+void MeshModel::draw(Renderer* renderer) {
+	if (draw_pref.f_draw_vertices)	drawVertices(renderer);
+	if (draw_pref.f_draw_edges)	drawEdges(renderer);
+	if (draw_pref.f_draw_bb)	drawBoundingBox(renderer);
+	if (draw_pref.f_draw_vertex_normals) drawVertexNormals(renderer);
+	if (draw_pref.f_draw_faces_normals) drawFacesNormals(renderer);
 }
 
-void MeshModel::drawVertices(mat4 tcw, Renderer* renderer)
+void MeshModel::drawVertices(Renderer* renderer)
 {
-	mat4 tcwm = tcw * _world_transform;
-	vector<vec4> vecs_to_draw; 
-	for (vector<vec4>::iterator i = vertices.begin(); i != vertices.end(); i++){
-		vecs_to_draw.push_back(tcwm*(*i));
-	}
 	Color color = is_active ? active_mesh_color : inactive_mesh_color;
-	renderer->drawPoints(vecs_to_draw, color);
+	renderer->drawPoints(vertices, _world_transform, color);
 }
 
-void MeshModel::drawEdges(mat4 tcw, Renderer* renderer) {
-	mat4 tcwm = tcw * _world_transform;
-	vector<vec4> vecs_to_draw;
-	for (vector<vec4>::iterator i = vertex_positions.begin(); i != vertex_positions.end(); i++) {
-		vecs_to_draw.push_back(tcwm * (*i));
-	}
+void MeshModel::drawEdges(Renderer* renderer) {
 	Color color = is_active ? active_mesh_color : inactive_mesh_color;
-	renderer->drawTriangles(vecs_to_draw, color);
+	renderer->drawTriangles(vertex_positions, _world_transform, color);
 }
 
-void MeshModel::drawVertexNormals(mat4 tcw, Renderer* renderer) {
+void MeshModel::drawVertexNormals(Renderer* renderer) {
 	//TODO: change transformations
-	if (vertex_normals.empty())	return;
+	/*if (vertex_normals.empty())	return;
 	mat4 tcwm = tcw * _world_transform;
 	vector<vec4> vecs_to_draw;
 	for (int i = 0; i < vertex_normals_indexes.size(); i+=2) {
 		vecs_to_draw.push_back(tcwm * vertices[vertex_normals_indexes[i]]);
 		vecs_to_draw.push_back(tcwm * vertex_normals[vertex_normals_indexes[i + 1]]);
 	}
-	renderer->drawLines(vecs_to_draw, vertex_normals_color);
+	renderer->drawLines(vecs_to_draw, vertex_normals_color);*/
 }
 
-void MeshModel::drawFacesNormals(mat4 tcw, Renderer* renderer) {
+void MeshModel::drawFacesNormals(Renderer* renderer) {
 	//TODO: change transformations
-	if (faces_normals.empty())	return;
+	/*if (faces_normals.empty())	return;
 	mat4 tcwm = tcw * _world_transform;
 	vector<vec4> vecs_to_draw;
 	for (int i = 0; i < faces_normals.size(); i++) {
 		vecs_to_draw.push_back(faces_normals_locations[i]);
 		vecs_to_draw.push_back(tcwm * faces_normals[i]);
 	}
-	renderer->drawLines(vecs_to_draw, faces_normals_color);
+	renderer->drawLines(vecs_to_draw, faces_normals_color);*/
 }
 
-void MeshModel::drawBoundingBox(mat4 tcw, Renderer* renderer) {
-	mat4 tcwm = tcw * _world_transform;
-	vector<vec4> vecs_to_draw;
-	for (vector<vec4>::iterator i = bounding_box_vertices.begin(); i != bounding_box_vertices.end(); i++) {
-		vecs_to_draw.push_back(tcwm * (*i));
-	}
+void MeshModel::drawBoundingBox(Renderer* renderer) {
+	vector<Edge> edges;
 	//draw only vertices (can delete later)
-	renderer->drawPoints(vecs_to_draw, bb_color);
+	renderer->drawPoints(bounding_box_vertices, _world_transform, bb_color);
 	//draw lines
 	for (int i = 0; i < 4; i++) {//0->1, 1->2, 2->3, 3->0
-		renderer->rasterizeLine(vecs_to_draw[i], vecs_to_draw[(i+1)%4], bb_color);
+		edges.push_back(Edge(bounding_box_vertices[i], bounding_box_vertices[(i + 1) % 4]));
 	}
 	for (int i = 0; i < 4; i++) {//4->5, 5->6, 6->7, 7->4
-		renderer->rasterizeLine(vecs_to_draw[i+4], vecs_to_draw[((i+1)%4)+4], bb_color);
+		edges.push_back(Edge(bounding_box_vertices[i + 4], bounding_box_vertices[((i + 1) % 4) + 4]));
 	}
 	for (int i = 0; i < 4; i++) {//0->4, 1->5, 2->6, 3->7
-		renderer->rasterizeLine(vecs_to_draw[i], vecs_to_draw[i+4], bb_color);
+		edges.push_back(Edge(bounding_box_vertices[i], bounding_box_vertices[i + 4]));
 	}
+	renderer->drawLines(edges, _world_transform, bb_color);
 }
 
 void MeshModel::translate(vec4 v) {

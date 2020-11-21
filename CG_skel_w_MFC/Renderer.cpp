@@ -3,6 +3,7 @@
 #include "CG_skel_w_MFC.h"
 #include "InitShader.h"
 #include "GL\freeglut.h"
+#include "MeshModel.h"
 
 #define INDEX(width,x,y,c) (x+y*width)*3+c
 
@@ -16,28 +17,56 @@ void Renderer::CreateBuffers()
 //==========
 
 
-//===Transformations Calcs
-void Renderer::calcViewport(){
-	mat4 s = scaleMat(m_width / 2.0, m_height / 2.0, 1);
-	mat4 t = translateMat(m_width / 2.0, m_height / 2.0, 0);
-	viewport = t * s;
-}
-//==========
-
-
 //===Inner Drawing Functions===
-void Renderer::drawLineModerate(vec4 v0, vec4 v1, Color c) {
-	int dx = v1.x - v0.x;
-	int dy = v1.y - v0.y;
+
+void Renderer::rasterizePoint(Pixel p, Color c) {
+	if (!isPixelLegal(p)) {
+		return;
+	}
+	m_outBuffer[INDEX(m_width, p.x, p.y, 0)] = c.r;
+	m_outBuffer[INDEX(m_width, p.x, p.y, 1)] = c.g;
+	m_outBuffer[INDEX(m_width, p.x, p.y, 2)] = c.b;
+}
+
+void Renderer::rasterizeLine(Line l, Color c) {
+	Pixel p0 = l.start;
+	Pixel p1 = l.end;
+	if (p0.x == p1.x) {
+		if (p0.y < p1.y) {
+			drawLineSteep(Line(p0,p1), c);
+		}
+		else {
+			drawLineSteep(Line(p1, p0), c);
+		}
+	}
+	if (p0.x > p1.x) {// make sure that v0 is left of v1
+		p0 = l.end;
+		p1 = l.start;
+	}
+
+	if (std::abs(p1.y - p0.y) < std::abs(p1.x - p0.x)) {//-1 <= m <= 1
+		drawLineModerate(Line(p0, p1), c);
+	}
+	else { //|m|>1
+		drawLineSteep(Line(p0, p1), c);
+	}
+}
+
+
+void Renderer::drawLineModerate(Line l, Color c) {
+	Pixel p0 = l.start;
+	Pixel p1 = l.end;
+	int dx = p1.x - p0.x;
+	int dy = p1.y - p0.y;
 	int yi = 1;
 	if (dy < 0) {
 		yi = -1;
 		dy = -dy;
 	}
 	int D = 2*dy - dx;
-	int y = v0.y;
-	for (int x = v0.x; x <= v1.x; x++) {
-		this->rasterizePoint(vec4(x, y, 0.0), c);
+	int y = p0.y;
+	for (int x = p0.x; x <= p1.x; x++) {
+		this->rasterizePoint(Pixel(x,y), c);
 		if (D > 0) {
 			y += yi;
 			D += 2*(dy-dx);
@@ -48,27 +77,27 @@ void Renderer::drawLineModerate(vec4 v0, vec4 v1, Color c) {
 	}
 }
 
-void Renderer::drawLineSteep(vec4 v0, vec4 v1, Color c) {
+void Renderer::drawLineSteep(Line l, Color c) {
 	//flip x<->y
-	v0 = vec4(v0.y, v0.x, 0.0);
-	v1 = vec4(v1.y, v1.x, 0.0);
-	//make sure v0 is left of v1
-	if (v0.x > v1.x) {
-		vec4 tmp = v0;
-		v0 = v1;
-		v1 = tmp;
+	Pixel p0 = { l.start.y, l.start.x };
+	Pixel p1 = { l.end.y, l.end.x };
+	//make sure p0 is left of p1
+	if (p0.x > p1.x) {
+		Pixel tmp = p0;
+		p0 = p1;
+		p1 = tmp;
 	}
-	int dx = v1.x - v0.x;
-	int dy = v1.y - v0.y;
+	int dx = p1.x - p0.x;
+	int dy = p1.y - p0.y;
 	int yi = 1;
 	if (dy < 0) {
 		yi = -1;
 		dy = -dy;
 	}
 	int D = 2 * dy - dx;
-	int y = v0.y;
-	for (int x = v0.x; x <= v1.x; x++) {
-		this->rasterizePoint(vec4(y, x, 0.0), c);
+	int y = p0.y;
+	for (int x = p0.x; x <= p1.x; x++) {
+		this->rasterizePoint(Pixel(y,x), c);
 		if (D > 0) {
 			y += yi;
 			D += 2 * (dy - dx);
@@ -78,6 +107,83 @@ void Renderer::drawLineSteep(vec4 v0, vec4 v1, Color c) {
 		}
 	}
 }
+//==========
+
+
+//===Inner Calculations===
+
+bool Renderer::isPixelLegal(Pixel p) {
+	return p.x >= 0 && p.x < m_width && p.y >= 0 && p.y < m_height;
+}
+
+bool Renderer::isLineLegal(Line l) {
+	return isPixelLegal(l.start) || isPixelLegal(l.end);
+}
+
+Pixel Renderer::viewPort(Vertex v) {
+	Pixel p = {
+		(int)std::round((m_width * (v.x + 1)) / 2),
+		(int)std::round((m_height * (v.y + 1)) / 2)
+	};
+	return p;
+}
+
+vector<Pixel> Renderer::transformVertices(vector<Vertex>& vertices, mat4 tm){ //TODO: improve cliping
+	vector<Pixel> pixels;
+	mat4 t_tot = tp * tc * tw * tm;
+	for (vector<vec4>::iterator i = vertices.begin(); i != vertices.end(); i++) {
+		vec4 v = t_tot * (*i);
+		Pixel p = viewPort(v);
+		if (isPixelLegal(p)) {
+			pixels.push_back(p);
+		}
+	}
+	return pixels;
+}
+
+
+vector<Line> Renderer::transformEdges(vector<vec4>& edges, mat4 tm) { //TODO:delete
+	vector<Line> lines;
+	mat4 t_tot = tp * tc * tw * tm;
+	for (vector<vec4>::iterator i = edges.begin(); i != edges.end(); i += 2) {
+		vec4 v1 = t_tot * (*i);
+		vec4 v2 = t_tot * (*(i + 1));
+		Line l = Line(viewPort(v1), viewPort(v2));
+		if (isLineLegal(l)) {
+			lines.push_back(l);
+		}
+	}
+	return lines;
+}
+
+vector<Line> Renderer::transformEdges(vector<Edge>& edges, mat4 tm) { //TODO: improve cliping
+	vector<Line> lines;
+	mat4 t_tot = tp * tc * tw * tm;
+	for (vector<Edge>::iterator i = edges.begin(); i != edges.end(); i++) {
+		Line l = Line(viewPort(i->start),viewPort(i->end));
+		if (isLineLegal(l)) {
+			lines.push_back(l);
+		}
+	}
+	return lines;
+}
+
+vector<Line> Renderer::transformFaces(vector<vec4>& faces, mat4 tm) {
+	vector<Line> lines;
+	mat4 t_tot = tp * tc * tw * tm;
+	for (vector<vec4>::iterator i = faces.begin(); i != faces.end(); i+=3) {
+		for (int j = 0; j < 3; j++) {
+			vec4 v0 = t_tot * (*(i + j));
+			vec4 v1 = t_tot * (*(i + ((j + 1) % 3)));
+			Line l = Line(viewPort(v0),viewPort(v1));
+			if (isLineLegal(l)) {
+				lines.push_back(l);
+			}
+		}
+	}
+	return lines;
+}
+
 //==========
 
 
@@ -144,7 +250,6 @@ Renderer::Renderer(int width, int height) :m_width(width), m_height(height)
 {
 	InitOpenGLRendering();
 	CreateBuffers();
-	calcViewport();
 }
 
 Renderer::~Renderer(void)
@@ -195,63 +300,37 @@ void Renderer::setSize(int width, int height) {
 	m_width = width;
 	m_height = height;
 	CreateBuffers();
-	calcViewport();
 }
 //==========
 
 
 //===Drawing Interface===
-void Renderer::rasterizePoint(vec4 v, Color c){
-	int x = std::round(v.x);
-	int y = std::round(v.y);   
-	if (x < 0 || x >= m_width || y < 0 || y >= m_height) {
-		return;
-	}
-	m_outBuffer[INDEX(m_width, x, y, 0)] = c.r;
-	m_outBuffer[INDEX(m_width, x, y, 1)] = c.g;
-	m_outBuffer[INDEX(m_width, x, y, 2)] = c.b;
-}
-
-void Renderer::rasterizeLine(vec4 v0, vec4 v1, Color c) {
-	if (v0.x == v1.x) {
-		if (v0.y < v1.y) {
-			drawLineSteep(v0, v1, c);
-		}
-		else {
-			drawLineSteep(v1, v0, c);
-		}
-	}
-	if (v0.x > v1.x) {// make sure that v0 is left of v1
-		vec4 tmp = v0;
-		v0 = v1;
-		v1 = tmp;
-	}
-
-	if (std::abs(v1.y - v0.y) < std::abs(v1.x - v0.x)) {//-1 <= m <= 1
-		drawLineModerate(v0, v1, c);
-	}
-	else { //|m|>1
-		drawLineSteep(v0, v1, c);
-	}
-}
-
-void Renderer::drawPoints(vector<vec4>& points, Color c){
-	for (vector<vec4>::iterator i = points.begin(); i!= points.end(); i++){
+void Renderer::drawPoints(vector<Vertex>& points, mat4 tm, Color c){
+	vector<Pixel> pixels = transformVertices(points, tm);
+	for (vector<Pixel>::iterator i = pixels.begin(); i != pixels.end(); i++) {
 		rasterizePoint(*i, c);
 	}
 }
 
-void Renderer::drawLines(vector<vec4>& points, Color c) {
-	for (vector<vec4>::iterator i = points.begin(); i != points.end(); i+=2) {
-		rasterizeLine(*i, *(i + 1), c);
+void Renderer::drawLines(vector<vec4>& points, mat4 tm, Color c) {
+	vector<Line> lines = transformEdges(points, tm);
+	for (vector<Line>::iterator i = lines.begin(); i != lines.end(); i++) {
+		rasterizeLine(*i, c);
 	}
 }
 
-void Renderer::drawTriangles(vector<vec4>& vertex_positions, Color c) {
-	for (vector<vec4>::iterator i = vertex_positions.begin(); i != vertex_positions.end(); i+=3) {
-		rasterizeLine(*i, *(i + 1), c);
-		rasterizeLine(*(i + 1), *(i + 2), c);
-		rasterizeLine(*(i + 2), *i, c);
+void Renderer::drawLines(vector<Edge>& edges, mat4 tm, Color c) {//TODO: implement
+	vector<Line> lines = transformEdges(edges, tm);
+	for (vector<Line>::iterator i = lines.begin(); i != lines.end(); i++) {
+		rasterizeLine(*i, c);
+	}
+}
+
+
+void Renderer::drawTriangles(vector<vec4>& vertex_positions, mat4 tm, Color c) {
+	vector<Line> lines = transformFaces(vertex_positions, tm);
+	for (vector<Line>::iterator i = lines.begin(); i != lines.end(); i++) {
+		rasterizeLine(*i, c);
 	}
 }
 
@@ -277,6 +356,8 @@ void Renderer::SetDemoBuffer()
 //==========
 
 
-//===Getters===
-mat4 Renderer::getViewport() { return viewport; }
+//===Transformation Setters===
+void Renderer::setCameraTransform(const mat4& tc) { this->tc = tc; }
+void Renderer::setProjection(const mat4& tp) { this->tp = tp; }
+void Renderer::setWorldTransform(const mat4& tw) { this->tw = tw; }
 //==========
