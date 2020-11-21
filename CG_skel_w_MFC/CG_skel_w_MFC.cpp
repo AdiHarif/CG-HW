@@ -35,6 +35,7 @@
 #define SCROLL_UP 3
 #define SCROLL_DOWN 4
 #define TAB 9
+#define DEL 127
 
 #define SCALE_UP_DEF 1.1
 #define SCALE_DOWN_DEF (1/1.1)
@@ -47,7 +48,7 @@ Renderer *renderer;
 int last_x, last_y;
 bool lb_down, rb_down, mb_down;
 bool first_movement=true;
-int never_gonna = 0;
+//int never_gonna = 0;
 
 //----------------------------------------------------------------------------
 // Callbacks
@@ -72,26 +73,18 @@ void keyboard(unsigned char key, int x, int y)
 
 	//rotate:
 	case 'A':
-		scene->translateSelection(vec4(-TRANSLATE_DEF, 0, 0));
-		break;
 	case 'a':
 		scene->translateSelection(vec4(-TRANSLATE_DEF, 0, 0));
 		break;
 	case 'D':
-		scene->translateSelection(vec4(TRANSLATE_DEF, 0, 0));
-		break;
 	case 'd':
 		scene->translateSelection(vec4(TRANSLATE_DEF, 0, 0));
 		break;
 	case 'W':
-		scene->translateSelection(vec4(0, TRANSLATE_DEF, 0));
-		break;
 	case 'w':
 		scene->translateSelection(vec4(0, TRANSLATE_DEF, 0));
 		break;
 	case 'S':
-		scene->translateSelection(vec4(0, -TRANSLATE_DEF, 0));
-		break;
 	case 's':
 		scene->translateSelection(vec4(0, -TRANSLATE_DEF, 0));
 		break;
@@ -106,9 +99,12 @@ void keyboard(unsigned char key, int x, int y)
 	case TAB:
 		scene->activateNextModel();
 		break;
-	case 'p':
 	case 'P':
+	case 'p':
 		scene->toggleCameraProjection();
+		break;
+	case DEL:
+		scene->removeModel(scene->getActiveModelIndex());
 		break;
 	}
 	scene->draw();
@@ -266,6 +262,8 @@ void mainMenu(int id)
 		CString strMsg;
 		_T("%s"), (LPCTSTR)strMsg;
 		AfxMessageBox(strMsg);*/
+
+		//TODO: write manual
 		AfxMessageBox("Never gonna give you up");
 		break;
 	}

@@ -83,6 +83,16 @@ void Scene::loadPrimModel(string file_name) {
 	activateLastModel();
 }
 
+void Scene::removeModel(int model) {
+	if (models.empty())	return;
+	if (model == ALL_MODELS_ACTIVE) {
+		models.clear();
+		return;
+	}
+	models.erase(models.begin() + model);
+	activateLastModel();
+}
+
 void Scene::scaleSelection(double scale_factor) {
 	if (false) {	//TODO: scale selected model
 

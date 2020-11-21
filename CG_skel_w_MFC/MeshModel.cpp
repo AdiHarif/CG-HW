@@ -139,12 +139,12 @@ void MeshModel::draw(Renderer* renderer) {
 void MeshModel::drawVertices(Renderer* renderer)
 {
 	Color color = is_active ? active_mesh_color : inactive_mesh_color;
-	renderer->drawPoints(vertices, _world_transform, color);
+	renderer->drawPoints(vertices, tm, color);
 }
 
 void MeshModel::drawEdges(Renderer* renderer) {
 	Color color = is_active ? active_mesh_color : inactive_mesh_color;
-	renderer->drawTriangles(vertex_positions, _world_transform, color);
+	renderer->drawTriangles(vertex_positions, tm, color);
 }
 
 void MeshModel::drawVertexNormals(Renderer* renderer) {
@@ -174,7 +174,7 @@ void MeshModel::drawFacesNormals(Renderer* renderer) {
 void MeshModel::drawBoundingBox(Renderer* renderer) {
 	vector<Edge> edges;
 	//draw only vertices (can delete later)
-	renderer->drawPoints(bounding_box_vertices, _world_transform, bb_color);
+	renderer->drawPoints(bounding_box_vertices, tm, bb_color);
 	//draw lines
 	for (int i = 0; i < 4; i++) {//0->1, 1->2, 2->3, 3->0
 		edges.push_back(Edge(bounding_box_vertices[i], bounding_box_vertices[(i + 1) % 4]));
@@ -185,41 +185,41 @@ void MeshModel::drawBoundingBox(Renderer* renderer) {
 	for (int i = 0; i < 4; i++) {//0->4, 1->5, 2->6, 3->7
 		edges.push_back(Edge(bounding_box_vertices[i], bounding_box_vertices[i + 4]));
 	}
-	renderer->drawLines(edges, _world_transform, bb_color);
+	renderer->drawLines(edges, tm, bb_color);
 }
 
 void MeshModel::translate(vec4 v) {
 	mat4 t = translateMat(v);
 	this->position = t * this->position;
-	this->_world_transform = t * this->_world_transform;
+	this->tm = t * this->tm;
 }
 
 void MeshModel::scale(vec3 v) {
 	mat4 s = scaleMat(v);
 	mat4 t1 = translateMat(this->position);
 	mat4 t2 = translateMat(-this->position);
-	this->_world_transform = t1 * s * t2 * this->_world_transform;
+	this->tm = t1 * s * t2 * this->tm;
 }
 
 void MeshModel::rotateX(GLfloat theta) {
 	mat4 r = rotateXMat(theta);
 	mat4 t1 = translateMat(this->position);
 	mat4 t2 = translateMat(-this->position);
-	this->_world_transform = t1 * r * t2 * this->_world_transform;
+	this->tm = t1 * r * t2 * this->tm;
 }
 
 void MeshModel::rotateY(GLfloat theta) {
 	mat4 r = rotateYMat(theta);
 	mat4 t1 = translateMat(this->position);
 	mat4 t2 = translateMat(-this->position);
-	this->_world_transform = t1 * r * t2 * this->_world_transform;
+	this->tm = t1 * r * t2 * this->tm;
 }
 
 void MeshModel::rotateZ(GLfloat theta) {
 	mat4 r = rotateZMat(theta);
 	mat4 t1 = translateMat(this->position);
 	mat4 t2 = translateMat(-this->position);
-	this->_world_transform = t1 * r * t2 * this->_world_transform;
+	this->tm = t1 * r * t2 * this->tm;
 }
 
 vector<vec4> MeshModel::getVertices() {
@@ -231,7 +231,7 @@ vector<vec4> MeshModel::getVertexPositions() {
 }
 
 mat4 MeshModel::getWorldTransform() {
-	return this->_world_transform;
+	return this->tm;
 }
 
 vec4 MeshModel::getPosition(){ return position; }
