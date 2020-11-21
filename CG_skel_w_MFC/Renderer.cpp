@@ -146,9 +146,9 @@ vector<Line> Renderer::transformEdges(vector<vec4>& edges, mat4 tm) { //TODO:del
 	vector<Line> lines;
 	mat4 t_tot = tp * tc * tw * tm;
 	for (vector<vec4>::iterator i = edges.begin(); i != edges.end(); i += 2) {
-		vec4 v1 = t_tot * (*i);
-		vec4 v2 = t_tot * (*(i + 1));
-		Line l = Line(viewPort(v1), viewPort(v2));
+		vec4 v0 = t_tot * (*i);
+		vec4 v1 = t_tot * (*(i + 1));
+		Line l = Line(viewPort(v0), viewPort(v1));
 		if (isLineLegal(l)) {
 			lines.push_back(l);
 		}
@@ -160,7 +160,9 @@ vector<Line> Renderer::transformEdges(vector<Edge>& edges, mat4 tm) { //TODO: im
 	vector<Line> lines;
 	mat4 t_tot = tp * tc * tw * tm;
 	for (vector<Edge>::iterator i = edges.begin(); i != edges.end(); i++) {
-		Line l = Line(viewPort(i->start),viewPort(i->end));
+		vec4 v0 = t_tot * (i->start);
+		vec4 v1 = t_tot * (i->end);
+		Line l = Line(viewPort(v0),viewPort(v1));
 		if (isLineLegal(l)) {
 			lines.push_back(l);
 		}
