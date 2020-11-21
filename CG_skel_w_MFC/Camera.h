@@ -3,12 +3,24 @@
 #include "mat.h"
 #include "vec.h"
 
+enum proj_type { ortho = 0, frustum = 1 };
+
 class Camera {
-	mat4 cTransform;
-	mat4 projection;
+	mat4 tc;
+	mat4 tp;
 	vec4 position;
 	//bool is_active;
 	vec4 up;
+
+	float left;
+	float right;
+	float bottom; 
+	float top;
+	float z_near;
+	float z_far;
+
+
+	enum proj_type { p_ortho = 0, p_persp = 1 } projection;
 
 	vec4 calcUp(vec4 at);
 
@@ -31,6 +43,8 @@ public:
 		const float z_near, const float z_far);
 	mat4 perspective(const float fovy, const float aspect,
 		const float z_near, const float z_far);
+
+	void toggleProjection();
 	//===========
 
 	//===Getters/Setters===

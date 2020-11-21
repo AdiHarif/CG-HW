@@ -37,7 +37,7 @@ void Camera::lookAt(const vec4& at) {
     vec4 v = normalize(cross(n, u));
     vec4 t = vec4(0.0, 0.0, 0.0, 1.0);
     mat4 c = mat4(u, v, n, t);
-    cTransform = c * translateMat(-position);
+    tc = c * translateMat(-position);
 }
 
 //==========
@@ -48,17 +48,36 @@ void Camera::ortho(const float left, const float right,
     const float bottom, const float top,
     const float z_near, const float z_far) {
 
+    this->left = left;
+    this->right = right;
+    this->bottom = bottom;
+    this->top = top;
+    this->z_near = z_near;
+    this->z_far = z_far;
+
+    projection = p_ortho;
+
     mat4 p;
     p[2][2] = 0;
     mat4 t = translateMat(-(right + left) / 2, -(bottom + top) / 2, (z_near + z_far) / 2);
     mat4 s = scaleMat(2 / (right - left), 2 / (top - bottom), 2 / (z_near - z_far));
-    projection = p * s * t;
+    tp = p * s * t;
 }
 
 
 void Camera::frustum(const float left, const float right,
     const float bottom, const float top,
     const float z_near, const float z_far) {
+
+    this->left = left;
+    this->right = right;
+    this->bottom = bottom;
+    this->top = top;
+    this->z_near = z_near;
+    this->z_far = z_far;
+
+    projection = p_persp;
+
     mat4 p;
     p[2][2] = 0;
     mat4 h;
@@ -68,16 +87,26 @@ void Camera::frustum(const float left, const float right,
     mat4 n;
     n[2][2] = (z_near + z_far) / (z_near - z_far);
     n[2][3] = (2 * z_near * z_far) / (z_near - z_far);
-    projection = p * n * s * h;
+    tp = p * n * s * h;
+}
+
+void Camera::toggleProjection() {
+    projection = proj_type(1 - projection);
+    if (projection == p_ortho) {
+        ortho(left, right, bottom, top, z_near, z_far);
+    }
+    else {
+        frustum(left, right, bottom, top, z_near, z_far);
+    }
 }
 //===========
 
 
 //===Getters===
 
-mat4 Camera::getTransform() { return cTransform; }
+mat4 Camera::getTransform() { return tc; }
 
-mat4 Camera::getProjection() { return projection; }
+mat4 Camera::getProjection() { return tp; }
 
 //bool Camera::getIsActive() { return is_active; }
 

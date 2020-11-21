@@ -107,8 +107,9 @@ void keyboard(unsigned char key, int x, int y)
 	case TAB:
 		scene->activateNextModel();
 		break;
-	case DEL:
-		scene->removeModel(scene->getActiveModelIndex());
+	case 'p':
+	case 'P':
+		scene->toggleCameraProjection();
 		break;
 	}
 	scene->draw();
