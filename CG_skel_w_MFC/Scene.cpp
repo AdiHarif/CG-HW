@@ -294,6 +294,7 @@ void Scene::activateLastCamera() {
 	active_camera = cameras.size() - 1;
 }
 
+
 //void Scene::deactivateAllCameras() {
 //	Camera* c = NULL;
 //	for (vector<Camera*>::iterator i = cameras.begin(); i != cameras.end(); i++) {
@@ -301,6 +302,10 @@ void Scene::activateLastCamera() {
 //		c->setIsActive(false);
 //	}
 //}
+
+void Scene::toggleCameraProjection() {
+	getActiveCamera()->toggleProjection();
+}
 
 //==========
 

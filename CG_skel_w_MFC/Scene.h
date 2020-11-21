@@ -85,6 +85,7 @@ public:
 	void activateLastCamera();
 	//void deactivateAllCameras();
 
+	void toggleCameraProjection();
 	//==========
 
 	//===Other===

@@ -106,6 +106,10 @@ void keyboard(unsigned char key, int x, int y)
 	case TAB:
 		scene->activateNextModel();
 		break;
+	case 'p':
+	case 'P':
+		scene->toggleCameraProjection();
+		break;
 	}
 	scene->draw();
 }
