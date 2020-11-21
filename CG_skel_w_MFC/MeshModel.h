@@ -79,7 +79,7 @@ protected :
 	vector<vec4> faces_normals_locations;
 
 	vec4 position;
-	mat4 _world_transform;
+	mat4 tm;
 	mat3 _normal_transform;
 
 	bool is_active;
