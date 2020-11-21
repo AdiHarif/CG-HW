@@ -29,6 +29,15 @@ struct FaceIdcs
 			v[i] = vn[i] = vt[i] = 0;
 	}
 
+	FaceIdcs(vec4 v) {
+		v[0] = v.x;
+		v[1] = v.y;
+		v[2] = v.z;
+		v[3] = 0;
+		for (int i = 0; i < 4; i++)
+			vn[i] = vt[i] = 0;
+	}
+
 	FaceIdcs(std::istream& aStream)
 	{
 		for (int i = 0; i < 4; i++)
