@@ -22,7 +22,7 @@ vec4 Camera::calcUp(vec4 at) {
 Camera::Camera(vec4 position) {
     this->position = position;
     lookAt(vec4(0.0));
-    ortho(-3.0, 3.0, -3.0, 3.0, 3.0, -3.0);
+    ortho(-3.0, 3.0, -3.0, 3.0, -5.0, -15.0);
 }
 
 //==========
@@ -79,10 +79,10 @@ void Camera::frustum(const float left, const float right,
     mat4 h;
     h[0][2] = (left + right) / 2;
     h[1][2] = (top + bottom) / 2;
-    mat4 s = scaleMat((2 * z_near) / (right - left), (2 * z_near) / (top - bottom), 1.0);
+    mat4 s = scaleMat(-(2 * z_near) / (right - left), -(2 * z_near) / (top - bottom), 1.0);
     mat4 n;
-    n[2][2] = -(z_near + z_far) / (z_near - z_far);
-    n[2][3] = -(2 * z_near * z_far) / (z_near - z_far);
+    n[2][2] = (z_near + z_far) / (z_near - z_far);
+    n[2][3] = (2 * z_near * z_far) / (z_near - z_far);
     n[3][2] = -1;
     n[3][3] = 0;
     tp = n * s * h;
