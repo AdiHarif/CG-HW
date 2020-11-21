@@ -33,9 +33,12 @@ Camera::Camera(vec4 position) {
 void Camera::lookAt(const vec4& at) {
     up = calcUp(at);
     vec4 look_dir = position - at;
+    look_dir.w = 0;
     vec4 n = normalize(look_dir);
     vec4 u = normalize(cross(up, n));
+    u.w = 0;
     vec4 v = normalize(cross(n, u));
+    v.w = 0;
     vec4 t = vec4(0.0, 0.0, 0.0, 1.0);
     mat4 c = mat4(u, v, n, t);
     tc = c * translateMat(-position);
