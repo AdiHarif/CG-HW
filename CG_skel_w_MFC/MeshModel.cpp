@@ -157,6 +157,14 @@ void MeshModel::drawVertexNormals(Renderer* renderer) {
 		vecs_to_draw.push_back(tcwm * vertex_normals[vertex_normals_indexes[i + 1]]);
 	}
 	renderer->drawLines(vecs_to_draw, vertex_normals_color);*/
+	/*vector<vec4> vecs_to_draw;
+	for (int i = 0; i < vertex_normals_indexes.size(); i+=2) {
+		vecs_to_draw.push_back(vertices[vertex_normals_indexes[i]]);
+		vecs_to_draw.push_back(vertex_normals[vertex_normals_indexes[i + 1]]);
+	}*/
+	if (vertex_normals.empty())	return;
+	Color color = is_active ? vertex_normals_color : inactive_mesh_color;
+	renderer->drawVertexNormals(vertices, tm, vertex_normals, ntm, vertex_normals_indexes, color);
 }
 
 void MeshModel::drawFacesNormals(Renderer* renderer) {
@@ -192,6 +200,9 @@ void MeshModel::translate(vec4 v) {
 	mat4 t = translateMat(v);
 	this->position = t * this->position;
 	this->tm = t * this->tm;
+
+	// normals transformations:
+	ntm = t * ntm;
 }
 
 void MeshModel::scale(vec3 v) {
@@ -199,6 +210,11 @@ void MeshModel::scale(vec3 v) {
 	mat4 t1 = translateMat(this->position);
 	mat4 t2 = translateMat(-this->position);
 	this->tm = t1 * s * t2 * this->tm;
+
+	// normals transformations:
+	mat4 s_inv = scaleMat(1 / v.x, 1 / v.y, 1 / v.z);
+	// no need to transpose, s_inv is diagonal
+	ntm = t1 * s_inv * t2 * ntm;
 }
 
 void MeshModel::rotateX(GLfloat theta) {
@@ -206,6 +222,9 @@ void MeshModel::rotateX(GLfloat theta) {
 	mat4 t1 = translateMat(this->position);
 	mat4 t2 = translateMat(-this->position);
 	this->tm = t1 * r * t2 * this->tm;
+
+	// normals transformations:
+	ntm = t1 * r * t2 * ntm;
 }
 
 void MeshModel::rotateY(GLfloat theta) {
@@ -213,6 +232,9 @@ void MeshModel::rotateY(GLfloat theta) {
 	mat4 t1 = translateMat(this->position);
 	mat4 t2 = translateMat(-this->position);
 	this->tm = t1 * r * t2 * this->tm;
+
+	// normals transformations:
+	ntm = t1 * r * t2 * ntm;
 }
 
 void MeshModel::rotateZ(GLfloat theta) {
@@ -220,6 +242,9 @@ void MeshModel::rotateZ(GLfloat theta) {
 	mat4 t1 = translateMat(this->position);
 	mat4 t2 = translateMat(-this->position);
 	this->tm = t1 * r * t2 * this->tm;
+
+	// normals transformations:
+	ntm = t1 * r * t2 * ntm;
 }
 
 vector<vec4> MeshModel::getVertices() {

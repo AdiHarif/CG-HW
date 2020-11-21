@@ -113,6 +113,7 @@ public:
 	void drawLines(vector<vec4>& points, mat4 tm, Color c); //Legacy, shoud delete in the future
 	void drawLines(vector<Edge>& edges, mat4 tm, Color c);
 	void drawTriangles(vector<vec4>& vertex_positions, mat4 tm, Color c);
+	void drawVertexNormals(vector<Vertex>& points, mat4 tm, vector<vec4>& normals, mat4 ntm, vector<int>& vertex_normals_indexes, Color c);
 
 	void SetDemoBuffer();
 	//==========

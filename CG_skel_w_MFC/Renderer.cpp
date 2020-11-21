@@ -128,7 +128,7 @@ Pixel Renderer::viewPort(Vertex v) {
 	return p;
 }
 
-vector<Pixel> Renderer::transformVertices(vector<Vertex>& vertices, mat4 tm){ //TODO: improve cliping
+vector<Pixel> Renderer::transformVertices(vector<Vertex>& vertices, mat4 tm){ //TODO: improve clipping
 	vector<Pixel> pixels;
 	mat4 t_tot = tp * tc * tw * tm;
 	for (vector<vec4>::iterator i = vertices.begin(); i != vertices.end(); i++) {
@@ -333,6 +333,27 @@ void Renderer::drawTriangles(vector<vec4>& vertex_positions, mat4 tm, Color c) {
 	vector<Line> lines = transformFaces(vertex_positions, tm);
 	for (vector<Line>::iterator i = lines.begin(); i != lines.end(); i++) {
 		rasterizeLine(*i, c);
+	}
+}
+
+void Renderer::drawVertexNormals(vector<Vertex>& points, mat4 tm, vector<vec4>& normals, mat4 ntm, vector<int>& vertex_normals_indexes, Color c) {
+	//vector<vec4> normals_to_draw;
+	for (vector<vec4>::iterator i = normals.begin(); i != normals.end(); i++) {
+		*i = normalize(*i);
+		*i *= 10;
+	}
+	vector<Pixel> vertices_pixels = transformVertices(points, tm);
+	vector<Pixel> normals_pixels = transformVertices(normals, ntm);
+	
+
+	for (int i = 0; i < vertex_normals_indexes.size(); i+=2) {
+		Pixel start = vertices_pixels[vertex_normals_indexes[i]];
+		Pixel end = Pixel(0, 0); 
+		end.x = vertices_pixels[vertex_normals_indexes[i]].x + normals[vertex_normals_indexes[i + 1]].x;
+		end.y = vertices_pixels[vertex_normals_indexes[i]].y + normals[vertex_normals_indexes[i + 1]].y;
+
+		Line l = Line(start, end);
+		rasterizeLine(l, c);
 	}
 }
 

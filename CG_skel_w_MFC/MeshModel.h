@@ -80,6 +80,7 @@ protected :
 
 	vec4 position;
 	mat4 tm;
+	mat4 ntm;
 	mat3 _normal_transform;
 
 	bool is_active;
