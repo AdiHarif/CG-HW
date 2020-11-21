@@ -111,6 +111,9 @@ void keyboard(unsigned char key, int x, int y)
 	case 'P':
 		scene->toggleCameraProjection();
 		break;
+	case DEL:
+		scene->removeModel(scene->getActiveModelIndex());
+		break;
 	}
 	scene->draw();
 }
