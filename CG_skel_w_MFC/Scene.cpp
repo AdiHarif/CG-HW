@@ -30,9 +30,9 @@ vector<Model*> Scene::getModels() {
 	return models;
 }
 
-int Scene::getActiveModelIndex() {
-	return active_model;
-}
+int Scene::getActiveModelIndex() { return active_model; }
+
+int Scene::getActiveCameraIndex() { return active_camera; }
 
 //==========
 
@@ -272,46 +272,34 @@ void Scene::addCamera(Camera* camera) {
 }
 
 void Scene::activateNextCamera() {
-	cout << "next cam" << endl;
 	if (models.size() < 1)	return;
-
-	Camera* c = NULL;
-	active_camera = (active_model + 1) % models.size();
-	deactivateAllCameras();
-	c = dynamic_cast<Camera*> (this->cameras[active_camera]);
-	c->setIsActive(true);
+	active_camera = (active_camera + 1) % cameras.size();
+	//deactivateAllCameras();
+	//getActiveCamera()->setIsActive(true);
 }
 
 void Scene::activatePrevCamera() {
-	cout << "prev cam" << endl;
 	if (models.size() < 1)	return;
-
-	Camera* c = NULL;
-	active_camera = (active_model - 1);
+	active_camera = (active_camera - 1);
 	if (active_camera < 0)	active_camera += cameras.size();
-	deactivateAllCameras();
-	c = dynamic_cast<Camera*> (this->cameras[active_camera]);
-	c->setIsActive(true);
+	//deactivateAllCameras();
+	//getActiveCamera()->setIsActive(true);
 }
 
 void Scene::activateLastCamera() {
 	if (cameras.empty())	return;
-	Camera* c = NULL;
-	for (vector<Camera*>::iterator i = cameras.begin(); i != cameras.end(); i++) {
-		c = dynamic_cast<Camera*> ((*i));
-		c->setIsActive(false);
-	}
-	c->setIsActive(true);
+	//deactivateAllCameras();
+	//c->setIsActive(true);
 	active_camera = cameras.size() - 1;
 }
 
-void Scene::deactivateAllCameras() {
-	Camera* c = NULL;
-	for (vector<Camera*>::iterator i = cameras.begin(); i != cameras.end(); i++) {
-		c = dynamic_cast<Camera*> ((*i));
-		c->setIsActive(false);
-	}
-}
+//void Scene::deactivateAllCameras() {
+//	Camera* c = NULL;
+//	for (vector<Camera*>::iterator i = cameras.begin(); i != cameras.end(); i++) {
+//		c = dynamic_cast<Camera*> ((*i));
+//		c->setIsActive(false);
+//	}
+//}
 
 //==========
 

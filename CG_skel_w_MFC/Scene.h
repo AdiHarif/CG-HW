@@ -35,9 +35,6 @@ class Scene {
 
 	mat4 tw;
 
-	//===Inner Getters===
-	Camera* getActiveCamera();
-	//==========
 
 public:
 	//===C'tors===
@@ -48,6 +45,8 @@ public:
 	//===Getters/Setters===
 	vector<Model*> getModels();
 	int getActiveModelIndex();
+	int getActiveCameraIndex();
+	Camera* getActiveCamera();
 	//==========
 
 
@@ -84,7 +83,7 @@ public:
 	void activateNextCamera();
 	void activatePrevCamera();
 	void activateLastCamera();
-	void deactivateAllCameras();
+	//void deactivateAllCameras();
 
 	//==========
 

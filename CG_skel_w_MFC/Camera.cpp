@@ -79,7 +79,7 @@ mat4 Camera::getTransform() { return cTransform; }
 
 mat4 Camera::getProjection() { return projection; }
 
-bool Camera::getIsActive() { return is_active; }
+//bool Camera::getIsActive() { return is_active; }
 
-void Camera::setIsActive(bool new_is_active) { is_active = new_is_active; }
+//void Camera::setIsActive(bool new_is_active) { is_active = new_is_active; }
 //==========

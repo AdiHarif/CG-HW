@@ -97,9 +97,11 @@ void keyboard(unsigned char key, int x, int y)
 		break;
 	case ']':
 		scene->activateNextCamera();
+		cout << scene->getActiveCameraIndex() << endl;
 		break;
 	case '[':
 		scene->activatePrevCamera();
+		cout << scene->getActiveCameraIndex() << endl;
 		break;
 	case TAB:
 		scene->activateNextModel();
@@ -242,9 +244,10 @@ void mainMenu(int id)
 	case MAIN_CAMERA:
 		//TODO: change camera params
 		//TODO: NOT WORKING
-		cam = &Camera(vec4(5.0, 0.0, 0.0));
+		cam = &Camera(vec4(0.0, 0.0, 10.0));
 		scene->addCamera(cam);
-		cout << "added camera";
+		cout << scene->getActiveCameraIndex() << endl;
+		scene->draw();
 		break;
 	case MAIN_DEMO:
 		scene->drawDemo();
