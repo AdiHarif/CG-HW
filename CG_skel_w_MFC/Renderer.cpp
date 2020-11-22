@@ -183,7 +183,7 @@ vector<Line> Renderer::transformEdges(vector<vec4>& edges, mat4 tm) { //TODO:del
 	return lines;
 }
 
-vector<Line> Renderer::transformEdges(vector<Edge>& edges, mat4 tm) { //TODO: improve cliping
+vector<Line> Renderer::transformEdges(vector<Edge>& edges, mat4 tm) { //TODO: improve clipping
 	vector<Line> lines;
 	mat4 t_tot = tp * tc * tw * tm;
 	for (vector<Edge>::iterator i = edges.begin(); i != edges.end(); i++) {
@@ -465,6 +465,13 @@ void Renderer::drawFacesNormals(vector<Normal>& normals, mat4 tm, mat4 ntm, Colo
 	for (vector<Line>::iterator i = lines.begin(); i != lines.end(); i++) {
 		rasterizeLine(*i, c);
 	}
+}
+
+void Renderer::drawCamera(vec4 pos, vec4 at, vec4 up, Color c) {
+	vector<vec4> vector;
+	vector.push_back(pos);
+	mat4 I = mat4();
+	//vector<Pixel> pixels = transformVertices(vector, I);
 }
 
 void Renderer::SetDemoBuffer()
