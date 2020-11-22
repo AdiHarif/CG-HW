@@ -332,6 +332,11 @@ void Scene::rotateCameraYAroundAt(float theta) {
 void Scene::rotateCameraZAroundAt(float theta) {
 	getActiveCamera()->rotateZAroundAt(theta);
 }
+
+void Scene::translateCameraC(vec4 v) {
+	getActiveCamera()->translateC(v);
+}
+
 //==========
 
 //===Other===

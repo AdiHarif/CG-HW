@@ -80,7 +80,17 @@ void Camera::rotateZAroundAt(float theta) {
     position = tci * vec4(0, 0, 0, 1);//updating new position in world coordinates
 }
 
-void translate(vec4 v) {
+void Camera::translateC(vec4 v) {
+    mat4 t = translateMat(-v);
+    mat4 ti = translateMat(v);
+
+    vec4 atc = tc * at; //at point in camera coordinates, this should not change after translate
+
+    tc = t * tc;
+    tci = tci * ti;
+
+    at = tci* atc;
+    position = vec4(tci[0][3], tci[1][3], tci[2][3], 1); //tci* (0,0,0,1)
 
 }
 

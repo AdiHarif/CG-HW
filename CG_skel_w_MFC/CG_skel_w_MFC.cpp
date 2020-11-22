@@ -122,15 +122,39 @@ void keyboard(unsigned char key, int x, int y)
 	case 'V':
 		scene->rotateCameraZAroundAt(-ROTATE_THETA_DEF);
 		break;
+	case 'i':
+	case 'I':
+		scene->rotateCameraXAroundAt(ROTATE_THETA_DEF);
+		break;
+	case 'k':
+	case 'K':
+		scene->rotateCameraXAroundAt(-ROTATE_THETA_DEF);
+		break;
+	case 'f':
+	case 'F':
+		scene->translateCameraC(vec4(-TRANSLATE_DEF, 0,0));
+		break;
+	case 'h':
+	case 'H':
+		scene->translateCameraC(vec4(TRANSLATE_DEF, 0, 0));
+		break;
+	case 't':
+	case 'T':
+		scene->translateCameraC(vec4(0, TRANSLATE_DEF, 0));
+		break;
+	case 'g':
+	case 'G':
+		scene->translateCameraC(vec4(0, -TRANSLATE_DEF, 0));
+		break;
 	case 'u':
 	case 'U':
-		scene->rotateCameraXAroundAt(ROTATE_THETA_DEF);
+		scene->translateCameraC(vec4(0, 0, -TRANSLATE_DEF));
 		break;
 	case 'j':
 	case 'J':
-		scene->rotateCameraXAroundAt(-ROTATE_THETA_DEF);
+		scene->translateCameraC(vec4(0, 0, TRANSLATE_DEF));
 		break;
-}
+	}
 	scene->draw();
 }
 

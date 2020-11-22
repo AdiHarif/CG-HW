@@ -38,7 +38,7 @@ public:
 	void rotateYAroundAt(float theta);
 	void rotateZAroundAt(float theta);
 
-	void translate(vec4 v);
+	void translateC(vec4 v); //translate in camera coordinates
 
 
 

@@ -90,6 +90,8 @@ public:
 	void rotateCameraXAroundAt(float theta);
 	void rotateCameraYAroundAt(float theta);
 	void rotateCameraZAroundAt(float theta);
+
+	void translateCameraC(vec4 v);
 	//==========
 
 	//===Other===
