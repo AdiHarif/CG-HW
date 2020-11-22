@@ -123,6 +123,10 @@ void addNewCamera() {
 }
 
 void transformActiveCamera() {
+	
+}
+
+void setProjectionSettings() {
 	int type;
 	float left, right, bottom, top, z_near, z_far, fovy, aspect;
 	cout << "Choose from the following:" << endl;
@@ -162,10 +166,6 @@ void transformActiveCamera() {
 			break;
 		}
 	}
-}
-
-void setProjectionSettings() {
-
 }
 
 //==========
