@@ -106,6 +106,10 @@ public:
 	void rotateCameraZAroundAt(float theta);
 
 	void translateCameraC(vec4 v);
+	void translateCameraWorld(vec4 v);
+	void rotateCameraXWorld(float theta);
+	void rotateCameraYWorld(float theta);
+	void rotateCameraZWorld(float theta);
 
 
 	void zoom(float amount);

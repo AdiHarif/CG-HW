@@ -22,7 +22,7 @@ void Camera::setTransformation(vec4 x_axis, vec4 y_axis, vec4 z_axis, vec4 posit
 
     x_axis.w = y_axis.w = z_axis.w = 0.0;
     x_axis = normalize(x_axis);
-    y_axis = normalize(y_axis);
+    up = y_axis = normalize(y_axis);
     z_axis = normalize(z_axis);
 
     tci = mat4(
@@ -91,6 +91,63 @@ void Camera::translateC(vec4 v) {
 
     at = tci* atc;
     position = vec4(tci[0][3], tci[1][3], tci[2][3], 1); //tci* (0,0,0,1)
+
+}
+
+
+void Camera::translateWorld(vec4 v) {
+
+    mat4 t = translateMat(v);
+    mat4 ti = translateMat(-v);
+
+    position = t * position;
+    at = t * at;
+
+    lookAt();
+
+}
+
+void Camera::rotateXWorld(float theta) {
+    mat4 r = rotateXMat(theta);
+    mat4 t = translateMat(position);
+    mat4 ti = translateMat(-position);
+
+    mat4 t_tot = t * r * ti;
+    at = t_tot * at;
+    up = r *up;
+
+    lookAt();
+
+
+}
+
+void Camera::rotateYWorld(float theta) {
+    mat4 r = rotateYMat(theta);
+    mat4 t = translateMat(position);
+    mat4 ti = translateMat(-position);
+
+    mat4 t_tot = t * r * ti;
+    at = t_tot * at;
+    up = r * up;
+
+    lookAt();
+
+
+
+}
+
+void Camera::rotateZWorld(float theta) {
+    mat4 r = rotateZMat(theta);
+    mat4 t = translateMat(position);
+    mat4 ti = translateMat(-position);
+
+    mat4 t_tot = t * r * ti;
+    at = t_tot * at;
+    up = r * up;
+
+    lookAt();
+
+
 
 }
 

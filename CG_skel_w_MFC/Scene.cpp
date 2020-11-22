@@ -404,6 +404,20 @@ void Scene::rotateCameraZAroundAt(float theta) {
 void Scene::translateCameraC(vec4 v) {
 	getActiveCamera()->translateC(v);
 }
+void Scene::translateCameraWorld(vec4 v) {
+	getActiveCamera()->translateWorld(v);
+}
+
+void Scene::rotateCameraXWorld(float theta) {
+	getActiveCamera()->rotateXWorld(theta);
+}
+void Scene::rotateCameraYWorld(float theta) {
+	getActiveCamera()->rotateYWorld(theta);
+}
+void Scene::rotateCameraZWorld(float theta) {
+	getActiveCamera()->rotateZWorld(theta);
+}
+
 
 
 void Scene::zoom(float amount) {

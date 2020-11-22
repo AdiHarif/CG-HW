@@ -244,6 +244,7 @@ void keyboard(unsigned char key, int x, int y)
 		break;
 	case 'm':
 	case 'M':
+<<<<<<< HEAD
 		scene->rotateCameraYAroundAt(rotation_step);
 		break;
 	case 'n':
@@ -281,6 +282,45 @@ void keyboard(unsigned char key, int x, int y)
 	case 'g':
 	case 'G':
 		scene->translateCameraC(vec4(0, -translation_step, 0));
+=======
+		scene->rotateCameraYWorld(ROTATE_THETA_DEF);
+		break;
+	case 'n':
+	case 'N':
+		scene->rotateCameraYWorld(-ROTATE_THETA_DEF);
+		break;
+	case 'b':
+	case 'B':
+		scene->rotateCameraZWorld(ROTATE_THETA_DEF);
+		break;
+	case 'v':
+	case 'V':
+		scene->rotateCameraZWorld(-ROTATE_THETA_DEF);
+		break;
+	case 'i':
+	case 'I':
+		scene->rotateCameraXWorld(ROTATE_THETA_DEF);
+		break;
+	case 'k':
+	case 'K':
+		scene->rotateCameraXWorld(-ROTATE_THETA_DEF);
+		break;
+	case 'f':
+	case 'F':
+		scene->translateCameraWorld(vec4(-TRANSLATE_DEF, 0,0));
+		break;
+	case 'h':
+	case 'H':
+		scene->translateCameraWorld(vec4(TRANSLATE_DEF, 0, 0));
+		break;
+	case 't':
+	case 'T':
+		scene->translateCameraWorld(vec4(0, TRANSLATE_DEF, 0));
+		break;
+	case 'g':
+	case 'G':
+		scene->translateCameraWorld(vec4(0, -TRANSLATE_DEF, 0));
+>>>>>>> 783538199a71d59554b9f8274fab712ace579824
 		break;
 	case 'u':
 	case 'U':
