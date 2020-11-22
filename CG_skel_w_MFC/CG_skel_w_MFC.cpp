@@ -213,11 +213,9 @@ void keyboard(unsigned char key, int x, int y)
 		break;
 	case ']':
 		scene->activateNextCamera();
-		cout << scene->getActiveCameraIndex() << endl;
 		break;
 	case '[':
 		scene->activatePrevCamera();
-		cout << scene->getActiveCameraIndex() << endl;
 		break;
 	case TAB:
 		scene->activateNextModel();
