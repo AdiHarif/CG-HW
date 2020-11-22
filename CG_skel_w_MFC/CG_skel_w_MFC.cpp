@@ -242,31 +242,6 @@ void keyboard(unsigned char key, int x, int y)
 	case DEL:
 		scene->removeModel(scene->getActiveModelIndex());
 		break;
-	case 'm':
-	case 'M':
-<<<<<<< HEAD
-		scene->rotateCameraYAroundAt(rotation_step);
-		break;
-	case 'n':
-	case 'N':
-		scene->rotateCameraYAroundAt(-rotation_step);
-		break;
-	case 'b':
-	case 'B':
-		scene->rotateCameraZAroundAt(rotation_step);
-		break;
-	case 'v':
-	case 'V':
-		scene->rotateCameraZAroundAt(-rotation_step);
-		break;
-	case 'i':
-	case 'I':
-		scene->rotateCameraXAroundAt(rotation_step);
-		break;
-	case 'k':
-	case 'K':
-		scene->rotateCameraXAroundAt(-rotation_step);
-		break;
 	case 'f':
 	case 'F':
 		scene->translateCameraC(vec4(-translation_step, 0,0));
@@ -282,53 +257,14 @@ void keyboard(unsigned char key, int x, int y)
 	case 'g':
 	case 'G':
 		scene->translateCameraC(vec4(0, -translation_step, 0));
-=======
-		scene->rotateCameraYWorld(ROTATE_THETA_DEF);
-		break;
-	case 'n':
-	case 'N':
-		scene->rotateCameraYWorld(-ROTATE_THETA_DEF);
-		break;
-	case 'b':
-	case 'B':
-		scene->rotateCameraZWorld(ROTATE_THETA_DEF);
-		break;
-	case 'v':
-	case 'V':
-		scene->rotateCameraZWorld(-ROTATE_THETA_DEF);
-		break;
-	case 'i':
-	case 'I':
-		scene->rotateCameraXWorld(ROTATE_THETA_DEF);
-		break;
-	case 'k':
-	case 'K':
-		scene->rotateCameraXWorld(-ROTATE_THETA_DEF);
-		break;
-	case 'f':
-	case 'F':
-		scene->translateCameraWorld(vec4(-TRANSLATE_DEF, 0,0));
-		break;
-	case 'h':
-	case 'H':
-		scene->translateCameraWorld(vec4(TRANSLATE_DEF, 0, 0));
-		break;
-	case 't':
-	case 'T':
-		scene->translateCameraWorld(vec4(0, TRANSLATE_DEF, 0));
-		break;
-	case 'g':
-	case 'G':
-		scene->translateCameraWorld(vec4(0, -TRANSLATE_DEF, 0));
->>>>>>> 783538199a71d59554b9f8274fab712ace579824
 		break;
 	case 'u':
 	case 'U':
-		scene->zoom(scale_step);
+		scene->scaleSelection(scale_step);
 		break;
 	case 'j':
 	case 'J':
-		scene->zoom(1/(scale_step));
+		scene->scaleSelection(1/(scale_step));
 		break;
 	case SPACEBAR:
 		scene->lookAtActiveModel();
@@ -366,11 +302,11 @@ void mouse(int button, int state, int x, int y)
 			break;
 		case SCROLL_UP:
 			//cout << "scroll up" << endl;
-			scene->scaleSelection(scale_step);
+			scene->zoom(scale_step);
 			break;
 		case SCROLL_DOWN:
 			//cout << "scroll down" << endl;
-			scene->scaleSelection(1/scale_step);
+			scene->zoom(1/scale_step);
 			break;
 	}
 
@@ -431,8 +367,8 @@ void motion(int x, int y)
 		first_movement = false;
 	}
 	else {
-		scene->rotateSelectionY(-dx);
-		scene->rotateSelectionX(dy);
+		scene->rotateCameraYAroundAt(-dx);
+		scene->rotateCameraXAroundAt(dy);
 		scene->draw();
 	}
 }
