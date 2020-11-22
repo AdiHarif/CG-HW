@@ -192,6 +192,22 @@ vector<Line> Renderer::transformFaces(vector<vec4>& faces, mat4 tm) {
 	return lines;
 }
 
+vector<Line> Renderer::transformNormals(vector<Normal>& normals, mat4 tm, mat4 ntm) {
+	vector<Line> lines;
+	mat4 tm_tot = tp * tc * tw * tm;
+	mat4 ntm_tot = tp * tc * tw * ntm;
+	for (int i = 0; i < normals.size(); i++) {
+		vec4 start = tm_tot * (normals[i].vertex);
+		vec4 end = ntm_tot * (normals[i].normal);
+		end += start;
+		Line l = Line(viewPort(start), viewPort(end));
+		if (isLineLegal(l)) {
+			lines.push_back(l);
+		}
+	}
+	return lines;
+}
+
 //==========
 
 
@@ -334,7 +350,6 @@ void Renderer::drawLines(vector<Edge>& edges, mat4 tm, Color c) {//TODO: impleme
 	}
 }
 
-
 void Renderer::drawTriangles(vector<vec4>& vertex_positions, mat4 tm, Color c) {
 	vector<Line> lines = transformFaces(vertex_positions, tm);
 	for (vector<Line>::iterator i = lines.begin(); i != lines.end(); i++) {
@@ -342,9 +357,9 @@ void Renderer::drawTriangles(vector<vec4>& vertex_positions, mat4 tm, Color c) {
 	}
 }
 
-void Renderer::drawVertexNormals(vector<Vertex>& points, mat4 tm, vector<vec4>& normals, mat4 ntm, vector<int>& vertex_normals_indexes, Color c) {
+//void Renderer::drawVertexNormals(vector<Vertex>& points, mat4 tm, vector<vec4>& normals, mat4 ntm, vector<int>& vertex_normals_indexes, Color c) {
 	//vector<vec4> normals_to_draw;
-	for (vector<vec4>::iterator i = normals.begin(); i != normals.end(); i++) {
+	/*for (vector<vec4>::iterator i = normals.begin(); i != normals.end(); i++) {
 		*i = normalize(*i);
 		*i *= 10;
 	}
@@ -360,6 +375,20 @@ void Renderer::drawVertexNormals(vector<Vertex>& points, mat4 tm, vector<vec4>& 
 
 		Line l = Line(start, end);
 		rasterizeLine(l, c);
+	}
+}*/
+
+void Renderer::drawVertexNormals(vector<Normal>& normals, mat4 tm, mat4 ntm, Color c) {
+	vector<Line> lines = transformNormals(normals, tm, ntm);
+	for (vector<Line>::iterator i = lines.begin(); i != lines.end(); i++) {
+		rasterizeLine(*i, c);
+	}
+}
+
+void Renderer::drawFacesNormals(vector<Normal>& normals, mat4 tm, mat4 ntm, Color c) {
+	vector<Line> lines = transformNormals(normals, tm, ntm);
+	for (vector<Line>::iterator i = lines.begin(); i != lines.end(); i++) {
+		rasterizeLine(*i, c);
 	}
 }
 
