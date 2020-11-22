@@ -404,7 +404,7 @@ void Renderer::drawCamera(vec4 pos, vec4 at, vec4 up, Color c) {
 	vector<vec4> vector;
 	vector.push_back(pos);
 	mat4 I = mat4();
-	vector<Pixel> pixels = transformVertices(vector, I);
+	//vector<Pixel> pixels = transformVertices(vector, I);
 }
 
 void Renderer::SetDemoBuffer()
