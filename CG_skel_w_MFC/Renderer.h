@@ -47,9 +47,9 @@ typedef struct Edge {
 
 typedef struct Normal {
 	Vertex vertex;
-	vec4 normal;
+	vec4 direction;
 
-	Normal(Vertex vertex, vec4 normal) : vertex(vertex), normal(normal) {}
+	Normal(Vertex vertex, vec4 direction) : vertex(vertex), direction(direction) {}
 };
 
 

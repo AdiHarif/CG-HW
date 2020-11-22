@@ -195,11 +195,19 @@ vector<Line> Renderer::transformFaces(vector<vec4>& faces, mat4 tm) {
 vector<Line> Renderer::transformNormals(vector<Normal>& normals, mat4 tm, mat4 ntm) {
 	vector<Line> lines;
 	mat4 tm_tot = tp * tc * tw * tm;
-	mat4 ntm_tot = tp * tc * tw * ntm;
+	mat4 ntm_t1 = tw * ntm;
+	mat4 ntm_t2 = tp * tc;
 	for (int i = 0; i < normals.size(); i++) {
 		vec4 start = tm_tot * (normals[i].vertex);
-		vec4 end = ntm_tot * (normals[i].normal);
-		end += start;
+		start = start / start.w;
+		vec4 direction = ntm_t1 * (normals[i].direction);
+		direction.w = 0;
+		direction = normalize(direction);
+		direction.w = 1;
+		direction = ntm_t2 * direction;
+		direction = direction / direction.w;
+		vec4 end = start + direction;
+		end.w = 1;
 		Line l = Line(viewPort(start), viewPort(end));
 		if (isLineLegal(l)) {
 			lines.push_back(l);
