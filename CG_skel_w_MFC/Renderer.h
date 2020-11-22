@@ -123,6 +123,7 @@ public:
 	void drawTriangles(vector<vec4>& vertex_positions, mat4 tm, Color c);
 	void drawVertexNormals(vector<Normal>& normals, mat4 tm, mat4 ntm, Color c);
 	void drawFacesNormals(vector<Normal>& normals, mat4 tm, mat4 ntm, Color c);
+	void drawCamera(vec4 pos, vec4 at, vec4 up, Color c);
 
 	void SetDemoBuffer();
 	//==========

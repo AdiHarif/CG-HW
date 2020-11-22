@@ -168,6 +168,10 @@ void setProjectionSettings() {
 	}
 }
 
+void transformWorld() {
+
+}
+
 //==========
 
 // Callbacks
@@ -341,6 +345,9 @@ void special(int key, int x, int y) {
 	case GLUT_KEY_F5:
 		scene->toggleFaceNormals();
 		break;
+	case GLUT_KEY_F6:
+		
+		break;
 	}
 	
 
@@ -432,7 +439,8 @@ void camerasMenuCB(int id){
 void mainMenuCB(int id){
 	switch(id){
 		case MAIN_MENU_TRANSFORM_WORLD:
-			std::cout << "MAIN_MENU_TRANSFORM_WORLD" << std::endl;
+			transformWorld();
+			//std::cout << "MAIN_MENU_TRANSFORM_WORLD" << std::endl;
 			break;
 		case MAIN_MENU_PARTY:
 			scene->party();
