@@ -46,6 +46,7 @@ public:
 	//===Getters/Setters===
 	vector<Model*> getModels();
 	int getActiveModelIndex();
+	Model* getActiveModel();
 	int getActiveCameraIndex();
 	Camera* getActiveCamera();
 	//==========
@@ -95,6 +96,7 @@ public:
 		const float z_near, const float z_far);
 	void activeCameraToPerspective(const float fovy, const float aspect,
 			const float z_near, const float z_far);
+	void lookAtActiveModel();
 	//void deactivateAllCameras();
 
 	void toggleCameraProjection();

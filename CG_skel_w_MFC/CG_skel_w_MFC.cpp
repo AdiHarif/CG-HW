@@ -37,6 +37,8 @@
 #define SCROLL_DOWN 4
 #define TAB 9
 #define DEL 127
+#define SPACEBAR 32
+
 #define SCALE 0
 #define ROTATE 1
 #define TRANSLATE 2
@@ -48,9 +50,13 @@
 #define PERSPECTIVE 2
 
 #define SCALE_UP_DEF 1.1
-#define SCALE_DOWN_DEF (1/1.1)
+//#define SCALE_DOWN_DEF (1/1.1)
 #define ROTATE_THETA_DEF 5
 #define TRANSLATE_DEF 0.3
+#define STEP_DOWN (1/1.1)
+#define STEP_UP 1.1
+#define MIN_SCALE_UP 1.01
+#define MAX_SCALE_DOWN 0.99
 
 Scene *scene;
 Renderer *renderer;
@@ -58,6 +64,7 @@ Renderer *renderer;
 int last_x, last_y;
 bool lb_down, rb_down, mb_down;
 bool first_movement=true;
+float scale_step = SCALE_UP_DEF, rotation_step = ROTATE_THETA_DEF, translation_step = TRANSLATE_DEF;
 //int never_gonna = 0;
 
 //----------------------------------------------------------------------------
@@ -172,6 +179,14 @@ void transformWorld() {
 
 }
 
+void changeAllSteps(float step_change) {
+	scale_step *= step_change;
+	if (step_change == STEP_DOWN)	scale_step = min(scale_step, MIN_SCALE_UP);
+	else	scale_step = max(scale_step, MAX_SCALE_DOWN);
+	rotation_step *= step_change;
+	translation_step *= step_change;
+}
+
 //==========
 
 // Callbacks
@@ -197,19 +212,19 @@ void keyboard(unsigned char key, int x, int y)
 	//rotate:
 	case 'A':
 	case 'a':
-		scene->translateSelection(vec4(-TRANSLATE_DEF, 0, 0));
+		scene->translateSelection(vec4(-translation_step, 0, 0));
 		break;
 	case 'D':
 	case 'd':
-		scene->translateSelection(vec4(TRANSLATE_DEF, 0, 0));
+		scene->translateSelection(vec4(translation_step, 0, 0));
 		break;
 	case 'W':
 	case 'w':
-		scene->translateSelection(vec4(0, TRANSLATE_DEF, 0));
+		scene->translateSelection(vec4(0, translation_step, 0));
 		break;
 	case 'S':
 	case 's':
-		scene->translateSelection(vec4(0, -TRANSLATE_DEF, 0));
+		scene->translateSelection(vec4(0, -translation_step, 0));
 		break;
 	case ']':
 		scene->activateNextCamera();
@@ -229,51 +244,62 @@ void keyboard(unsigned char key, int x, int y)
 		break;
 	case 'm':
 	case 'M':
-		scene->rotateCameraYAroundAt(ROTATE_THETA_DEF);
+		scene->rotateCameraYAroundAt(rotation_step);
 		break;
 	case 'n':
 	case 'N':
-		scene->rotateCameraYAroundAt(-ROTATE_THETA_DEF);
+		scene->rotateCameraYAroundAt(-rotation_step);
 		break;
 	case 'b':
 	case 'B':
-		scene->rotateCameraZAroundAt(ROTATE_THETA_DEF);
+		scene->rotateCameraZAroundAt(rotation_step);
 		break;
 	case 'v':
 	case 'V':
-		scene->rotateCameraZAroundAt(-ROTATE_THETA_DEF);
+		scene->rotateCameraZAroundAt(-rotation_step);
 		break;
 	case 'i':
 	case 'I':
-		scene->rotateCameraXAroundAt(ROTATE_THETA_DEF);
+		scene->rotateCameraXAroundAt(rotation_step);
 		break;
 	case 'k':
 	case 'K':
-		scene->rotateCameraXAroundAt(-ROTATE_THETA_DEF);
+		scene->rotateCameraXAroundAt(-rotation_step);
 		break;
 	case 'f':
 	case 'F':
-		scene->translateCameraC(vec4(-TRANSLATE_DEF, 0,0));
+		scene->translateCameraC(vec4(-translation_step, 0,0));
 		break;
 	case 'h':
 	case 'H':
-		scene->translateCameraC(vec4(TRANSLATE_DEF, 0, 0));
+		scene->translateCameraC(vec4(translation_step, 0, 0));
 		break;
 	case 't':
 	case 'T':
-		scene->translateCameraC(vec4(0, TRANSLATE_DEF, 0));
+		scene->translateCameraC(vec4(0, translation_step, 0));
 		break;
 	case 'g':
 	case 'G':
-		scene->translateCameraC(vec4(0, -TRANSLATE_DEF, 0));
+		scene->translateCameraC(vec4(0, -translation_step, 0));
 		break;
 	case 'u':
 	case 'U':
-		scene->zoom(1.1);
+		scene->zoom(scale_step);
 		break;
 	case 'j':
 	case 'J':
-		scene->zoom(1/(1.1));
+		scene->zoom(1/(scale_step));
+		break;
+	case SPACEBAR:
+		scene->lookAtActiveModel();
+		break;
+	case 'z':
+	case 'Z':
+		changeAllSteps(STEP_DOWN);
+		break;
+	case 'x':
+	case 'X':
+		changeAllSteps(STEP_UP);
 		break;
 	}
 	scene->draw();
@@ -300,11 +326,11 @@ void mouse(int button, int state, int x, int y)
 			break;
 		case SCROLL_UP:
 			//cout << "scroll up" << endl;
-			scene->scaleSelection(SCALE_UP_DEF);
+			scene->scaleSelection(scale_step);
 			break;
 		case SCROLL_DOWN:
 			//cout << "scroll down" << endl;
-			scene->scaleSelection(SCALE_DOWN_DEF);
+			scene->scaleSelection(1/scale_step);
 			break;
 	}
 
@@ -315,16 +341,16 @@ void special(int key, int x, int y) {
 	switch (key) {
 	//translate:
 	case GLUT_KEY_RIGHT:
-		scene->rotateSelectionY(-ROTATE_THETA_DEF);
+		scene->rotateSelectionY(-rotation_step);
 		break;
 	case GLUT_KEY_LEFT:
-		scene->rotateSelectionY(ROTATE_THETA_DEF);
+		scene->rotateSelectionY(rotation_step);
 		break;
 	case GLUT_KEY_UP:
-		scene->rotateSelectionX(-ROTATE_THETA_DEF);
+		scene->rotateSelectionX(-rotation_step);
 		break;
 	case GLUT_KEY_DOWN:
-		scene->rotateSelectionX(ROTATE_THETA_DEF);
+		scene->rotateSelectionX(rotation_step);
 		break;
 	
 	//toggles:
@@ -444,7 +470,11 @@ void mainMenuCB(int id){
 			scene->party();
 			break;
 		case MAIN_MENU_ABOUT:
-			AfxMessageBox("Never gonna give you up");
+			/*LPCTSTR s = "asdfasdf";
+			s =s+ "\n";
+			s = s+ "NO WAY";
+			AfxMessageBox(s);*/
+			AfxMessageBox("I don't always write long manuals, but when I do:");
 			break;
 	}
 }

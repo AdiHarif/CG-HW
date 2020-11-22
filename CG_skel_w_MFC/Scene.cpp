@@ -9,6 +9,10 @@ using namespace std;
 Color camera_plus_color = { 1.0, 1.0, 0.0 };
 
 //===Inner Getters===
+Model* Scene::getActiveModel() {
+	return models[active_model];
+}
+
 Camera* Scene::getActiveCamera() {
 	return cameras[active_camera];
 }
@@ -364,6 +368,12 @@ void Scene::activeCameraToPerspective(const float fovy, const float aspect,
 	const float z_near, const float z_far) {
 
 	getActiveCamera()->perspective(fovy, aspect, z_near, z_far);
+}
+
+void Scene::lookAtActiveModel() {
+	MeshModel* m = dynamic_cast<MeshModel*> (getActiveModel());
+	Camera* c = getActiveCamera();
+	c->lookAt(m->getPosition(), c->getUp());
 }
 
 
