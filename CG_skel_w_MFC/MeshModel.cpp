@@ -124,7 +124,11 @@ void MeshModel::loadFile(string fileName)
 			vertex_positions.push_back(vec4(vertices[it->v[i] - 1]));
 			
 			if (!vertex_normals.empty()) {
-				vertices_to_normals.push_back(Normal(vertices[it->v[i] - 1], normalize(vertex_normals[it->vn[i] - 1])));
+				vec4 dir = vertex_normals[it->vn[i] - 1];
+				dir.w = 0;
+				dir = normalize(dir);
+				dir.w = 1;
+				vertices_to_normals.push_back(Normal(vertices[it->v[i] - 1], dir));
 			}
 			//vertex_normals_indexes.push_back(it->v[i] - 1);
 			//vertex_normals_indexes.push_back(it->vn[i] - 1);
