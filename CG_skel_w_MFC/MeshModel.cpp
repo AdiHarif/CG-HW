@@ -181,7 +181,7 @@ void MeshModel::drawFacesNormals(Renderer* renderer) {
 		vecs_to_draw.push_back(tcwm * faces_normals[i]);
 	}
 	renderer->drawLines(vecs_to_draw, faces_normals_color);*/
-	if (vertex_normals.empty())	return;
+	if (vertex_positions.empty())	return;
 	Color color = is_active ? faces_normals_color : inactive_mesh_color;
 	renderer->drawFacesNormals(faces_to_normals, tm, ntm, color);
 
@@ -208,9 +208,6 @@ void MeshModel::translate(vec4 v) {
 	mat4 t = translateMat(v);
 	this->position = t * this->position;
 	this->tm = t * this->tm;
-
-	// normals transformations:
-	ntm = t * ntm;
 }
 
 void MeshModel::scale(vec3 v) {
@@ -220,9 +217,8 @@ void MeshModel::scale(vec3 v) {
 	this->tm = t1 * s * t2 * this->tm;
 
 	// normals transformations:
-	mat4 s_inv = scaleMat(1 / v.x, 1 / v.y, 1 / v.z);
-	// no need to transpose, s_inv is diagonal
-	ntm = t1 * s_inv * t2 * ntm;
+	mat4 sn1 = scaleMat(1 / v.x, 1 / v.y, 1 / v.z);
+	ntm = sn1 * ntm;
 }
 
 void MeshModel::rotateX(GLfloat theta) {
@@ -232,7 +228,7 @@ void MeshModel::rotateX(GLfloat theta) {
 	this->tm = t1 * r * t2 * this->tm;
 
 	// normals transformations:
-	ntm = t1 * r * t2 * ntm;
+	ntm =  r * ntm;
 }
 
 void MeshModel::rotateY(GLfloat theta) {
@@ -242,7 +238,7 @@ void MeshModel::rotateY(GLfloat theta) {
 	this->tm = t1 * r * t2 * this->tm;
 
 	// normals transformations:
-	ntm = t1 * r * t2 * ntm;
+	ntm =  r * ntm;
 }
 
 void MeshModel::rotateZ(GLfloat theta) {
@@ -252,7 +248,7 @@ void MeshModel::rotateZ(GLfloat theta) {
 	this->tm = t1 * r * t2 * this->tm;
 
 	// normals transformations:
-	ntm = t1 * r * t2 * ntm;
+	ntm =  r * ntm;
 }
 
 vector<vec4> MeshModel::getVertices() {
@@ -302,15 +298,17 @@ void MeshModel::computeFacesNormals() {
 
 		vec4 center = vec4( (vertex_positions[i].x + vertex_positions[i + 1].x + vertex_positions[i + 2].x) / 3,
 							(vertex_positions[i].y + vertex_positions[i + 1].y + vertex_positions[i + 2].y) / 3,
-							(vertex_positions[i].z + vertex_positions[i + 1].z + vertex_positions[i + 2].z) / 3 );
+							(vertex_positions[i].z + vertex_positions[i + 1].z + vertex_positions[i + 2].z) / 3 ,
+							1.0);
 	
 		vec4 v0 = vertex_positions[i + 1] - vertex_positions[i];
 		vec4 v1 = vertex_positions[i + 2] - vertex_positions[i];
 		vec4 crs = cross(v0, v1);
-		vec4 normal = normalize(crs / length(crs));
-		normal += center;
+		crs.w = 0;
+		vec4 direction = crs / length(crs);
+		direction.w = 1;
 		
-		faces_to_normals.push_back(Normal(center, normal));
+		faces_to_normals.push_back(Normal(center, direction));
 	}
 }
 
