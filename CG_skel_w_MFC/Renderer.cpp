@@ -117,7 +117,12 @@ bool Renderer::isPixelLegal(Pixel p) {
 }
 
 bool Renderer::isLineLegal(Line l) {
-	return isPixelLegal(l.start) || isPixelLegal(l.end);
+	return !(
+		(l.start.x < 0 && l.end.x < 0) ||
+		(l.start.x > m_width && l.end.x > m_width) ||
+		(l.start.y < 0 && l.end.y < 0) ||
+		(l.start.y > m_height && l.end.y > m_height)
+		);
 }
 
 Pixel Renderer::viewPort(Vertex v) {
