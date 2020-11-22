@@ -1,0 +1,40 @@
+I don't always write long manuals, but when I do:
+
+
+HOW TO USE:
+
+Mouse:
+LEFT_BUTTON (hold): Move camera around lookAt point
+RIGHT_BUTTON: Open menu
+SCROLL_UP: Zoom in
+SCROLL_DOWN: Zoom out
+
+
+Keyboard:
+ESC: Exit program
+TAB: Switch between selected models
+W-A-S-D: Move selected models in world view
+]: Activate next camera (cyclic)
+[: Activate previous camera (cyclic)
+P: Toggle camera projection (Ortho-Frustum)
+DEL: Remove selected model
+B-V-I-K-M-N: Rotate camera around lookAt point //DELETE
+F-H-T-G: Strafe selected camera
+U-J: Scale selected model(s)
+Z-X: Change step size
+ARROW_KEYS: Rotate selected model(s) (X, Y)
+F1: Toggle drawing vertices
+F2: Toggle drawing edges
+F3: Toggle drawing bounding box(es)
+F4: Toggle drawing vertex normals
+F5: Toggle drawing face normals
+F6: Toggle drawing cameras
+
+Legend:
+Green: Selected model(s)
+Grey: Unselected model(s)
+Red dot: (0, 0, 0)
+Yellow +: Cameras
+Purple: Vertex normals (of selected model(s))
+Red: Face normals (of selected model(s))
+White: Bounding box
