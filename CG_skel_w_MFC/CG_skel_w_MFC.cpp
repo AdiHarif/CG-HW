@@ -244,7 +244,6 @@ void keyboard(unsigned char key, int x, int y)
 		break;
 	case 'm':
 	case 'M':
-<<<<<<< HEAD
 		scene->rotateCameraYAroundAt(rotation_step);
 		break;
 	case 'n':
@@ -282,45 +281,6 @@ void keyboard(unsigned char key, int x, int y)
 	case 'g':
 	case 'G':
 		scene->translateCameraC(vec4(0, -translation_step, 0));
-=======
-		scene->rotateCameraYWorld(ROTATE_THETA_DEF);
-		break;
-	case 'n':
-	case 'N':
-		scene->rotateCameraYWorld(-ROTATE_THETA_DEF);
-		break;
-	case 'b':
-	case 'B':
-		scene->rotateCameraZWorld(ROTATE_THETA_DEF);
-		break;
-	case 'v':
-	case 'V':
-		scene->rotateCameraZWorld(-ROTATE_THETA_DEF);
-		break;
-	case 'i':
-	case 'I':
-		scene->rotateCameraXWorld(ROTATE_THETA_DEF);
-		break;
-	case 'k':
-	case 'K':
-		scene->rotateCameraXWorld(-ROTATE_THETA_DEF);
-		break;
-	case 'f':
-	case 'F':
-		scene->translateCameraWorld(vec4(-TRANSLATE_DEF, 0,0));
-		break;
-	case 'h':
-	case 'H':
-		scene->translateCameraWorld(vec4(TRANSLATE_DEF, 0, 0));
-		break;
-	case 't':
-	case 'T':
-		scene->translateCameraWorld(vec4(0, TRANSLATE_DEF, 0));
-		break;
-	case 'g':
-	case 'G':
-		scene->translateCameraWorld(vec4(0, -TRANSLATE_DEF, 0));
->>>>>>> 783538199a71d59554b9f8274fab712ace579824
 		break;
 	case 'u':
 	case 'U':
@@ -514,7 +474,42 @@ void mainMenuCB(int id){
 			s =s+ "\n";
 			s = s+ "NO WAY";
 			AfxMessageBox(s);*/
-			AfxMessageBox("I don't always write long manuals, but when I do:");
+			//AfxMessageBox("I don't always write long manuals, but when I do:");
+			AfxMessageBox("I don't always write long manuals, but when I do:\r\n"
+						"HOW TO USE:\r\n"
+						"\r\nMouse:\r\n"
+						"LEFT_BUTTON(hold): Move camera around lookAt point\r\n"
+						"RIGHT_BUTTON: Open menu\r\n"
+						"SCROLL_UP: Zoom in\r\n"
+						"SCROLL_DOWN: Zoom out\r\n"
+
+						"\r\nKeyboard:\r\n"
+						"ESC: Exit program\r\n"
+						"TAB: Switch between selected models\r\n"
+						"W-A-S-D: Move selected models in world view\r\n"
+						"]: Activate next camera(cyclic)\r\n"
+						"[: Activate previous camera(cyclic)\r\n"
+						"P: Toggle camera projection(Ortho-Frustum)\r\n"
+						"DEL: Remove selected model\r\n"
+						"F-H-T-G: Strafe selected camera\r\n"
+						"U-J: Scale selected model(s)\r\n"
+						"Z-X: Change step size\r\n"
+						"ARROW_KEYS: Rotate selected model(s) (X, Y)\r\n"
+						"F1: Toggle drawing vertices\r\n"
+						"F2: Toggle drawing edges\r\n"
+						"F3: Toggle drawing bounding box(es)\r\n"
+						"F4: Toggle drawing vertex normals\r\n"
+						"F5: Toggle drawing face normals\r\n"
+						"F6: Toggle drawing cameras\r\n"
+
+						"\r\nLegend:\r\n"
+						"Green: Selected model(s)\r\n"
+						"Grey: Unselected model(s)\r\n"
+						"Red dot: (0, 0, 0)\r\n"
+						"Yellow +: Cameras\r\n"
+						"Purple: Vertex normals(of selected model(s))\r\n"
+						"Red: Face normals(of selected model(s))\r\n"
+						"White: Bounding box\r\n");
 			break;
 	}
 }
