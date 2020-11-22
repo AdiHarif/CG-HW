@@ -160,7 +160,7 @@ vector<Line> Renderer::transformEdges(vector<vec4>& edges, mat4 tm) { //TODO:del
 		vec4 v1 = t_tot * (*(i + 1));
 		v1 = v1 / v1.w;
 		if ((v0.z < -1 && v1.z < -1) || (v0.z > 1 && v1.z > 1)) continue;
-		if (v0.z > v1.z) {
+		/*if (v0.z > v1.z) {
 			vec4 tmp = v0;
 			v0 = v1;
 			v1 = tmp;
@@ -172,7 +172,7 @@ vector<Line> Renderer::transformEdges(vector<vec4>& edges, mat4 tm) { //TODO:del
 		if (v1.z > 1) {
 			vec4 correction = (v0-v1) * ((1 - v1.z) / (v0.z - v1.z));
 			v0 = v0 + correction;
-		}
+		}*/
 
 
 		Line l = Line(viewPort(v0), viewPort(v1));
@@ -192,7 +192,7 @@ vector<Line> Renderer::transformEdges(vector<Edge>& edges, mat4 tm) { //TODO: im
 		vec4 v1 = t_tot * (i->end);
 		v1 = v1 / v1.w;
 		if ((v0.z < -1 && v1.z < -1) || (v0.z > 1 && v1.z > 1)) continue;
-		if (v0.z > v1.z) {
+		/*if (v0.z > v1.z) {
 			vec4 tmp = v0;
 			v0 = v1;
 			v1 = tmp;
@@ -204,7 +204,7 @@ vector<Line> Renderer::transformEdges(vector<Edge>& edges, mat4 tm) { //TODO: im
 		if (v1.z > 1) {
 			vec4 correction = (v0 - v1) * ((1 - v1.z) / (v0.z - v1.z));
 			v0 = v0 + correction;
-		}
+		}*/
 		Line l = Line(viewPort(v0),viewPort(v1));
 		if (isLineLegal(l)) {
 			lines.push_back(l);
@@ -223,7 +223,7 @@ vector<Line> Renderer::transformFaces(vector<vec4>& faces, mat4 tm) {
 			vec4 v1 = t_tot * (*(i + ((j + 1) % 3)));
 			v1 = v1 / v1.w;
 			if ((v0.z < -1 && v1.z < -1) || (v0.z > 1 && v1.z > 1)) continue;
-			if (v0.z > v1.z) {
+			/*if (v0.z > v1.z) {
 				vec4 tmp = v0;
 				v0 = v1;
 				v1 = tmp;
@@ -235,7 +235,7 @@ vector<Line> Renderer::transformFaces(vector<vec4>& faces, mat4 tm) {
 			if (v1.z > 1) {
 				vec4 correction = (v0 - v1) * ((1 - v1.z) / (v0.z - v1.z));
 				v0 = v0 + correction;
-			}
+			}*/
 			Line l = Line(viewPort(v0),viewPort(v1));
 			if (isLineLegal(l)) {
 				lines.push_back(l);
@@ -262,7 +262,7 @@ vector<Line> Renderer::transformNormals(vector<Normal>& normals, mat4 tm, mat4 n
 		vec4 end = start + direction;
 		end.w = 1;
 		if ((start.z < -1 && end.z < -1) || (start.z > 1 && end.z > 1)) continue;
-		if (start.z > end.z) {
+		/*if (start.z > end.z) {
 			vec4 tmp = start;
 			start = end;
 			end = tmp;
@@ -274,7 +274,7 @@ vector<Line> Renderer::transformNormals(vector<Normal>& normals, mat4 tm, mat4 n
 		if (end.z > 1) {
 			vec4 correction = (start - end) * ((1 - end.z) / (start.z - end.z));
 			start = start + correction;
-		}
+		}*/
 		Line l = Line(viewPort(start), viewPort(end));
 		if (isLineLegal(l)) {
 			lines.push_back(l);
