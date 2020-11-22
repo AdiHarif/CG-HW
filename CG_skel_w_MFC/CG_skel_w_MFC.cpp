@@ -542,7 +542,7 @@ void initMenu()
 
 	glutAddSubMenu("Models",modelsMenu);
 	glutAddSubMenu("Cameras",camerasMenu);
-	glutAddMenuEntry("Transform World", MAIN_MENU_TRANSFORM_WORLD);
+	//glutAddMenuEntry("Transform World", MAIN_MENU_TRANSFORM_WORLD);
 	glutAddMenuEntry("Party For 5 Seconds",MAIN_MENU_PARTY);
 	glutAddMenuEntry("About",MAIN_MENU_ABOUT);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
