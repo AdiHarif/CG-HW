@@ -43,6 +43,9 @@
 #define X 0
 #define Y 1
 #define Z 2
+#define ORTHO 0
+#define FRUSTUM 1
+#define PERSPECTIVE 2
 
 #define SCALE_UP_DEF 1.1
 #define SCALE_DOWN_DEF (1/1.1)
@@ -69,7 +72,7 @@ void transformActiveModel() {
 	int action, axis, theta;
 	vec3 scale_by, translate_by;
 	cout << "What do you feel like?" << endl;
-	cout << "Scale: 0, Rotate: 1, Translate: 2" << endl;
+	cout << "Scale: 0" << endl << "Rotate: 1" << endl << "Translate: 2" << endl;
 	cin >> action;
 	switch (action) {
 	case SCALE:
@@ -120,7 +123,45 @@ void addNewCamera() {
 }
 
 void transformActiveCamera() {
-
+	int type;
+	float left, right, bottom, top, z_near, z_far, fovy, aspect;
+	cout << "Choose from the following:" << endl;
+	cout << "Ortho: 0" << endl << "Frustum: 1" << endl << "Perspective: 2" << endl;
+	cin >> type;
+	switch (type) {
+	case PERSPECTIVE:
+		cout << "fovy:";
+		cin >> fovy;
+		cout << "aspect:";
+		cin >> aspect;
+		cout << "z_near:";
+		cin >> z_near;
+		cout << "z_far:";
+		cin >> z_far;
+		scene->getActiveCamera()->frustum(left, right, bottom, top, z_near, z_far);
+		break;
+	default:
+		cout << "left:";
+		cin >> left;
+		cout << "right:";
+		cin >> right;
+		cout << "bottom:";
+		cin >> bottom;
+		cout << "top:";
+		cin >> top;
+		cout << "z_near:";
+		cin >> z_near;
+		cout << "z_far:";
+		cin >> z_far;
+		switch (type) {
+		case ORTHO:
+			scene->getActiveCamera()->ortho(left, right, bottom, top, z_near, z_far);
+			break;
+		case FRUSTUM:
+			scene->getActiveCamera()->frustum(left, right, bottom, top, z_near, z_far);
+			break;
+		}
+	}
 }
 
 void setProjectionSettings() {
@@ -365,6 +406,8 @@ void camerasMenuCB(int id){
 		//std::cout << "CAMERA_MENU_PROJECTION_SETTINGS" << std::endl;
 		break;
 	}
+
+	scene->draw();
 }
 
 

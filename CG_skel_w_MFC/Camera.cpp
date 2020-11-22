@@ -160,6 +160,11 @@ void Camera::frustum(const float left, const float right,
     tp = n * s * h;
 }
 
+void Camera::perspective(const float fovy, const float aspect,
+    const float z_near, const float z_far) {
+
+}
+
 void Camera::toggleProjection() {
     projection = proj_type(1 - projection);
     if (projection == p_ortho) {

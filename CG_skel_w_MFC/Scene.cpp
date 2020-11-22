@@ -322,6 +322,26 @@ void Scene::activateLastCamera() {
 	active_camera = cameras.size() - 1;
 }
 
+void Scene::activeCameraToOrtho(const float left, const float right,
+	const float bottom, const float top,
+	const float z_near, const float z_far) {
+
+	getActiveCamera()->ortho(left, right, bottom, top, z_near, z_far);
+}
+
+void Scene::activeCameraToFrustum( const float left, const float right,
+	const float bottom, const float top,
+	const float z_near, const float z_far ) {
+
+	getActiveCamera()->frustum(left, right, bottom, top, z_near, z_far);
+}
+
+void Scene::activeCameraToPerspective(const float fovy, const float aspect,
+	const float z_near, const float z_far) {
+
+	getActiveCamera()->perspective(fovy, aspect, z_near, z_far);
+}
+
 
 //void Scene::deactivateAllCameras() {
 //	Camera* c = NULL;
