@@ -271,11 +271,11 @@ void keyboard(unsigned char key, int x, int y)
 		break;
 	case 'u':
 	case 'U':
-		scene->translateCameraC(vec4(0, 0, -TRANSLATE_DEF));
+		scene->zoom(1.1);
 		break;
 	case 'j':
 	case 'J':
-		scene->translateCameraC(vec4(0, 0, TRANSLATE_DEF));
+		scene->zoom(1/(1.1));
 		break;
 	}
 	scene->draw();
