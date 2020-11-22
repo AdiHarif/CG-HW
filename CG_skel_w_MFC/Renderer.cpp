@@ -474,7 +474,11 @@ void Renderer::drawCamera(vec4 pos, vec4 at, vec4 up, Color c) {
 	vector<Pixel> pixels = transformVertices(vector_pos, I);
 	for (vector<Pixel>::iterator i = pixels.begin(); i != pixels.end(); i++) {
 		//(*i).z = -10;
-		rasterizePoint(*i, c);
+		Pixel origin = *i;
+		for (int j = -2; j <= 2; j++) {
+			rasterizePoint(Pixel(origin.x+j, origin.y, origin.z), c);
+			rasterizePoint(Pixel(origin.x, origin.y+j, origin.z), c);
+		}
 	}
 }
 
