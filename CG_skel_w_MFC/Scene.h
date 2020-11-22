@@ -33,6 +33,8 @@ class Scene {
 	int active_light;
 	int active_camera;
 
+	bool f_draw_cameras = false;
+
 	mat4 tw;
 
 public:
@@ -77,6 +79,7 @@ public:
 	void toggleBB();
 	void toggleVertexNormals();
 	void toggleFaceNormals();
+	void toggleCameras();
 	//==========
 
 	//===Cameras Interface===

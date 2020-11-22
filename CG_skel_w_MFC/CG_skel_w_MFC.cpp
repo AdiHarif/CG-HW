@@ -346,7 +346,7 @@ void special(int key, int x, int y) {
 		scene->toggleFaceNormals();
 		break;
 	case GLUT_KEY_F6:
-		
+		scene->toggleCameras();
 		break;
 	}
 	

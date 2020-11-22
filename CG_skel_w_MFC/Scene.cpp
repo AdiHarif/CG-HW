@@ -53,15 +53,19 @@ void Scene::draw()
 		m->draw(m_renderer);
 	}
 
-	for (vector<Camera*>::iterator i = cameras.begin(); i != cameras.end(); i++) {
-		if (i - cameras.begin() != active_camera) {
-			vec4 pos = (*i)->getPosition();
-			vec4 at = (*i)->getAt();
-			vec4 up = (*i)->getUp();
-			Color color = camera_plus_color;
-			m_renderer->drawCamera(pos, at, up, color);
+	if (f_draw_cameras) {
+		for (vector<Camera*>::iterator i = cameras.begin(); i != cameras.end(); i++) {
+			if ((i - cameras.begin()) != active_camera) {
+				vec4 pos = (*i)->getPosition();
+				vec4 at = (*i)->getAt();
+				vec4 up = (*i)->getUp();
+				Color color = camera_plus_color;
+				m_renderer->drawCamera(pos, at, up, color);
+			}
 		}
 	}
+
+
 
 	vector<vec4> tmp;
 	tmp.push_back(vec4(0,0,0,1));
@@ -298,6 +302,15 @@ void Scene::toggleFaceNormals() {
 			MeshModel* m = dynamic_cast<MeshModel*> (this->models[i]);
 			m->toggleFaceNormals();
 		}
+	}
+}
+
+void Scene::toggleCameras() {
+	if (false) {	//TODO: toggle selected model
+
+	}
+	else {	//toggle world
+		f_draw_cameras = !f_draw_cameras;
 	}
 }
 

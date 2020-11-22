@@ -468,10 +468,14 @@ void Renderer::drawFacesNormals(vector<Normal>& normals, mat4 tm, mat4 ntm, Colo
 }
 
 void Renderer::drawCamera(vec4 pos, vec4 at, vec4 up, Color c) {
-	vector<vec4> vector;
-	vector.push_back(pos);
+	vector<vec4> vector_pos;
+	vector_pos.push_back(pos);
 	mat4 I = mat4();
-	//vector<Pixel> pixels = transformVertices(vector, I);
+	vector<Pixel> pixels = transformVertices(vector_pos, I);
+	for (vector<Pixel>::iterator i = pixels.begin(); i != pixels.end(); i++) {
+		//(*i).z = -10;
+		rasterizePoint(*i, c);
+	}
 }
 
 void Renderer::SetDemoBuffer()
