@@ -39,6 +39,11 @@ public:
 	void rotateZAroundAt(float theta);
 
 	void translateC(vec4 v); //translate in camera coordinates
+	void translateWorld(vec4 v); //translate in world coordinates
+
+	void rotateXWorld(float theta);
+	void rotateYWorld(float theta);
+	void rotateZWorld(float theta);
 
 	void lookAt();
 	void lookAt(const vec4 at, vec4 up = vec4(0, 1, 0, 1));
