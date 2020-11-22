@@ -23,14 +23,15 @@
 
 #define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
 
-#define FILE_OPEN 1
-#define FILE_PRIMITIVE_CUBE 2
-#define CAMERA_ADD 1
-#define CAMERA_SELECT 2
-#define MAIN_CAMERA 1
-#define MAIN_DEMO 2
-#define MAIN_PARTY 3
-#define MAIN_ABOUT 4
+#define MODEL_MENU_OPEN_FILE 1
+#define MODEL_MENU_ADD_PRIMITIVE 2
+#define MODEL_MENU_TRANSFORM_ACTIVE_MODEL 3
+#define CAMERA_MENU_ADD_CAMERA 1
+#define CAMERA_MENU_TRANSFORM_ACTIVE_CAMERA 2
+#define CAMERA_MENU_PROJECTION_SETTINGS 3
+#define MAIN_MENU_TRANSFORM_WORLD 1
+#define MAIN_MENU_PARTY 2
+#define MAIN_MENU_ABOUT 3
 
 #define SCROLL_UP 3
 #define SCROLL_DOWN 4
@@ -247,11 +248,13 @@ void motion(int x, int y)
 	}
 }
 
-void fileMenu(int id)
-{
+
+
+
+void modelsMenuCB(int id){
 	CFileDialog dlg(TRUE, _T(".obj"), NULL, NULL, _T("*.obj|*.*"));
 	switch (id){
-	case FILE_OPEN:
+	case MODEL_MENU_OPEN_FILE:
 		if(dlg.DoModal()==IDOK)
 		{
 			std::string s((LPCTSTR)dlg.GetPathName());
@@ -259,12 +262,30 @@ void fileMenu(int id)
 			scene->draw();
 		}
 		break;
-	case FILE_PRIMITIVE_CUBE:
+	case MODEL_MENU_ADD_PRIMITIVE:
 		scene->loadPrimModel("cube.obj");
 		scene->draw();
 		break;
+	case MODEL_MENU_TRANSFORM_ACTIVE_MODEL:
+		std::cout << "MODEL_MENU_TRANSFORM_ACTIVE_MODEL" << std::endl;
+		break;
 	}
 }
+
+void camerasMenuCB(int id){
+	switch (id){
+	case CAMERA_MENU_ADD_CAMERA:
+		std::cout << "CAMERA_MENU_ADD_CAMERA" << std::endl;
+		break;
+	case CAMERA_MENU_TRANSFORM_ACTIVE_CAMERA:
+		std::cout << "CAMERA_MENU_TRANSFORM_ACTIVE_CAMERA" << std::endl;
+		break;
+	case CAMERA_MENU_PROJECTION_SETTINGS:
+		std::cout << "CAMERA_MENU_PROJECTION_SETTINGS" << std::endl;
+		break;
+	}
+}
+
 
 //void cameraMenu(int id) {
 //	CFileDialog dlg(TRUE, _T(".obj"), NULL, NULL, _T("*.obj|*.*"));
@@ -284,57 +305,75 @@ void fileMenu(int id)
 //	}
 //}
 
+void mainMenuCB(int id){
+	switch(id){
+		case MAIN_MENU_TRANSFORM_WORLD:
+			std::cout << "MAIN_MENU_TRANSFORM_WORLD" << std::endl;
+			break;
+		case MAIN_MENU_PARTY:
+			scene->party();
+			break;
+		case MAIN_MENU_ABOUT:
+			AfxMessageBox("Never gonna give you up");
+			break;
+	}
+}
+
 void mainMenu(int id)
 {
-	Camera* cam = NULL;
-	switch (id)
-	{
-	case MAIN_CAMERA:
-		//TODO: change camera params
-		//TODO: NOT WORKING
-		cam = new Camera(vec4(10.0, 0.0, 0.0));
-		scene->addCamera(cam);
-		cout << scene->getActiveCameraIndex() << endl;
-		scene->draw();
-		break;
-	case MAIN_DEMO:
-		scene->drawDemo();
-		break;
-	case MAIN_PARTY:
-		scene->party();
-		break;
-	case MAIN_ABOUT:
-		/*string sentences[6] = { "give you up", "let you down", "run around and desert you",
-								"make you cry", "say goodbye", "tell a lie and hurt you" };
-		string selected_sentence = sentences[(never_gonna++)%sentences->size()];
-		CString strMsg;
-		_T("%s"), (LPCTSTR)strMsg;
-		AfxMessageBox(strMsg);*/
+	//Camera* cam = NULL;
+	//switch (id)
+	//{
+	//case MAIN_CAMERA:
+	//	//TODO: change camera params
+	//	//TODO: NOT WORKING
+	//	cam = new Camera(vec4(10.0, 0.0, 0.0));
+	//	scene->addCamera(cam);
+	//	cout << scene->getActiveCameraIndex() << endl;
+	//	scene->draw();
+	//	break;
+	//case MAIN_DEMO:
+	//	scene->drawDemo();
+	//	break;
+	//case MAIN_PARTY:
+	//	scene->party();
+	//	break;
+	//case MAIN_ABOUT:
+	//	/*string sentences[6] = { "give you up", "let you down", "run around and desert you",
+	//							"make you cry", "say goodbye", "tell a lie and hurt you" };
+	//	string selected_sentence = sentences[(never_gonna++)%sentences->size()];
+	//	CString strMsg;
+	//	_T("%s"), (LPCTSTR)strMsg;
+	//	AfxMessageBox(strMsg);*/
 
-		//TODO: write manual
-		AfxMessageBox("Never gonna give you up");
-		break;
-	}
+	//	//TODO: write manual
+	//	AfxMessageBox("Never gonna give you up");
+	//	break;
+	//}
 }
 
 void initMenu()
 {
-	int menuFile = glutCreateMenu(fileMenu);
-	glutAddMenuEntry("Open...",FILE_OPEN);
-	glutAddMenuEntry("Add Primitive: Cube", FILE_PRIMITIVE_CUBE);
-	glutCreateMenu(mainMenu);
+	int modelsMenu = glutCreateMenu(modelsMenuCB);
+	glutAddMenuEntry("Load Model From a File",MODEL_MENU_OPEN_FILE);
+	glutAddMenuEntry("Add Primitive: Cube", MODEL_MENU_ADD_PRIMITIVE);
+	glutAddMenuEntry("Transform Active Model", MODEL_MENU_TRANSFORM_ACTIVE_MODEL);
+	int camerasMenu = glutCreateMenu(camerasMenuCB);
+	glutAddMenuEntry("Add New Camera",CAMERA_MENU_ADD_CAMERA);
+	glutAddMenuEntry("Transform Active Camera ", CAMERA_MENU_TRANSFORM_ACTIVE_CAMERA);
+	glutAddMenuEntry("Projection Settings", CAMERA_MENU_PROJECTION_SETTINGS);
+	glutCreateMenu(mainMenuCB);
 
 	/*int menuCamera = glutCreateMenu(cameraMenu);
 	glutAddMenuEntry("Add Camera", CAMERA_ADD);
 	glutAddMenuEntry("Select Camera", CAMERA_SELECT);
 	glutCreateMenu(mainMenu);*/
 
-	glutAddSubMenu("Add Model",menuFile);
-	//glutAddSubMenu("Camera", menuCamera);
-	glutAddMenuEntry("Add Camera", MAIN_CAMERA);
-	glutAddMenuEntry("Demo",MAIN_DEMO);
-	glutAddMenuEntry("Party for 5 sec.",MAIN_PARTY);
-	glutAddMenuEntry("About",MAIN_ABOUT);
+	glutAddSubMenu("Models",modelsMenu);
+	glutAddSubMenu("Cameras",camerasMenu);
+	glutAddMenuEntry("Transform World", MAIN_MENU_TRANSFORM_WORLD);
+	glutAddMenuEntry("Party For 5 Seconds",MAIN_MENU_PARTY);
+	glutAddMenuEntry("About",MAIN_MENU_ABOUT);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 //----------------------------------------------------------------------------
