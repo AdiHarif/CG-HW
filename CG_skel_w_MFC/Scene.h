@@ -35,7 +35,6 @@ class Scene {
 
 	mat4 tw;
 
-
 public:
 	//===C'tors===
 	Scene() {}; //unimplemented
@@ -87,6 +86,8 @@ public:
 	//void deactivateAllCameras();
 
 	void toggleCameraProjection();
+
+	void rotateCameraYAroundAt(float theta);
 	//==========
 
 	//===Other===

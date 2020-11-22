@@ -348,10 +348,10 @@ class mat4 {
     mat4( const vec4& a, const vec4& b, const vec4& c, const vec4& d )
 	{ _m[0] = a;  _m[1] = b;  _m[2] = c;  _m[3] = d; }
 
-    mat4( GLfloat m00, GLfloat m10, GLfloat m20, GLfloat m30,
-	  GLfloat m01, GLfloat m11, GLfloat m21, GLfloat m31,
-	  GLfloat m02, GLfloat m12, GLfloat m22, GLfloat m32,
-	  GLfloat m03, GLfloat m13, GLfloat m23, GLfloat m33 )
+    mat4( GLfloat m00, GLfloat m01, GLfloat m02, GLfloat m03,
+	  GLfloat m10, GLfloat m11, GLfloat m12, GLfloat m13,
+	  GLfloat m20, GLfloat m21, GLfloat m22, GLfloat m23,
+	  GLfloat m30, GLfloat m31, GLfloat m32, GLfloat m33 )
 	{
 	    _m[0] = vec4( m00, m01, m02, m03 );
 	    _m[1] = vec4( m10, m11, m12, m13 );

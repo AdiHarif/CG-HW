@@ -3,17 +3,14 @@
 
 
 //===Inner Calculations===
-
-vec4 Camera::calcUp(vec4 at) {
-    vec4 z = vec4(0.0, 0.0, 1.0, 1.0);
-    if (position == at) return z;
-    vec4 v = at - position;
-    if (v * z == 0) return z;
-    if (length(cross(v, z)) < FLT_EPSILON)	return vec4(0.0, 1.0, 0.0, 1.0);
-    up = cross(v, cross(z, v));
-    return up;
+mat4 Camera::calcTcInverse() {
+    return mat4(
+        vec4(tc[0][0], tc[1][0], tc[2][0], -tc[0][3]),
+        vec4(tc[0][1], tc[1][1], tc[2][1], -tc[1][3]),
+        vec4(tc[0][2], tc[1][2], tc[2][2], -tc[2][3]),
+        vec4(0, 0, 0, 1)
+    );
 }
-
 //==========
 
 
@@ -21,7 +18,7 @@ vec4 Camera::calcUp(vec4 at) {
 
 Camera::Camera(vec4 position) {
     this->position = position;
-    lookAt(vec4(0.0));
+    lookAt(vec4(0,0,0,1));
     ortho(-3.0, 3.0, -3.0, 3.0, -5.0, -15.0);
 }
 
@@ -30,24 +27,88 @@ Camera::Camera(vec4 position) {
 
 //===Transformations Interface===
 
-void Camera::lookAt(const vec4& at) {
-    up = calcUp(at);
-    vec4 look_dir = position - at;
-    look_dir.w = 0;
-    vec4 n = normalize(look_dir);
-    vec4 u = normalize(cross(up, n));
-    u.w = 0;
-    vec4 v = normalize(cross(n, u));
-    v.w = 0;
-    vec4 t = vec4(0.0, 0.0, 0.0, 1.0);
-    mat4 c = mat4(u, v, n, t);
-    tc = c * translateMat(-position);
+
+void Camera::setTransformation(vec4 x_axis, vec4 y_axis, vec4 z_axis, vec4 position) {
+    /*x_axis.w = y_axis.w = z_axis.w = 0.0;
+    x_axis = normalize(x_axis);
+    y_axis = normalize(y_axis);
+    z_axis = normalize(z_axis);
+    tc = mat4(x_axis, y_axis, z_axis, vec4(0, 0, 0, 1));
+    tc = translateMat(-position) * tc;
+
+    tci = mat4(
+        vec4(x_axis.x, y_axis.x, z_axis.x, position.x),
+        vec4(x_axis.y, y_axis.y, z_axis.y, position.y),
+        vec4(x_axis.z, y_axis.z, z_axis.z, position.z),
+        vec4(0,0,0,1)
+    );*/
+
+    x_axis.w = y_axis.w = z_axis.w = 0.0;
+    x_axis = normalize(x_axis);
+    y_axis = normalize(y_axis);
+    z_axis = normalize(z_axis);
+
+    tci = mat4(
+        vec4(x_axis.x, y_axis.x, z_axis.x, 0),
+        vec4(x_axis.y, y_axis.y, z_axis.y, 0),
+        vec4(x_axis.z, y_axis.z, z_axis.z, 0),
+        vec4(0, 0, 0, 1)
+    );
+
+    tc = transpose(tci);
+
+
+    std::cout << "setTransform: (before translate)" << std::endl << (tc * tci) << std::endl << std::endl;
+
+    tci = translateMat(position)* tci;
+    tc = tc * translateMat(-position);
+
+    std::cout << "setTransform:" << std::endl << (tc * tci) << std::endl << std::endl;
+
 }
+
+
+void Camera::rotateYAroundAt(float theta) {
+    vec4 atc = tc * at; //at vector in camera coordinats;
+    mat4 t1 = translateMat(atc);
+    mat4 r = rotateYMat(theta);
+    mat4 t2 = translateMat(-atc);
+    tc = t1 * r * t2 * tc;
+
+    mat4 ri = rotateYMat(-theta);
+    tci = tci * t1 * ri * t2;
+
+    position = tci * vec4(0, 0, 0, 1);//updating new position in world coordinates
+    std::cout << "rotateYAroundAt:" << std::endl << (tc * tci) << std::endl << std::endl;
+    std::cout << "rotateYAroundAt: (position)" << std::endl << position << std::endl << std::endl;
+}
+
+void translate(vec4 v) {
+
+}
+
+
+
+void Camera::lookAt() {
+    vec4 z_axis = normalize(position - at);
+    vec4 x_axis = normalize(cross(up, z_axis));
+    vec4 y_axis = normalize(cross(z_axis, x_axis));
+    vec4 t = vec4(0.0, 0.0, 0.0, 1.0);
+    setTransformation(x_axis, y_axis, z_axis, position);
+}
+
+void Camera::lookAt(const vec4 at, vec4 up) {
+    this->at = at;
+    this->up = up;
+    lookAt();
+}
+
 
 //==========
 
 
 //===Projections===
+
 void Camera::ortho(const float left, const float right,
     const float bottom, const float top,
     const float z_near, const float z_far) {
@@ -90,7 +151,6 @@ void Camera::frustum(const float left, const float right,
     n[3][2] = -1;
     n[3][3] = 0;
     tp = n * s * h;
-    std::cout << tp << std::endl;
 }
 
 void Camera::toggleProjection() {

@@ -15,3 +15,5 @@ Scene:
 
 Renderer:
 	add z cliping and improve current x,y cliping
+	calculate normals before converting to pixels
+	fix normals out of bounds error

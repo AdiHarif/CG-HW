@@ -8,8 +8,11 @@ enum proj_type { ortho = 0, frustum = 1 };
 class Camera {
 	mat4 tc;
 	mat4 tp;
+
+	mat4 tci;
+
 	vec4 position;
-	//bool is_active;
+	vec4 at;
 	vec4 up;
 
 	float left;
@@ -22,7 +25,9 @@ class Camera {
 
 	enum proj_type { p_ortho = 0, p_persp = 1 } projection;
 
-	vec4 calcUp(vec4 at);
+	//===Inner Calculations===
+	mat4 calcTcInverse();
+	//==========
 
 public:
 	//===C'tor===
@@ -30,11 +35,19 @@ public:
 	//==========
 
 	//Transformations Interface===
-	void setTransformation(const mat4& transform);
+	void setTransformation(vec4 x_axis, vec4 y_axis, vec4 z_axis, vec4 position);
+
+	void rotateYAroundAt(float theta);
+
+	void translate(vec4 v);
+
+
+
+	void lookAt();
+	void lookAt(const vec4 at, vec4 up = vec4(0, 1, 0, 1));
 	//==========
 
 	//===Projections===
-	void lookAt(const vec4& at);
 	void ortho(const float left, const float right,
 		const float bottom, const float top,
 		const float z_near, const float z_far);

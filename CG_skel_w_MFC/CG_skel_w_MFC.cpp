@@ -106,6 +106,14 @@ void keyboard(unsigned char key, int x, int y)
 	case DEL:
 		scene->removeModel(scene->getActiveModelIndex());
 		break;
+	case 'm':
+	case 'M':
+		scene->rotateCameraYAroundAt(ROTATE_THETA_DEF);
+		break;
+	case 'n':
+	case 'N':
+		scene->rotateCameraYAroundAt(-ROTATE_THETA_DEF);
+		break;
 	}
 	scene->draw();
 }
