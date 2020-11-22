@@ -37,6 +37,15 @@
 #define SCROLL_DOWN 4
 #define TAB 9
 #define DEL 127
+#define SCALE 0
+#define ROTATE 1
+#define TRANSLATE 2
+#define X 0
+#define Y 1
+#define Z 2
+#define ORTHO 0
+#define FRUSTUM 1
+#define PERSPECTIVE 2
 
 #define SCALE_UP_DEF 1.1
 #define SCALE_DOWN_DEF (1/1.1)
@@ -52,6 +61,115 @@ bool first_movement=true;
 //int never_gonna = 0;
 
 //----------------------------------------------------------------------------
+
+//===Input Functions===
+
+void transformActiveModel() {
+	if (scene->getModels().empty()) {
+		cout << "There are no models </3" << endl;
+		return;
+	}
+	int action, axis, theta;
+	vec3 scale_by, translate_by;
+	cout << "What do you feel like?" << endl;
+	cout << "Scale: 0" << endl << "Rotate: 1" << endl << "Translate: 2" << endl;
+	cin >> action;
+	switch (action) {
+	case SCALE:
+		cout << "So... you wanna scale..." << endl;
+		cout << "Enter 3 numbers for X, Y and Z scaling:" << endl;
+		cin >> scale_by[0] >> scale_by[1] >> scale_by[2];
+		scene->scaleSelection(scale_by);
+		cout << "BEHOLD YOUR SCALED MODELS!" << endl;
+		break;
+	case ROTATE:
+		cout << "Rotating today, are we? Choose axis:" << endl;
+		cout << "X: 0" << endl << "Y: 1" << endl << "Z: 2" << endl;
+		cin >> axis;
+		cout << "Now - choose theta to rotate by:" << endl;
+		cin >> theta;
+		switch (axis) {
+		case X:
+			scene->rotateSelectionX(theta);
+			break;
+		case Y:
+			scene->rotateSelectionY(theta);
+			break;
+		case Z:
+			scene->rotateSelectionZ(theta);
+			break;
+		}
+		cout << "BEHOLD YOUR ROTATED MODELS!" << endl;
+		break;
+	case TRANSLATE:
+		cout << "Translation it is." << endl;
+		cout << "Enter 3 numbers for X, Y and Z translation:" << endl;
+		cin >> translate_by[0] >> translate_by[1] >> translate_by[2];
+		scene->translateSelection(translate_by);
+		cout << "BEHOLD YOUR TRANSLATED MODELS!" << endl;
+		break;
+	}
+	cout << endl;
+	scene->draw();
+}
+
+void addNewCamera() {
+	cout << "Enter X, Y and Z values for your brand new GoPro Hero9 Black Edition:" << endl;
+	vec4 cam_values;
+	cin >> cam_values[0] >> cam_values[1] >> cam_values[2];
+	Camera* cam = new Camera(cam_values);
+	scene->addCamera(cam);
+	cout << "Enjoy, and bring me pictures of Spiderman!" << endl;
+}
+
+void transformActiveCamera() {
+	
+}
+
+void setProjectionSettings() {
+	int type;
+	float left, right, bottom, top, z_near, z_far, fovy, aspect;
+	cout << "Choose from the following:" << endl;
+	cout << "Ortho: 0" << endl << "Frustum: 1" << endl << "Perspective: 2" << endl;
+	cin >> type;
+	switch (type) {
+	case PERSPECTIVE:
+		cout << "fovy:";
+		cin >> fovy;
+		cout << "aspect:";
+		cin >> aspect;
+		cout << "z_near:";
+		cin >> z_near;
+		cout << "z_far:";
+		cin >> z_far;
+		scene->getActiveCamera()->frustum(left, right, bottom, top, z_near, z_far);
+		break;
+	default:
+		cout << "left:";
+		cin >> left;
+		cout << "right:";
+		cin >> right;
+		cout << "bottom:";
+		cin >> bottom;
+		cout << "top:";
+		cin >> top;
+		cout << "z_near:";
+		cin >> z_near;
+		cout << "z_far:";
+		cin >> z_far;
+		switch (type) {
+		case ORTHO:
+			scene->getActiveCamera()->ortho(left, right, bottom, top, z_near, z_far);
+			break;
+		case FRUSTUM:
+			scene->getActiveCamera()->frustum(left, right, bottom, top, z_near, z_far);
+			break;
+		}
+	}
+}
+
+//==========
+
 // Callbacks
 
 void display( void )
@@ -267,7 +385,8 @@ void modelsMenuCB(int id){
 		scene->draw();
 		break;
 	case MODEL_MENU_TRANSFORM_ACTIVE_MODEL:
-		std::cout << "MODEL_MENU_TRANSFORM_ACTIVE_MODEL" << std::endl;
+		transformActiveModel();
+		//std::cout << "MODEL_MENU_TRANSFORM_ACTIVE_MODEL" << std::endl;
 		break;
 	}
 }
@@ -275,15 +394,20 @@ void modelsMenuCB(int id){
 void camerasMenuCB(int id){
 	switch (id){
 	case CAMERA_MENU_ADD_CAMERA:
-		std::cout << "CAMERA_MENU_ADD_CAMERA" << std::endl;
+		addNewCamera();
+		//std::cout << "CAMERA_MENU_ADD_CAMERA" << std::endl;
 		break;
 	case CAMERA_MENU_TRANSFORM_ACTIVE_CAMERA:
-		std::cout << "CAMERA_MENU_TRANSFORM_ACTIVE_CAMERA" << std::endl;
+		transformActiveCamera();
+		//std::cout << "CAMERA_MENU_TRANSFORM_ACTIVE_CAMERA" << std::endl;
 		break;
 	case CAMERA_MENU_PROJECTION_SETTINGS:
-		std::cout << "CAMERA_MENU_PROJECTION_SETTINGS" << std::endl;
+		setProjectionSettings();
+		//std::cout << "CAMERA_MENU_PROJECTION_SETTINGS" << std::endl;
 		break;
 	}
+
+	scene->draw();
 }
 
 
@@ -445,3 +569,4 @@ int main( int argc, char **argv )
 	
 	return nRetCode;
 }
+

@@ -60,6 +60,7 @@ public:
 	void removeModel(int model);
 
 	void scaleSelection(double scale_factor);
+	void scaleSelection(vec3 scale_by);
 	void rotateSelectionX(double theta);
 	void rotateSelectionY(double theta);
 	void rotateSelectionZ(double theta);
@@ -83,6 +84,14 @@ public:
 	void activateNextCamera();
 	void activatePrevCamera();
 	void activateLastCamera();
+	void activeCameraToOrtho(const float left, const float right,
+		const float bottom, const float top,
+		const float z_near, const float z_far);
+	void activeCameraToFrustum(const float left, const float right,
+		const float bottom, const float top,
+		const float z_near, const float z_far);
+	void activeCameraToPerspective(const float fovy, const float aspect,
+			const float z_near, const float z_far);
 	//void deactivateAllCameras();
 
 	void toggleCameraProjection();

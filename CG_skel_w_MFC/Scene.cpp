@@ -18,7 +18,7 @@ Camera* Scene::getActiveCamera() {
 Scene::Scene(Renderer *renderer) : m_renderer(renderer){
 	active_model = -1;
 	active_camera = -1;
-	Camera* def_cam =new Camera(vec4(0.0, 0.0, 10.0));
+	Camera* def_cam = new Camera(vec4(0.0, 0.0, 10.0));
 	addCamera(def_cam);
 }
 
@@ -106,6 +106,20 @@ void Scene::scaleSelection(double scale_factor) {
 			MeshModel* m = dynamic_cast<MeshModel*> (this->models[i]);
 			if (m->getIsActive()) {
 				m->scale(vec3(scale_factor));
+			}
+		}
+	}
+}
+
+void Scene::scaleSelection(vec3 scale_by) {
+	if (false) {	//TODO: scale selected model
+
+	}
+	else {	//scale world
+		for (int i = 0; i < this->models.size(); i++) {
+			MeshModel* m = dynamic_cast<MeshModel*> (this->models[i]);
+			if (m->getIsActive()) {
+				m->scale(scale_by);
 			}
 		}
 	}
@@ -306,6 +320,26 @@ void Scene::activateLastCamera() {
 	//deactivateAllCameras();
 	//c->setIsActive(true);
 	active_camera = cameras.size() - 1;
+}
+
+void Scene::activeCameraToOrtho(const float left, const float right,
+	const float bottom, const float top,
+	const float z_near, const float z_far) {
+
+	getActiveCamera()->ortho(left, right, bottom, top, z_near, z_far);
+}
+
+void Scene::activeCameraToFrustum( const float left, const float right,
+	const float bottom, const float top,
+	const float z_near, const float z_far ) {
+
+	getActiveCamera()->frustum(left, right, bottom, top, z_near, z_far);
+}
+
+void Scene::activeCameraToPerspective(const float fovy, const float aspect,
+	const float z_near, const float z_far) {
+
+	getActiveCamera()->perspective(fovy, aspect, z_near, z_far);
 }
 
 
