@@ -163,6 +163,10 @@ void Camera::frustum(const float left, const float right,
 void Camera::perspective(const float fovy, const float aspect,
     const float z_near, const float z_far) {
 
+    float r_angle = (M_PI / 180.0) * fovy;
+    float h = 2 * (-z_near) * std::tan(r_angle / 2);
+    float w = h * aspect;
+    frustum(-w/2, w/2, -h/2, h/2, z_near, z_far);
 }
 
 void Camera::toggleProjection() {
