@@ -129,8 +129,8 @@ void Camera::ortho(const float left, const float right,
 
     projection = p_ortho;
 
-    mat4 t = translateMat(-(right + left) / 2, -(bottom + top) / 2, (z_near + z_far) / 2);
-    mat4 s = scaleMat(2 / (right - left), 2 / (top - bottom), 2 / (z_near - z_far));
+    mat4 t = translateMat(-(right + left) / 2, -(bottom + top) / 2, -(z_near + z_far) / 2);
+    mat4 s = scaleMat(2 / (right - left), 2 / (top - bottom), 2 / -(z_near - z_far));
     tp = s * t;
 }
 
@@ -151,10 +151,10 @@ void Camera::frustum(const float left, const float right,
     mat4 h;
     h[0][2] = (left + right) / 2;
     h[1][2] = (top + bottom) / 2;
-    mat4 s = scaleMat(-(2 * z_near) / (right - left), -(2 * z_near) / (top - bottom), 1.0);
+    mat4 s = scaleMat((-2 * z_near) / (right - left), -(2 * z_near) / (top - bottom), 1.0);
     mat4 n;
     n[2][2] = (z_near + z_far) / (z_near - z_far);
-    n[2][3] = (2 * z_near * z_far) / (z_near - z_far);
+    n[2][3] = (2 * z_near * z_far) / (z_far-z_near);
     n[3][2] = -1;
     n[3][3] = 0;
     tp = n * s * h;
@@ -163,6 +163,10 @@ void Camera::frustum(const float left, const float right,
 void Camera::perspective(const float fovy, const float aspect,
     const float z_near, const float z_far) {
 
+    float r_angle = (M_PI / 180.0) * fovy;
+    float h = 2 * (-z_near) * std::tan(r_angle / 2);
+    float w = h * aspect;
+    frustum(-w/2, w/2, -h/2, h/2, z_near, z_far);
 }
 
 void Camera::toggleProjection() {

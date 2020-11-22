@@ -142,7 +142,7 @@ void setProjectionSettings() {
 		cin >> z_near;
 		cout << "z_far:";
 		cin >> z_far;
-		scene->getActiveCamera()->frustum(left, right, bottom, top, z_near, z_far);
+		scene->getActiveCamera()->perspective(fovy, aspect, z_near, z_far);
 		break;
 	default:
 		cout << "left:";

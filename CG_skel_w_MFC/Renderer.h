@@ -17,12 +17,14 @@ using namespace std;
 typedef struct Pixel {
 	int x;
 	int y;
+	float z;
 
-	Pixel(int x, int y) : x(x), y(y) {}
+	Pixel(int x, int y, float z = 0) : x(x), y(y), z(z) {}
 
 	Pixel(const Pixel& p) {
 		x = p.x;
 		y = p.y;
+		z = p.z;
 	}
 
 };
@@ -31,7 +33,7 @@ typedef struct Line {
 	Pixel start;
 	Pixel end;
 
-	Line(Pixel p1, Pixel p2) : start(p1), end(p2) {}
+	Line(Pixel p1, Pixel p2) : start(p1), end(p2) {	}
 
 	Line(const Line& l) : start(l.start), end(l.end) {}
 };
