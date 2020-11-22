@@ -87,7 +87,9 @@ public:
 
 	void toggleCameraProjection();
 
+	void rotateCameraXAroundAt(float theta);
 	void rotateCameraYAroundAt(float theta);
+	void rotateCameraZAroundAt(float theta);
 	//==========
 
 	//===Other===

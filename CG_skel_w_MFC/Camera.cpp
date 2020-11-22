@@ -2,16 +2,6 @@
 #include "Camera.h"
 
 
-//===Inner Calculations===
-mat4 Camera::calcTcInverse() {
-    return mat4(
-        vec4(tc[0][0], tc[1][0], tc[2][0], -tc[0][3]),
-        vec4(tc[0][1], tc[1][1], tc[2][1], -tc[1][3]),
-        vec4(tc[0][2], tc[1][2], tc[2][2], -tc[2][3]),
-        vec4(0, 0, 0, 1)
-    );
-}
-//==========
 
 
 //===C'tor===
@@ -29,19 +19,6 @@ Camera::Camera(vec4 position) {
 
 
 void Camera::setTransformation(vec4 x_axis, vec4 y_axis, vec4 z_axis, vec4 position) {
-    /*x_axis.w = y_axis.w = z_axis.w = 0.0;
-    x_axis = normalize(x_axis);
-    y_axis = normalize(y_axis);
-    z_axis = normalize(z_axis);
-    tc = mat4(x_axis, y_axis, z_axis, vec4(0, 0, 0, 1));
-    tc = translateMat(-position) * tc;
-
-    tci = mat4(
-        vec4(x_axis.x, y_axis.x, z_axis.x, position.x),
-        vec4(x_axis.y, y_axis.y, z_axis.y, position.y),
-        vec4(x_axis.z, y_axis.z, z_axis.z, position.z),
-        vec4(0,0,0,1)
-    );*/
 
     x_axis.w = y_axis.w = z_axis.w = 0.0;
     x_axis = normalize(x_axis);
@@ -57,16 +34,25 @@ void Camera::setTransformation(vec4 x_axis, vec4 y_axis, vec4 z_axis, vec4 posit
 
     tc = transpose(tci);
 
-
-    std::cout << "setTransform: (before translate)" << std::endl << (tc * tci) << std::endl << std::endl;
-
     tci = translateMat(position)* tci;
     tc = tc * translateMat(-position);
 
-    std::cout << "setTransform:" << std::endl << (tc * tci) << std::endl << std::endl;
 
 }
 
+
+void Camera::rotateXAroundAt(float theta) {
+    vec4 atc = tc * at; //at vector in camera coordinats;
+    mat4 t1 = translateMat(atc);
+    mat4 r = rotateXMat(theta);
+    mat4 t2 = translateMat(-atc);
+    tc = t1 * r * t2 * tc;
+
+    mat4 ri = rotateXMat(-theta);
+    tci = tci * t1 * ri * t2;
+
+    position = tci * vec4(0, 0, 0, 1);//updating new position in world coordinates
+}
 
 void Camera::rotateYAroundAt(float theta) {
     vec4 atc = tc * at; //at vector in camera coordinats;
@@ -79,8 +65,19 @@ void Camera::rotateYAroundAt(float theta) {
     tci = tci * t1 * ri * t2;
 
     position = tci * vec4(0, 0, 0, 1);//updating new position in world coordinates
-    std::cout << "rotateYAroundAt:" << std::endl << (tc * tci) << std::endl << std::endl;
-    std::cout << "rotateYAroundAt: (position)" << std::endl << position << std::endl << std::endl;
+}
+
+void Camera::rotateZAroundAt(float theta) {
+    vec4 atc = tc * at; //at vector in camera coordinats;
+    mat4 t1 = translateMat(atc);
+    mat4 r = rotateZMat(theta);
+    mat4 t2 = translateMat(-atc);
+    tc = t1 * r * t2 * tc;
+
+    mat4 ri = rotateYMat(-theta);
+    tci = tci * t1 * ri * t2;
+
+    position = tci * vec4(0, 0, 0, 1);//updating new position in world coordinates
 }
 
 void translate(vec4 v) {

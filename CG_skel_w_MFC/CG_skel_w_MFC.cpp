@@ -114,7 +114,23 @@ void keyboard(unsigned char key, int x, int y)
 	case 'N':
 		scene->rotateCameraYAroundAt(-ROTATE_THETA_DEF);
 		break;
-	}
+	case 'b':
+	case 'B':
+		scene->rotateCameraZAroundAt(ROTATE_THETA_DEF);
+		break;
+	case 'v':
+	case 'V':
+		scene->rotateCameraZAroundAt(-ROTATE_THETA_DEF);
+		break;
+	case 'u':
+	case 'U':
+		scene->rotateCameraXAroundAt(ROTATE_THETA_DEF);
+		break;
+	case 'j':
+	case 'J':
+		scene->rotateCameraXAroundAt(-ROTATE_THETA_DEF);
+		break;
+}
 	scene->draw();
 }
 

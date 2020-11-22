@@ -321,8 +321,16 @@ void Scene::toggleCameraProjection() {
 	getActiveCamera()->toggleProjection();
 }
 
+void Scene::rotateCameraXAroundAt(float theta) {
+	getActiveCamera()->rotateXAroundAt(theta);
+}
+
 void Scene::rotateCameraYAroundAt(float theta) {
 	getActiveCamera()->rotateYAroundAt(theta);
+}
+
+void Scene::rotateCameraZAroundAt(float theta) {
+	getActiveCamera()->rotateZAroundAt(theta);
 }
 //==========
 

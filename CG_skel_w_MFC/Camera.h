@@ -25,9 +25,6 @@ class Camera {
 
 	enum proj_type { p_ortho = 0, p_persp = 1 } projection;
 
-	//===Inner Calculations===
-	mat4 calcTcInverse();
-	//==========
 
 public:
 	//===C'tor===
@@ -37,7 +34,9 @@ public:
 	//Transformations Interface===
 	void setTransformation(vec4 x_axis, vec4 y_axis, vec4 z_axis, vec4 position);
 
+	void rotateXAroundAt(float theta);
 	void rotateYAroundAt(float theta);
+	void rotateZAroundAt(float theta);
 
 	void translate(vec4 v);
 
