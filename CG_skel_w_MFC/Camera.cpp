@@ -110,6 +110,21 @@ void Camera::lookAt(const vec4 at, vec4 up) {
     lookAt();
 }
 
+void Camera::zoom(float aspect) {
+
+    vec4 v = vec4(0, 0, ((tc*at).z)*(aspect-1), 0);
+
+
+    mat4 t = translateMat(-v);
+    mat4 ti = translateMat(v);
+
+
+    tc = t * tc;
+    tci = tci * ti;
+
+    position = vec4(tci[0][3], tci[1][3], tci[2][3], 1); //tci* (0,0,0,1)
+
+}
 
 //==========
 

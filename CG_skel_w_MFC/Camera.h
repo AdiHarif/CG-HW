@@ -40,10 +40,10 @@ public:
 
 	void translateC(vec4 v); //translate in camera coordinates
 
-
-
 	void lookAt();
 	void lookAt(const vec4 at, vec4 up = vec4(0, 1, 0, 1));
+
+	void zoom(float aspect);
 	//==========
 
 	//===Projections===

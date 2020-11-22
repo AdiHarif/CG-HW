@@ -371,6 +371,12 @@ void Scene::translateCameraC(vec4 v) {
 	getActiveCamera()->translateC(v);
 }
 
+
+void Scene::zoom(float amount) {
+	getActiveCamera()->zoom(amount);
+
+}
+
 //==========
 
 //===Other===
