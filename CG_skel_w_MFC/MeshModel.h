@@ -74,9 +74,11 @@ protected :
 	vector<vec4> vertex_positions;
 	vector<vec4> vertex_normals;
 	vector<vec4> bounding_box_vertices;
-	vector<int> vertex_normals_indexes;
-	vector<vec4> faces_normals;
-	vector<vec4> faces_normals_locations;
+	//vector<int> vertex_normals_indexes;
+	//vector<vec4> faces_normals;
+	//vector<vec4> faces_normals_locations;
+	vector<Normal> vertices_to_normals;
+	vector<Normal> faces_to_normals;
 
 	vec4 position;
 	mat4 tm;
@@ -97,18 +99,19 @@ protected :
 
 
 public:
+	MeshModel(string fileName);
+	~MeshModel(void);
+	void loadFile(string fileName);
+
 	void draw(Renderer* renderer);
 	void drawVertices(Renderer* renderer);
 	void drawEdges(Renderer* renderer);
 	void drawVertexNormals(Renderer* renderer);
-	void drawFacesNormals( Renderer* renderer);
+	void drawFacesNormals(Renderer* renderer);
 	void drawBoundingBox(Renderer* renderer);
 	void initBoundingBox(vec4 min, vec4 max);
 	void computeFacesNormals();
 
-	MeshModel(string fileName);
-	~MeshModel(void);
-	void loadFile(string fileName);
 	void translate(vec4);
 	void scale(vec3);
 	void rotateX(GLfloat);

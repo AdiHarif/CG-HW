@@ -122,8 +122,12 @@ void MeshModel::loadFile(string fileName)
 		for (int i = 0; i < 3; i++)
 		{
 			vertex_positions.push_back(vec4(vertices[it->v[i] - 1]));
-			vertex_normals_indexes.push_back(it->v[i] - 1);
-			vertex_normals_indexes.push_back(it->vn[i] - 1);
+			
+			if (!vertex_normals.empty()) {
+				vertices_to_normals.push_back(Normal(vertices[it->v[i] - 1], normalize(vertex_normals[it->vn[i] - 1])));
+			}
+			//vertex_normals_indexes.push_back(it->v[i] - 1);
+			//vertex_normals_indexes.push_back(it->vn[i] - 1);
 		}
 	}
 }
@@ -148,23 +152,23 @@ void MeshModel::drawEdges(Renderer* renderer) {
 }
 
 void MeshModel::drawVertexNormals(Renderer* renderer) {
-	//TODO: change transformations
-	/*if (vertex_normals.empty())	return;
-	mat4 tcwm = tcw * _world_transform;
-	vector<vec4> vecs_to_draw;
-	for (int i = 0; i < vertex_normals_indexes.size(); i+=2) {
-		vecs_to_draw.push_back(tcwm * vertices[vertex_normals_indexes[i]]);
-		vecs_to_draw.push_back(tcwm * vertex_normals[vertex_normals_indexes[i + 1]]);
-	}
-	renderer->drawLines(vecs_to_draw, vertex_normals_color);*/
-	/*vector<vec4> vecs_to_draw;
-	for (int i = 0; i < vertex_normals_indexes.size(); i+=2) {
-		vecs_to_draw.push_back(vertices[vertex_normals_indexes[i]]);
-		vecs_to_draw.push_back(vertex_normals[vertex_normals_indexes[i + 1]]);
-	}*/
+//	//TODO: change transformations
+//	/*if (vertex_normals.empty())	return;
+//	mat4 tcwm = tcw * _world_transform;
+//	vector<vec4> vecs_to_draw;
+//	for (int i = 0; i < vertex_normals_indexes.size(); i+=2) {
+//		vecs_to_draw.push_back(tcwm * vertices[vertex_normals_indexes[i]]);
+//		vecs_to_draw.push_back(tcwm * vertex_normals[vertex_normals_indexes[i + 1]]);
+//	}
+//	renderer->drawLines(vecs_to_draw, vertex_normals_color);*/
+//	/*vector<vec4> vecs_to_draw;
+//	for (int i = 0; i < vertex_normals_indexes.size(); i+=2) {
+//		vecs_to_draw.push_back(vertices[vertex_normals_indexes[i]]);
+//		vecs_to_draw.push_back(vertex_normals[vertex_normals_indexes[i + 1]]);
+//	}*/
 	if (vertex_normals.empty())	return;
 	Color color = is_active ? vertex_normals_color : inactive_mesh_color;
-	renderer->drawVertexNormals(vertices, tm, vertex_normals, ntm, vertex_normals_indexes, color);
+	renderer->drawVertexNormals(vertices_to_normals, tm, ntm, color);
 }
 
 void MeshModel::drawFacesNormals(Renderer* renderer) {
@@ -177,6 +181,10 @@ void MeshModel::drawFacesNormals(Renderer* renderer) {
 		vecs_to_draw.push_back(tcwm * faces_normals[i]);
 	}
 	renderer->drawLines(vecs_to_draw, faces_normals_color);*/
+	if (vertex_normals.empty())	return;
+	Color color = is_active ? faces_normals_color : inactive_mesh_color;
+	renderer->drawFacesNormals(faces_to_normals, tm, ntm, color);
+
 }
 
 void MeshModel::drawBoundingBox(Renderer* renderer) {
@@ -276,21 +284,41 @@ void MeshModel::initBoundingBox(vec4 min, vec4 max) {
 
 void MeshModel::computeFacesNormals() {
 	//TODO: transformations
-	for (vector<vec4>::iterator i = vertex_positions.begin(); i != vertex_positions.end(); i+=3) {
+	//for (vector<vec4>::iterator i = vertex_positions.begin(); i != vertex_positions.end(); i+=3) {
 
-		vec4 v0 = *(i + 1) - *(i);
-		vec4 v1 = *(i + 2) - *(i);
+	//	vec4 v0 = *(i + 1) - *(i);
+	//	vec4 v1 = *(i + 2) - *(i);
+	//	vec4 crs = cross(v0, v1);
+	//	vec4 normal = crs / length(crs);
+	//	faces_normals.push_back(normal);
+
+	//	vec4 center;
+	//	center.x = (((vec4)(*i)).x + ((vec4)(*(i + 1))).x + ((vec4)(*(i + 2))).x) / 3;
+	//	center.y = (((vec4)(*i)).y + ((vec4)(*(i + 1))).y + ((vec4)(*(i + 2))).y) / 3;
+	//	center.z = (((vec4)(*i)).z + ((vec4)(*(i + 1))).z + ((vec4)(*(i + 2))).z) / 3;
+	//	faces_normals_locations.push_back(center);
+	//}
+	for (int i = 0; i < vertex_positions.size(); i+=3) {
+
+		vec4 center = vec4( (vertex_positions[i].x + vertex_positions[i + 1].x + vertex_positions[i + 2].x) / 3,
+							(vertex_positions[i].y + vertex_positions[i + 1].y + vertex_positions[i + 2].y) / 3,
+							(vertex_positions[i].z + vertex_positions[i + 1].z + vertex_positions[i + 2].z) / 3 );
+	
+		vec4 v0 = vertex_positions[i + 1] - vertex_positions[i];
+		vec4 v1 = vertex_positions[i + 2] - vertex_positions[i];
 		vec4 crs = cross(v0, v1);
-		vec4 normal = crs / length(crs);
-		faces_normals.push_back(normal);
-
-		vec4 center;
-		center.x = (((vec4)(*i)).x + ((vec4)(*(i + 1))).x + ((vec4)(*(i + 2))).x) / 3;
-		center.y = (((vec4)(*i)).y + ((vec4)(*(i + 1))).y + ((vec4)(*(i + 2))).y) / 3;
-		center.z = (((vec4)(*i)).z + ((vec4)(*(i + 1))).z + ((vec4)(*(i + 2))).z) / 3;
-		faces_normals_locations.push_back(center);
+		vec4 normal = normalize(crs / length(crs));
+		normal += center;
+		
+		faces_to_normals.push_back(Normal(center, normal));
 	}
 }
+
+//void MeshModel::matchNormalsToVertices() {
+//	for (vector<int>::iterator i = vertex_normals_indexes.begin(); i != vertex_normals_indexes.end(); i++) {
+//		
+//	}
+//}
 
 void MeshModel::toggleVertices(){
 	draw_pref.f_draw_vertices = !draw_pref.f_draw_vertices;

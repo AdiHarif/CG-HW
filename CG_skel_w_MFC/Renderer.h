@@ -45,6 +45,13 @@ typedef struct Edge {
 	Edge(Vertex start, Vertex end) : start(start), end(end) {}
 };
 
+typedef struct Normal {
+	Vertex vertex;
+	vec4 normal;
+
+	Normal(Vertex vertex, vec4 normal) : vertex(vertex), normal(normal) {}
+};
+
 
 
 class Renderer
@@ -82,6 +89,7 @@ class Renderer
 	vector<Line> transformEdges(vector<vec4>& edges, mat4 tm); //Legacy, should delete this in the future.
 	vector<Line> transformEdges(vector<Edge>& edges, mat4 tm);
 	vector<Line> transformFaces(vector<vec4>& faces, mat4 tm); //TODO change this to work with face struct
+	vector<Line> transformNormals(vector<Normal>& normals, mat4 tm, mat4 ntm);
 	//==========
 
 
@@ -110,10 +118,11 @@ public:
 
 	//===Drawing Interface===
 	void drawPoints(vector<Vertex>& points, mat4 tm, Color c);
-	void drawLines(vector<vec4>& points, mat4 tm, Color c); //Legacy, shoud delete in the future
+	void drawLines(vector<vec4>& points, mat4 tm, Color c); //Legacy, shoud delete in the future (felt legacy, might delete later)
 	void drawLines(vector<Edge>& edges, mat4 tm, Color c);
 	void drawTriangles(vector<vec4>& vertex_positions, mat4 tm, Color c);
-	void drawVertexNormals(vector<Vertex>& points, mat4 tm, vector<vec4>& normals, mat4 ntm, vector<int>& vertex_normals_indexes, Color c);
+	void drawVertexNormals(vector<Normal>& normals, mat4 tm, mat4 ntm, Color c);
+	void drawFacesNormals(vector<Normal>& normals, mat4 tm, mat4 ntm, Color c);
 
 	void SetDemoBuffer();
 	//==========
