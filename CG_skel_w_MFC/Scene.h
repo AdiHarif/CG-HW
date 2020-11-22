@@ -60,6 +60,7 @@ public:
 	void removeModel(int model);
 
 	void scaleSelection(double scale_factor);
+	void scaleSelection(vec3 scale_by);
 	void rotateSelectionX(double theta);
 	void rotateSelectionY(double theta);
 	void rotateSelectionZ(double theta);

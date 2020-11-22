@@ -18,7 +18,7 @@ Camera* Scene::getActiveCamera() {
 Scene::Scene(Renderer *renderer) : m_renderer(renderer){
 	active_model = -1;
 	active_camera = -1;
-	Camera* def_cam =new Camera(vec4(0.0, 0.0, 10.0));
+	Camera* def_cam = new Camera(vec4(0.0, 0.0, 10.0));
 	addCamera(def_cam);
 }
 
@@ -106,6 +106,20 @@ void Scene::scaleSelection(double scale_factor) {
 			MeshModel* m = dynamic_cast<MeshModel*> (this->models[i]);
 			if (m->getIsActive()) {
 				m->scale(vec3(scale_factor));
+			}
+		}
+	}
+}
+
+void Scene::scaleSelection(vec3 scale_by) {
+	if (false) {	//TODO: scale selected model
+
+	}
+	else {	//scale world
+		for (int i = 0; i < this->models.size(); i++) {
+			MeshModel* m = dynamic_cast<MeshModel*> (this->models[i]);
+			if (m->getIsActive()) {
+				m->scale(scale_by);
 			}
 		}
 	}

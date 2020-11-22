@@ -181,7 +181,7 @@ void MeshModel::drawFacesNormals(Renderer* renderer) {
 		vecs_to_draw.push_back(tcwm * faces_normals[i]);
 	}
 	renderer->drawLines(vecs_to_draw, faces_normals_color);*/
-	if (vertex_normals.empty())	return;
+	if (vertex_positions.empty())	return;
 	Color color = is_active ? faces_normals_color : inactive_mesh_color;
 	renderer->drawFacesNormals(faces_to_normals, tm, ntm, color);
 
