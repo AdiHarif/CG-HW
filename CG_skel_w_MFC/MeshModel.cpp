@@ -52,7 +52,7 @@ MeshModel::~MeshModel(void)
 void MeshModel::loadFile(string fileName)
 {
 	vec4 min, max;
-	//vector<FaceIdcs> faces;
+	vector<FaceIdcs> face_idcs;
 	ifstream ifile(fileName.c_str());
 	// while not end of file
 	while (!ifile.eof())
@@ -80,7 +80,7 @@ void MeshModel::loadFile(string fileName)
 			
 		}
 		else if (lineType == "f"){ 
-			faces.push_back(issLine);
+			face_idcs.push_back(issLine);
 		} 
 		else if (lineType == "vn") {
 			this->vertex_normals.push_back(vec4fFromStream(issLine));
@@ -116,23 +116,25 @@ void MeshModel::loadFile(string fileName)
 	}
 
 	// iterate through all stored faces and create triangles
-	int k=0;
-	for (vector<FaceIdcs>::iterator it = faces.begin(); it != faces.end(); ++it)
+	for (vector<FaceIdcs>::iterator it = face_idcs.begin(); it != face_idcs.end(); ++it)
 	{
+		Face f;
 		for (int i = 0; i < 3; i++)
 		{
-			vertex_positions.push_back(vec4(vertices[it->v[i] - 1]));
-			
-			if (!vertex_normals.empty()) {
-				vec4 dir = vertex_normals[it->vn[i] - 1];
-				dir.w = 0;
-				dir = normalize(dir);
-				dir.w = 1;
-				vertices_to_normals.push_back(Normal(vertices[it->v[i] - 1], dir));
+			f.vertices[i] = &this->vertices[it->v[i]-1];
+
+			int index = it->vn[i] - 1;
+			if (index > -1) {
+				f.normals[i] = &this->vertex_normals[index];
 			}
-			//vertex_normals_indexes.push_back(it->v[i] - 1);
-			//vertex_normals_indexes.push_back(it->vn[i] - 1);
+
+			int index = it->vt[i] - 1;
+			if (index > -1) {
+				//f.textures[i] = ?
+			}
 		}
+		//TODO: add face normal calc here
+		this->faces.push_back(f);
 	}
 }
 

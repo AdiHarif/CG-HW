@@ -14,7 +14,7 @@
 
 using namespace std;
 
-typedef struct Pixel {
+struct Pixel {
 	int x;
 	int y;
 	float z;
@@ -29,7 +29,7 @@ typedef struct Pixel {
 
 };
 
-typedef struct Line {
+struct Line {
 	Pixel start;
 	Pixel end;
 
@@ -40,18 +40,37 @@ typedef struct Line {
 
 typedef vec4 Vertex;
 
-typedef struct Edge {
+ struct Edge {
 	Vertex start;
 	Vertex end;
 
 	Edge(Vertex start, Vertex end) : start(start), end(end) {}
 };
 
-typedef struct Normal {
-	Vertex vertex;
-	vec4 direction;
 
-	Normal(Vertex vertex, vec4 direction) : vertex(vertex), direction(direction) {}
+ typedef vec4 Normal;
+
+//struct Normal {
+//	Vertex vertex;
+//	vec4 direction;
+//
+//	Normal(Vertex vertex, vec4 direction) : vertex(vertex), direction(direction) {}
+//};
+
+struct Face {
+
+	Vertex* vertices[3];
+	Normal* normals[3];
+	void* textures[3];
+
+
+	Face()
+	{
+		for (int i = 0; i < 3; i++) {
+			vertices[i] = normals[i] = textures[i] = nullptr;
+		}
+	}
+
 };
 
 

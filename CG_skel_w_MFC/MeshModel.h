@@ -69,9 +69,9 @@ class MeshModel : public Model
 protected :
 	MeshModel() {}
 
-	vector<FaceIdcs> faces;
+	vector<Face> faces;
 	vector<vec4> vertices;
-	vector<vec4> vertex_positions;
+	//vector<vec4> vertex_positions;
 	vector<vec4> vertex_normals;
 	vector<vec4> bounding_box_vertices;
 	//vector<int> vertex_normals_indexes;
