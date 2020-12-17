@@ -23,7 +23,7 @@ CDlgEditCam::CDlgEditCam(CWnd* pParent /*=nullptr*/)
 	, left(0)
 	, right(0)
 	, bottom(0)
-	, up(0)
+	, top(0)
 	, z_near(0)
 	, z_far(0)
 	, fovy(0)
@@ -48,7 +48,7 @@ void CDlgEditCam::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_LEFT, left);
 	DDX_Text(pDX, IDC_EDIT_RIGHT, right);
 	DDX_Text(pDX, IDC_EDIT_BOTTOM, bottom);
-	DDX_Text(pDX, IDC_EDIT_UP, up);
+	DDX_Text(pDX, IDC_EDIT_TOP, top);
 	DDX_Text(pDX, IDC_EDIT_Z_NEAR, z_near);
 	DDX_Text(pDX, IDC_EDIT_Z_FAR, z_far);
 	DDX_Text(pDX, IDC_EDIT_FOVY, fovy);
@@ -57,7 +57,16 @@ void CDlgEditCam::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_RADIO_FRUSTUM, frustum_radio);
 	DDX_Control(pDX, IDC_RADIO_PERSPECTIVE, perspective_radio);
 	DDX_Control(pDX, IDC_COMBO_ORDER, rot_order);
+	DDX_Control(pDX, IDC_EDIT_LEFT, left_editbox);
+	DDX_Control(pDX, IDC_EDIT_RIGHT, right_editbox);
+	DDX_Control(pDX, IDC_EDIT_BOTTOM, bottom_editbox);
+	DDX_Control(pDX, IDC_EDIT_TOP, top_editbox);
+	DDX_Control(pDX, IDC_EDIT_Z_NEAR, z_near_editbox);
+	DDX_Control(pDX, IDC_EDIT_Z_FAR, z_far_editbox);
+	DDX_Control(pDX, IDC_EDIT_FOVY, fovy_editbox);
+	DDX_Control(pDX, IDC_EDIT_ASPECT, aspect_editbox);
 	initOrderCombo();
+	ortho_radio.SetCheck(TRUE);
 }
 
 
@@ -81,19 +90,34 @@ void CDlgEditCam::OnBnClickedOk()
 
 void CDlgEditCam::OnBnClickedRadioOrtho()
 {
-	// TODO: Add your control notification handler code here
+	left_editbox.EnableWindow(TRUE);
+	right_editbox.EnableWindow(TRUE);
+	top_editbox.EnableWindow(TRUE);
+	bottom_editbox.EnableWindow(TRUE);
+	fovy_editbox.EnableWindow(FALSE);
+	aspect_editbox.EnableWindow(FALSE);
 }
 
 
 void CDlgEditCam::OnBnClickedRadioFrustum()
 {
-	// TODO: Add your control notification handler code here
+	left_editbox.EnableWindow(TRUE);
+	right_editbox.EnableWindow(TRUE);
+	top_editbox.EnableWindow(TRUE);
+	bottom_editbox.EnableWindow(TRUE);
+	fovy_editbox.EnableWindow(FALSE);
+	aspect_editbox.EnableWindow(FALSE);
 }
 
 
 void CDlgEditCam::OnBnClickedRadioPerspective()
 {
-	// TODO: Add your control notification handler code here
+	left_editbox.EnableWindow(FALSE);
+	right_editbox.EnableWindow(FALSE);
+	top_editbox.EnableWindow(FALSE);
+	bottom_editbox.EnableWindow(FALSE);
+	fovy_editbox.EnableWindow(TRUE);
+	aspect_editbox.EnableWindow(TRUE);
 }
 
 void CDlgEditCam::initOrderCombo() {

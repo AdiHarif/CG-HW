@@ -171,7 +171,17 @@ void transformActiveCamera() {
 		}
 
 		//projection:
-
+		if (dlg.left != 0 || dlg.right != 0 || dlg.bottom != 0 || dlg.top != 0 || dlg.z_near != 0 || dlg.z_far != 0) {
+			if (dlg.ortho_radio.GetCheck()) {
+				scene->getActiveCamera()->ortho(dlg.left, dlg.right, dlg.bottom, dlg.top, dlg.z_near, dlg.z_far);
+			}
+			if (dlg.frustum_radio.GetCheck()) {
+				scene->getActiveCamera()->frustum(dlg.left, dlg.right, dlg.bottom, dlg.top, dlg.z_near, dlg.z_far);
+			}
+		}
+		if (dlg.perspective_radio.GetCheck() && (dlg.z_near != 0 || dlg.z_far != 0 || dlg.fovy != 0 || dlg.aspect != 0)) {
+			scene->getActiveCamera()->perspective(dlg.fovy, dlg.aspect, dlg.z_near, dlg.z_far);
+		}
 	}
 
 	//cout << "How would you like to transform the active camera? (in world frame):" << endl;

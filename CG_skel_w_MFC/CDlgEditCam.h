@@ -31,7 +31,7 @@ public:
 	float left;
 	float right;
 	float bottom;
-	float up;
+	float top;
 	float z_near;
 	float z_far;
 	float fovy;
@@ -45,4 +45,12 @@ public:
 	afx_msg void OnBnClickedRadioPerspective();
 	CComboBox rot_order;
 	void initOrderCombo();
+	CEdit left_editbox;
+	CEdit right_editbox;
+	CEdit bottom_editbox;
+	CEdit top_editbox;
+	CEdit z_near_editbox;
+	CEdit z_far_editbox;
+	CEdit fovy_editbox;
+	CEdit aspect_editbox;
 };
