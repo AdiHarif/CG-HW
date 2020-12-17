@@ -140,9 +140,38 @@ void addNewCamera() {
 void transformActiveCamera() {
 	CDlgEditCam dlg;
 	if (dlg.DoModal() == IDOK) {
+
+		//translate:
 		if (dlg.translate_x != 0 || dlg.translate_y != 0 || dlg.translate_z != 0) {
 			scene->translateCameraWorld(vec4(dlg.translate_x, dlg.translate_y, dlg.translate_z, 1));
 		}
+
+		//rotate: TODO: add function calls
+		if (dlg.rotate_x != 0 || dlg.rotate_y != 0 || dlg.rotate_z != 0) {
+			switch (dlg.rot_order.GetCurSel()) {
+			case 0://x->y->z
+			
+				break;
+			case 1://x->z->y
+
+				break;
+			case 2://y->x->z
+
+				break;
+			case 3://y->z->x
+
+				break;
+			case 4://z->x->y
+
+				break;
+			case 5://z->y->x
+
+				break;
+			}
+		}
+
+		//projection:
+
 	}
 
 	//cout << "How would you like to transform the active camera? (in world frame):" << endl;

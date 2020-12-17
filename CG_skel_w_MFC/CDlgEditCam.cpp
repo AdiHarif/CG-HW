@@ -53,11 +53,55 @@ void CDlgEditCam::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_Z_FAR, z_far);
 	DDX_Text(pDX, IDC_EDIT_FOVY, fovy);
 	DDX_Text(pDX, IDC_EDIT_ASPECT, aspect);
+	DDX_Control(pDX, IDC_RADIO_ORTHO, ortho_radio);
+	DDX_Control(pDX, IDC_RADIO_FRUSTUM, frustum_radio);
+	DDX_Control(pDX, IDC_RADIO_PERSPECTIVE, perspective_radio);
+	DDX_Control(pDX, IDC_COMBO_ORDER, rot_order);
+	initOrderCombo();
 }
 
 
 BEGIN_MESSAGE_MAP(CDlgEditCam, CDialog)
+	ON_BN_CLICKED(IDOK, &CDlgEditCam::OnBnClickedOk)
+	ON_BN_CLICKED(IDC_RADIO_ORTHO, &CDlgEditCam::OnBnClickedRadioOrtho)
+	ON_BN_CLICKED(IDC_RADIO_FRUSTUM, &CDlgEditCam::OnBnClickedRadioFrustum)
+	ON_BN_CLICKED(IDC_RADIO_PERSPECTIVE, &CDlgEditCam::OnBnClickedRadioPerspective)
 END_MESSAGE_MAP()
 
 
 // CDlgNewCam message handlers
+
+
+void CDlgEditCam::OnBnClickedOk()
+{
+	// TODO: Add your control notification handler code here
+	CDialog::OnOK();
+}
+
+
+void CDlgEditCam::OnBnClickedRadioOrtho()
+{
+	// TODO: Add your control notification handler code here
+}
+
+
+void CDlgEditCam::OnBnClickedRadioFrustum()
+{
+	// TODO: Add your control notification handler code here
+}
+
+
+void CDlgEditCam::OnBnClickedRadioPerspective()
+{
+	// TODO: Add your control notification handler code here
+}
+
+void CDlgEditCam::initOrderCombo() {
+	rot_order.AddString(_T("x->y->z"));
+	rot_order.AddString(_T("x->z->y"));
+	rot_order.AddString(_T("y->x->z"));
+	rot_order.AddString(_T("y->z->x"));
+	rot_order.AddString(_T("z->x->y"));
+	rot_order.AddString(_T("z->y->x"));
+	rot_order.SetCurSel(0);
+}

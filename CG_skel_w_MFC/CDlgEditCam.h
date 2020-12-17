@@ -36,4 +36,13 @@ public:
 	float z_far;
 	float fovy;
 	float aspect;
+	CButton ortho_radio;
+	CButton frustum_radio;
+	CButton perspective_radio;
+	afx_msg void OnBnClickedOk();
+	afx_msg void OnBnClickedRadioOrtho();
+	afx_msg void OnBnClickedRadioFrustum();
+	afx_msg void OnBnClickedRadioPerspective();
+	CComboBox rot_order;
+	void initOrderCombo();
 };
