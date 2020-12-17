@@ -140,7 +140,9 @@ void addNewCamera() {
 void transformActiveCamera() {
 	CDlgEditCam dlg;
 	if (dlg.DoModal() == IDOK) {
-		printf("ok");
+		if (dlg.translate_x != 0 || dlg.translate_y != 0 || dlg.translate_z != 0) {
+			scene->translateCameraWorld(vec4(dlg.translate_x, dlg.translate_y, dlg.translate_z, 1));
+		}
 	}
 
 	//cout << "How would you like to transform the active camera? (in world frame):" << endl;
