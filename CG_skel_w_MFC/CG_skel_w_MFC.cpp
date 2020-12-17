@@ -19,6 +19,7 @@
 #include "InitShader.h"
 #include "Scene.h"
 #include "Renderer.h"
+#include "CDlgNewCam.h"
 #include <string>
 
 #define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
@@ -121,15 +122,25 @@ void transformActiveModel() {
 }
 
 void addNewCamera() {
-	cout << "Enter X, Y and Z values for your brand new GoPro Hero9 Black Edition:" << endl;
-	vec4 cam_values;
-	cin >> cam_values[0] >> cam_values[1] >> cam_values[2];
-	Camera* cam = new Camera(cam_values);
-	scene->addCamera(cam);
-	cout << "Enjoy, and bring me pictures of Spiderman!" << endl;
+	CDlgNewCam dlg;
+	if (dlg.DoModal() == IDOK) {
+		Camera* new_cam = new Camera(vec4(dlg.pos_x, dlg.pos_y, dlg.pos_z));
+		scene->addCamera(new_cam);
+	}
+
+	//cout << "Enter X, Y and Z values for your brand new GoPro Hero9 Black Edition:" << endl;
+	//vec4 cam_values;
+	//cin >> cam_values[0] >> cam_values[1] >> cam_values[2];
+	//Camera* cam = new Camera(cam_values);
+	//scene->addCamera(cam);
+	//cout << "Enjoy, and bring me pictures of Spiderman!" << endl;
 }
 
 void transformActiveCamera() {
+	/*if (dlg.DoModal() == IDOK) {
+		printf("ok");
+	}*/
+
 	cout << "How would you like to transform the active camera? (in world frame):" << endl;
 	cout << "Translate: 0" << endl << "Rotate: 1" << endl;
 	int trans_type;
