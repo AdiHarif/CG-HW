@@ -20,6 +20,7 @@
 #include "Scene.h"
 #include "Renderer.h"
 #include "CDlgNewCam.h"
+#include "CDlgEditCam.h"
 #include <string>
 
 #define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
@@ -137,43 +138,44 @@ void addNewCamera() {
 }
 
 void transformActiveCamera() {
-	/*if (dlg.DoModal() == IDOK) {
+	CDlgEditCam dlg;
+	if (dlg.DoModal() == IDOK) {
 		printf("ok");
-	}*/
-
-	cout << "How would you like to transform the active camera? (in world frame):" << endl;
-	cout << "Translate: 0" << endl << "Rotate: 1" << endl;
-	int trans_type;
-	cin >> trans_type;
-	if (trans_type == 0) {
-		cout << "Enter a Translation vector (X,Y,Z)" << endl;
-		float x, y, z;
-		cin >> x >> y >> z;
-		scene->translateCameraWorld(vec4(x, y, z, 1));
 	}
-	if (trans_type == 1) {
-		int axis;
-		cout << "Choose axis to rotate around:" << endl;
-		cout << "X: 0" << endl << "Y: 1" << endl << "Z: 2" << endl;
-		cin >> axis;
-		cout << "Please enter an angle:" << endl;
-		float theta;
-		cin >> theta;
 
-		switch (axis) {
-		case X:
-			scene->rotateCameraXWorld(theta);
-			break;
-		case Y:
-			scene->rotateCameraYWorld(theta);
-			break;
-		case Z:
-			scene->rotateCameraZWorld(theta);
-			break;
-		}
+	//cout << "How would you like to transform the active camera? (in world frame):" << endl;
+	//cout << "Translate: 0" << endl << "Rotate: 1" << endl;
+	//int trans_type;
+	//cin >> trans_type;
+	//if (trans_type == 0) {
+	//	cout << "Enter a Translation vector (X,Y,Z)" << endl;
+	//	float x, y, z;
+	//	cin >> x >> y >> z;
+	//	scene->translateCameraWorld(vec4(x, y, z, 1));
+	//}
+	//if (trans_type == 1) {
+	//	int axis;
+	//	cout << "Choose axis to rotate around:" << endl;
+	//	cout << "X: 0" << endl << "Y: 1" << endl << "Z: 2" << endl;
+	//	cin >> axis;
+	//	cout << "Please enter an angle:" << endl;
+	//	float theta;
+	//	cin >> theta;
 
-	}
-	
+	//	switch (axis) {
+	//	case X:
+	//		scene->rotateCameraXWorld(theta);
+	//		break;
+	//	case Y:
+	//		scene->rotateCameraYWorld(theta);
+	//		break;
+	//	case Z:
+	//		scene->rotateCameraZWorld(theta);
+	//		break;
+	//	}
+
+	//}
+
 }
 
 void setProjectionSettings() {
