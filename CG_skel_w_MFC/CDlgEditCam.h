@@ -21,4 +21,19 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
+public:
+	float translate_x;
+	float translate_y;
+	float translate_z;
+	float rotate_x;
+	float rotate_y;
+	float rotate_z;
+	float left;
+	float right;
+	float bottom;
+	float up;
+	float z_near;
+	float z_far;
+	float fovy;
+	float aspect;
 };
