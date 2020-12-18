@@ -19,6 +19,9 @@
 #include "InitShader.h"
 #include "Scene.h"
 #include "Renderer.h"
+#include "CDlgNewCam.h"
+#include "CDlgEditCam.h"
+#include "CDlgTransformModel.h"
 #include <string>
 
 #define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
@@ -27,8 +30,7 @@
 #define MODEL_MENU_ADD_PRIMITIVE 2
 #define MODEL_MENU_TRANSFORM_ACTIVE_MODEL 3
 #define CAMERA_MENU_ADD_CAMERA 1
-#define CAMERA_MENU_TRANSFORM_ACTIVE_CAMERA 2
-#define CAMERA_MENU_PROJECTION_SETTINGS 3
+#define CAMERA_MENU_EDIT_ACTIVE_CAMERA 2
 #define MAIN_MENU_TRANSFORM_WORLD 1
 #define MAIN_MENU_PARTY 2
 #define MAIN_MENU_ABOUT 3
@@ -76,93 +78,144 @@ void transformActiveModel() {
 		cout << "There are no models </3" << endl;
 		return;
 	}
-	int action, axis, theta;
-	vec3 scale_by, translate_by;
-	cout << "What do you feel like?" << endl;
-	cout << "Scale: 0" << endl << "Rotate: 1" << endl << "Translate: 2" << endl;
-	cin >> action;
-	switch (action) {
-	case SCALE:
-		cout << "So... you wanna scale..." << endl;
-		cout << "Enter 3 numbers for X, Y and Z scaling:" << endl;
-		cin >> scale_by[0] >> scale_by[1] >> scale_by[2];
-		scene->scaleSelection(scale_by);
-		cout << "BEHOLD YOUR SCALED MODELS!" << endl;
-		break;
-	case ROTATE:
-		cout << "Rotating today, are we? Choose axis:" << endl;
-		cout << "X: 0" << endl << "Y: 1" << endl << "Z: 2" << endl;
-		cin >> axis;
-		cout << "Now - choose theta to rotate by:" << endl;
-		cin >> theta;
-		switch (axis) {
-		case X:
-			scene->rotateSelectionX(theta);
-			break;
-		case Y:
-			scene->rotateSelectionY(theta);
-			break;
-		case Z:
-			scene->rotateSelectionZ(theta);
-			break;
+
+	CDlgTransformModel dlg;
+	if (dlg.DoModal() == IDOK) {
+		vec3 scale_vec(dlg.scale_x, dlg.scale_y, dlg.scale_z);
+		vec4 translation_vec(dlg.translate_x, dlg.translate_y, dlg.translate_z);
+		vec4 rotation_vec(dlg.rotate_x, dlg.rotate_y, dlg.rotate_z);
+		
+		//scale:
+		if (!(scale_vec == vec3(0, 0, 0))) {
+			scene->scaleSelection(scale_vec);
 		}
-		cout << "BEHOLD YOUR ROTATED MODELS!" << endl;
-		break;
-	case TRANSLATE:
-		cout << "Translation it is." << endl;
-		cout << "Enter 3 numbers for X, Y and Z translation:" << endl;
-		cin >> translate_by[0] >> translate_by[1] >> translate_by[2];
-		scene->translateSelection(translate_by);
-		cout << "BEHOLD YOUR TRANSLATED MODELS!" << endl;
-		break;
+
+		//translate:
+		if (!(translation_vec == vec3(0, 0, 0))) {
+			scene->translateSelection(translation_vec);
+		}
+
+		//rotate:
+		if (!(rotation_vec == vec3(0, 0, 0)) && dlg.rot_order_index != CB_ERR) {
+			switch (dlg.rot_order_index) {
+			case 0://x->y->z
+				scene->rotateSelectionX(rotation_vec.x);
+				scene->rotateSelectionY(rotation_vec.y);
+				scene->rotateSelectionZ(rotation_vec.z);
+				break;
+			case 1://x->z->y
+				scene->rotateSelectionX(rotation_vec.x);
+				scene->rotateSelectionZ(rotation_vec.z);
+				scene->rotateSelectionY(rotation_vec.y);
+				break;
+			case 2://y->x->z
+				scene->rotateSelectionY(rotation_vec.y);
+				scene->rotateSelectionX(rotation_vec.x);
+				scene->rotateSelectionZ(rotation_vec.z);
+				break;
+			case 3://y->z->x
+				scene->rotateSelectionY(rotation_vec.y);
+				scene->rotateSelectionZ(rotation_vec.z);
+				scene->rotateSelectionX(rotation_vec.x);
+				break;
+			case 4://z->x->y
+				scene->rotateSelectionZ(rotation_vec.z);
+				scene->rotateSelectionX(rotation_vec.x);
+				scene->rotateSelectionY(rotation_vec.y);
+				break;
+			case 5://z->y->x
+				scene->rotateSelectionZ(rotation_vec.z);
+				scene->rotateSelectionY(rotation_vec.y);
+				scene->rotateSelectionX(rotation_vec.x);
+				break;
+			}
+		}
 	}
-	cout << endl;
-	scene->draw();
 }
 
 void addNewCamera() {
-	cout << "Enter X, Y and Z values for your brand new GoPro Hero9 Black Edition:" << endl;
-	vec4 cam_values;
-	cin >> cam_values[0] >> cam_values[1] >> cam_values[2];
-	Camera* cam = new Camera(cam_values);
-	scene->addCamera(cam);
-	cout << "Enjoy, and bring me pictures of Spiderman!" << endl;
+	CDlgNewCam dlg;
+	if (dlg.DoModal() == IDOK) {
+		vec4 pos = vec4(dlg.pos_x, dlg.pos_y, dlg.pos_z);
+		vec4 lookat = vec4(dlg.lookat_x, dlg.lookat_y, dlg.lookat_z);
+		vec4 up = vec4(dlg.up_x, dlg.up_y, dlg.up_z);
+		if (!(pos == lookat)) {
+			Camera* new_cam = NULL;
+			if (up != vec4(0, 0, 0)) {
+				new_cam = new Camera(pos, lookat);
+			}
+			else {
+				new_cam = new Camera(pos, lookat, up);
+			}
+			scene->addCamera(new_cam);
+		}		
+	}
 }
 
-void transformActiveCamera() {
-	cout << "How would you like to transform the active camera? (in world frame):" << endl;
-	cout << "Translate: 0" << endl << "Rotate: 1" << endl;
-	int trans_type;
-	cin >> trans_type;
-	if (trans_type == 0) {
-		cout << "Enter a Translation vector (X,Y,Z)" << endl;
-		float x, y, z;
-		cin >> x >> y >> z;
-		scene->translateCameraWorld(vec4(x, y, z, 1));
-	}
-	if (trans_type == 1) {
-		int axis;
-		cout << "Choose axis to rotate around:" << endl;
-		cout << "X: 0" << endl << "Y: 1" << endl << "Z: 2" << endl;
-		cin >> axis;
-		cout << "Please enter an angle:" << endl;
-		float theta;
-		cin >> theta;
+void editActiveCamera() {
+	CDlgEditCam dlg;
+	if (dlg.DoModal() == IDOK) {
 
-		switch (axis) {
-		case X:
-			scene->rotateCameraXWorld(theta);
-			break;
-		case Y:
-			scene->rotateCameraYWorld(theta);
-			break;
-		case Z:
-			scene->rotateCameraZWorld(theta);
-			break;
+		//translate:
+		vec4 translation_vec = vec4(dlg.translate_x, dlg.translate_y, dlg.translate_z);
+		if (!(translation_vec == vec4(0, 0, 0))) {
+			scene->translateCameraWorld(translation_vec);
 		}
 
+		//rotate:
+		vec4 rotation_vec = vec4(dlg.rotate_x, dlg.rotate_y, dlg.rotate_z);
+		if (!(rotation_vec == vec4(0, 0, 0)) && dlg.rot_order_index != CB_ERR) {
+			switch (dlg.rot_order_index) {
+			case 0://x->y->z
+				scene->rotateCameraXWorld(rotation_vec.x);
+				scene->rotateCameraYWorld(rotation_vec.y);
+				scene->rotateCameraZWorld(rotation_vec.z);
+				break;
+			case 1://x->z->y
+				scene->rotateCameraXWorld(rotation_vec.x);
+				scene->rotateCameraZWorld(rotation_vec.z);
+				scene->rotateCameraYWorld(rotation_vec.y);
+				break;
+			case 2://y->x->z
+				scene->rotateCameraYWorld(rotation_vec.y);
+				scene->rotateCameraXWorld(rotation_vec.x);
+				scene->rotateCameraZWorld(rotation_vec.z);
+				break;
+			case 3://y->z->x
+				scene->rotateCameraYWorld(rotation_vec.y);
+				scene->rotateCameraZWorld(rotation_vec.z);
+				scene->rotateCameraXWorld(rotation_vec.x);
+				break;
+			case 4://z->x->y
+				scene->rotateCameraZWorld(rotation_vec.z);
+				scene->rotateCameraXWorld(rotation_vec.x);
+				scene->rotateCameraYWorld(rotation_vec.y);
+				break;
+			case 5://z->y->x
+				scene->rotateCameraZWorld(rotation_vec.z);
+				scene->rotateCameraYWorld(rotation_vec.y);
+				scene->rotateCameraXWorld(rotation_vec.x);
+				break;
+			}
+		}
+
+		//projection:
+		if (dlg.left != 0 || dlg.right != 0 || dlg.bottom != 0 || dlg.top != 0 || dlg.z_near != 0 || dlg.z_far != 0) {
+			switch (dlg.proj_radio_index) {
+			case 0: // ortho
+				scene->getActiveCamera()->ortho(dlg.left, dlg.right, dlg.bottom, dlg.top, dlg.z_near, dlg.z_far);
+				break;
+			case 1: // frustum
+				scene->getActiveCamera()->frustum(dlg.left, dlg.right, dlg.bottom, dlg.top, dlg.z_near, dlg.z_far);
+				break;
+			case 2: // perspective
+				if (dlg.z_near != 0 || dlg.z_far != 0 || dlg.fovy != 0 || dlg.aspect != 0) {
+					scene->getActiveCamera()->perspective(dlg.fovy, dlg.aspect, dlg.z_near, dlg.z_far);
+				}
+				break;
+			}
+		}
 	}
-	
 }
 
 void setProjectionSettings() {
@@ -416,18 +469,17 @@ void modelsMenuCB(int id){
 		{
 			std::string s((LPCTSTR)dlg.GetPathName());
 			scene->loadOBJModel((LPCTSTR)dlg.GetPathName());
-			scene->draw();
 		}
 		break;
 	case MODEL_MENU_ADD_PRIMITIVE:
 		scene->loadPrimModel("cube.obj");
-		scene->draw();
 		break;
 	case MODEL_MENU_TRANSFORM_ACTIVE_MODEL:
 		transformActiveModel();
 		//std::cout << "MODEL_MENU_TRANSFORM_ACTIVE_MODEL" << std::endl;
 		break;
 	}
+	scene->draw();
 }
 
 void camerasMenuCB(int id){
@@ -436,13 +488,9 @@ void camerasMenuCB(int id){
 		addNewCamera();
 		//std::cout << "CAMERA_MENU_ADD_CAMERA" << std::endl;
 		break;
-	case CAMERA_MENU_TRANSFORM_ACTIVE_CAMERA:
-		transformActiveCamera();
+	case CAMERA_MENU_EDIT_ACTIVE_CAMERA:
+		editActiveCamera();
 		//std::cout << "CAMERA_MENU_TRANSFORM_ACTIVE_CAMERA" << std::endl;
-		break;
-	case CAMERA_MENU_PROJECTION_SETTINGS:
-		setProjectionSettings();
-		//std::cout << "CAMERA_MENU_PROJECTION_SETTINGS" << std::endl;
 		break;
 	}
 
@@ -563,8 +611,7 @@ void initMenu()
 	glutAddMenuEntry("Transform Active Model", MODEL_MENU_TRANSFORM_ACTIVE_MODEL);
 	int camerasMenu = glutCreateMenu(camerasMenuCB);
 	glutAddMenuEntry("Add New Camera",CAMERA_MENU_ADD_CAMERA);
-	glutAddMenuEntry("Transform Active Camera ", CAMERA_MENU_TRANSFORM_ACTIVE_CAMERA);
-	glutAddMenuEntry("Projection Settings", CAMERA_MENU_PROJECTION_SETTINGS);
+	glutAddMenuEntry("Edit Active Camera ", CAMERA_MENU_EDIT_ACTIVE_CAMERA);
 	glutCreateMenu(mainMenuCB);
 
 	/*int menuCamera = glutCreateMenu(cameraMenu);

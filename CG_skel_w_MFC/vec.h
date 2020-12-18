@@ -240,6 +240,12 @@ struct vec3 {
 
     operator GLfloat* ()
 	{ return static_cast<GLfloat*>( &x ); }
+
+    //  --- Comparison Operators ---
+    //
+    bool operator ==(vec3 v) {
+        return (x == v.x) && (y == v.y) && (z == v.z);
+    }
 };
 
 //----------------------------------------------------------------------------
