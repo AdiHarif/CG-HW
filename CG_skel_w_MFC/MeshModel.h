@@ -70,20 +70,26 @@ protected :
 	MeshModel() {}
 
 	vector<Face> faces;
-	vector<vec4> vertices;
-	//vector<vec4> vertex_positions;
-	vector<vec4> vertex_normals;
+	vector<Vertex> vertices;
+	vector<Normal> vertex_normals;
+
 	vector<vec4> bounding_box_vertices;
+
+	//vector<vec4> vertex_positions;
 	//vector<int> vertex_normals_indexes;
 	//vector<vec4> faces_normals;
 	//vector<vec4> faces_normals_locations;
-	vector<Normal> vertices_to_normals;
-	vector<Normal> faces_to_normals;
+	/*vector<Normal> vertices_to_normals;
+	vector<Normal> faces_to_normals;*/
+
 
 	vec4 position;
 	mat4 tm;
+	mat4 tw;
 	mat4 ntm;
-	mat3 _normal_transform;
+	mat4 ntw;
+
+	//mat3 _normal_transform;
 
 	bool is_active;
 
@@ -94,8 +100,6 @@ protected :
 	Color bb_color;
 
 	DrawPref draw_pref;
-
-	
 
 
 public:
@@ -110,7 +114,7 @@ public:
 	void drawFacesNormals(Renderer* renderer);
 	void drawBoundingBox(Renderer* renderer);
 	void initBoundingBox(vec4 min, vec4 max);
-	void computeFacesNormals();
+	//void computeFacesNormals();
 
 	void translate(vec4);
 	void scale(vec3);
@@ -118,7 +122,7 @@ public:
 	void rotateY(GLfloat);
 	void rotateZ(GLfloat);
 	vector<vec4> getVertices();
-	vector<vec4> getVertexPositions();
+	//vector<vec4> getVertexPositions();
 	mat4 getWorldTransform();
 	vec4 getPosition();
 	

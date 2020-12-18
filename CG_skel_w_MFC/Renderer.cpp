@@ -151,37 +151,37 @@ vector<Pixel> Renderer::transformVertices(vector<Vertex>& vertices, mat4 tm){ //
 }
 
 
-vector<Line> Renderer::transformEdges(vector<vec4>& edges, mat4 tm) { //TODO:delete
-	vector<Line> lines;
-	mat4 t_tot = tp * tc * tw * tm;
-	for (vector<vec4>::iterator i = edges.begin(); i != edges.end(); i += 2) {
-		vec4 v0 = t_tot * (*i);
-		v0 = v0 / v0.w;
-		vec4 v1 = t_tot * (*(i + 1));
-		v1 = v1 / v1.w;
-		if ((v0.z < -1 && v1.z < -1) || (v0.z > 1 && v1.z > 1)) continue;
-		/*if (v0.z > v1.z) {
-			vec4 tmp = v0;
-			v0 = v1;
-			v1 = tmp;
-		}
-		if (v0.z < -1) {
-			vec4 correction = (v1 - v0) * ( (-1-v0.z)/(v1.z-v0.z));
-			v0 = v0 + correction;
-		}
-		if (v1.z > 1) {
-			vec4 correction = (v0-v1) * ((1 - v1.z) / (v0.z - v1.z));
-			v0 = v0 + correction;
-		}*/
-
-
-		Line l = Line(viewPort(v0), viewPort(v1));
-		if (isLineLegal(l)) {
-			lines.push_back(l);
-		}
-	}
-	return lines;
-}
+//vector<Line> Renderer::transformEdges(vector<vec4>& edges, mat4 tm) { //TODO:delete
+//	vector<Line> lines;
+//	mat4 t_tot = tp * tc * tw * tm;
+//	for (vector<vec4>::iterator i = edges.begin(); i != edges.end(); i += 2) {
+//		vec4 v0 = t_tot * (*i);
+//		v0 = v0 / v0.w;
+//		vec4 v1 = t_tot * (*(i + 1));
+//		v1 = v1 / v1.w;
+//		if ((v0.z < -1 && v1.z < -1) || (v0.z > 1 && v1.z > 1)) continue;
+//		/*if (v0.z > v1.z) {
+//			vec4 tmp = v0;
+//			v0 = v1;
+//			v1 = tmp;
+//		}
+//		if (v0.z < -1) {
+//			vec4 correction = (v1 - v0) * ( (-1-v0.z)/(v1.z-v0.z));
+//			v0 = v0 + correction;
+//		}
+//		if (v1.z > 1) {
+//			vec4 correction = (v0-v1) * ((1 - v1.z) / (v0.z - v1.z));
+//			v0 = v0 + correction;
+//		}*/
+//
+//
+//		Line l = Line(viewPort(v0), viewPort(v1));
+//		if (isLineLegal(l)) {
+//			lines.push_back(l);
+//		}
+//	}
+//	return lines;
+//}
 
 vector<Line> Renderer::transformEdges(vector<Edge>& edges, mat4 tm) { //TODO: improve clipping
 	vector<Line> lines;
@@ -213,14 +213,15 @@ vector<Line> Renderer::transformEdges(vector<Edge>& edges, mat4 tm) { //TODO: im
 	return lines;
 }
 
-vector<Line> Renderer::transformFaces(vector<vec4>& faces, mat4 tm) {
+vector<Line> Renderer::transformFaces(vector<Face>& faces, mat4 tm) {
 	vector<Line> lines;
 	mat4 t_tot = tp * tc * tw * tm;
-	for (vector<vec4>::iterator i = faces.begin(); i != faces.end(); i+=3) {
+	for (vector<Face>::iterator i = faces.begin(); i != faces.end(); i++) {
+		Face f = (*i);
 		for (int j = 0; j < 3; j++) {
-			vec4 v0 = t_tot * (*(i + j));
+			vec4 v0 = t_tot * (*f.vertices[j]);
 			v0 = v0 / v0.w;
-			vec4 v1 = t_tot * (*(i + ((j + 1) % 3)));
+			vec4 v1 = t_tot * (*f.vertices[(j + 1) % 3]);
 			v1 = v1 / v1.w;
 			if ((v0.z < -1 && v1.z < -1) || (v0.z > 1 && v1.z > 1)) continue;
 			/*if (v0.z > v1.z) {
@@ -245,15 +246,42 @@ vector<Line> Renderer::transformFaces(vector<vec4>& faces, mat4 tm) {
 	return lines;
 }
 
-vector<Line> Renderer::transformNormals(vector<Normal>& normals, mat4 tm, mat4 ntm) {
+vector<Line> Renderer::transformVertexNormals(vector<Face>& faces, mat4 tm, mat4 ntm) {
 	vector<Line> lines;
 	mat4 tm_tot = tp * tc * tw * tm;
 	mat4 ntm_t1 = tw * ntm;
 	mat4 ntm_t2 = tp * tc;
-	for (int i = 0; i < normals.size(); i++) {
-		vec4 start = tm_tot * (normals[i].vertex);
+	for (int i = 0; i < faces.size(); i++) {
+		for (int j = 0; j < 3; j++) {
+			vec4 start = tm_tot * (*faces[i].vertices[j]);
+			start = start / start.w;
+			vec4 direction = ntm_t1 * (*faces[i].normals[j]);
+			direction.w = 0;
+			direction = normalize(direction);
+			direction.w = 1;
+			direction = ntm_t2 * direction;
+			direction = direction / direction.w;
+			vec4 end = start + direction;
+			end.w = 1;
+			if ((start.z < -1 && end.z < -1) || (start.z > 1 && end.z > 1)) continue;
+			Line l = Line(viewPort(start), viewPort(end));
+			if (isLineLegal(l)) {
+				lines.push_back(l);
+			}
+		}
+	}
+	return lines;
+}
+
+vector<Line> Renderer::transformFaceNormals(vector<Face>& faces, mat4 tm, mat4 ntm) {
+	vector<Line> lines;
+	mat4 tm_tot = tp * tc * tw * tm;
+	mat4 ntm_t1 = tw * ntm;
+	mat4 ntm_t2 = tp * tc;
+	for (int i = 0; i < faces.size(); i++) {
+		vec4 start = tm_tot * (faces[i].center);
 		start = start / start.w;
-		vec4 direction = ntm_t1 * (normals[i].direction);
+		vec4 direction = ntm_t1 * (faces[i].center_normal);
 		direction.w = 0;
 		direction = normalize(direction);
 		direction.w = 1;
@@ -262,19 +290,6 @@ vector<Line> Renderer::transformNormals(vector<Normal>& normals, mat4 tm, mat4 n
 		vec4 end = start + direction;
 		end.w = 1;
 		if ((start.z < -1 && end.z < -1) || (start.z > 1 && end.z > 1)) continue;
-		/*if (start.z > end.z) {
-			vec4 tmp = start;
-			start = end;
-			end = tmp;
-		}
-		if (start.z < -1) {
-			vec4 correction = (end - start) * ((-1 - start.z) / (end.z - start.z));
-			start = start + correction;
-		}
-		if (end.z > 1) {
-			vec4 correction = (start - end) * ((1 - end.z) / (start.z - end.z));
-			start = start + correction;
-		}*/
 		Line l = Line(viewPort(start), viewPort(end));
 		if (isLineLegal(l)) {
 			lines.push_back(l);
@@ -404,33 +419,33 @@ void Renderer::setSize(int width, int height) {
 
 
 //===Drawing Interface===
-void Renderer::drawPoints(vector<Vertex>& points, mat4 tm, Color c){
-	vector<Pixel> pixels = transformVertices(points, tm);
+void Renderer::drawVertices(vector<Vertex>& vertices, mat4 tm, Color c){
+	vector<Pixel> pixels = transformVertices(vertices, tm);
 	for (vector<Pixel>::iterator i = pixels.begin(); i != pixels.end(); i++) {
 		rasterizePoint(*i, c);
 	}
 }
 
-void Renderer::drawLines(vector<vec4>& points, mat4 tm, Color c) {
-	vector<Line> lines = transformEdges(points, tm);
-	for (vector<Line>::iterator i = lines.begin(); i != lines.end(); i++) {
-		rasterizeLine(*i, c);
-	}
-}
-
-void Renderer::drawLines(vector<Edge>& edges, mat4 tm, Color c) {//TODO: implement
+void Renderer::drawEdges(vector<Edge>& edges, mat4 tm, Color c) {
 	vector<Line> lines = transformEdges(edges, tm);
 	for (vector<Line>::iterator i = lines.begin(); i != lines.end(); i++) {
 		rasterizeLine(*i, c);
 	}
 }
 
-void Renderer::drawTriangles(vector<vec4>& vertex_positions, mat4 tm, Color c) {
-	vector<Line> lines = transformFaces(vertex_positions, tm);
+void Renderer::drawEdges(vector<Face>& faces, mat4 tm, Color c) {
+	vector<Line> lines = transformFaces(faces, tm);
 	for (vector<Line>::iterator i = lines.begin(); i != lines.end(); i++) {
 		rasterizeLine(*i, c);
 	}
 }
+
+//void Renderer::drawTriangles(vector<Face>& faces, mat4 tm, Color c) {
+//	vector<Line> lines = transformFaces(faces, tm);
+//	for (vector<Line>::iterator i = lines.begin(); i != lines.end(); i++) {
+//		rasterizeLine(*i, c);
+//	}
+//}
 
 //void Renderer::drawVertexNormals(vector<Vertex>& points, mat4 tm, vector<vec4>& normals, mat4 ntm, vector<int>& vertex_normals_indexes, Color c) {
 	//vector<vec4> normals_to_draw;
@@ -453,15 +468,15 @@ void Renderer::drawTriangles(vector<vec4>& vertex_positions, mat4 tm, Color c) {
 	}
 }*/
 
-void Renderer::drawVertexNormals(vector<Normal>& normals, mat4 tm, mat4 ntm, Color c) {
-	vector<Line> lines = transformNormals(normals, tm, ntm);
+void Renderer::drawVertexNormals(vector<Face>& faces, mat4 tm, mat4 ntm, Color c) {
+	vector<Line> lines = transformVertexNormals(faces, tm, ntm);
 	for (vector<Line>::iterator i = lines.begin(); i != lines.end(); i++) {
 		rasterizeLine(*i, c);
 	}
 }
 
-void Renderer::drawFacesNormals(vector<Normal>& normals, mat4 tm, mat4 ntm, Color c) {
-	vector<Line> lines = transformNormals(normals, tm, ntm);
+void Renderer::drawFacesNormals(vector<Face>& faces, mat4 tm, mat4 ntm, Color c) {
+	vector<Line> lines = transformFaceNormals(faces, tm, ntm);
 	for (vector<Line>::iterator i = lines.begin(); i != lines.end(); i++) {
 		rasterizeLine(*i, c);
 	}

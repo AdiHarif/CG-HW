@@ -19,7 +19,7 @@ public:
 		vertices.push_back(vec4(-1.0, 1.0, 1.0));
 		vertices.push_back(vec4(-1.0, 1.0, -1.0));
 
-		faces.push_back(FaceIdcs(vec4(2, 3, 4)));
+		/*faces.push_back(FaceIdcs(vec4(2, 3, 4)));
 		faces.push_back(FaceIdcs(vec4(8, 7, 6)));
 		faces.push_back(FaceIdcs(vec4(5, 6, 2)));
 		faces.push_back(FaceIdcs(vec4(6, 7, 3)));
@@ -30,7 +30,7 @@ public:
 		faces.push_back(FaceIdcs(vec4(1, 5, 2)));
 		faces.push_back(FaceIdcs(vec4(2, 6, 3)));
 		faces.push_back(FaceIdcs(vec4(4, 3, 8)));
-		faces.push_back(FaceIdcs(vec4(5, 1, 8)));
+		faces.push_back(FaceIdcs(vec4(5, 1, 8)));*/
 
 		vec4 min = vec4(-1.0, -1.0, -1.0);
 		vec4 max = vec4(1.0, 1.0, 1.0);
@@ -47,14 +47,14 @@ public:
 			(*i) = t * (*i);
 		}
 
-		for (vector<FaceIdcs>::iterator it = faces.begin(); it != faces.end(); ++it) {
+		/*for (vector<FaceIdcs>::iterator it = faces.begin(); it != faces.end(); ++it) {
 			for (int i = 0; i < 3; i++)
 			{
 				vertex_positions.push_back(vec4(vertices[it->v[i] - 1]));
 			}
 		}
 
-		computeFacesNormals();
+		computeFacesNormals();*/
 		position = vec4(0.0, 0.0, 0.0, 1.0);
 		active_mesh_color = { 0.0, 1.0, 0.0 };
 		inactive_mesh_color = { 0.4, 0.4, 0.4 };

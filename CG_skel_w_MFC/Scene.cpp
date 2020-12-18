@@ -73,7 +73,7 @@ void Scene::draw()
 
 	vector<vec4> tmp;
 	tmp.push_back(vec4(0,0,0,1));
-	m_renderer->drawPoints(tmp, mat4(1), Color({ 1,0,0 }));
+	m_renderer->drawVertices(tmp, mat4(1), Color({ 1,0,0 }));
 
 	m_renderer->swapBuffers();
 }

@@ -63,12 +63,27 @@ struct Face {
 	Normal* normals[3];
 	void* textures[3];
 
+	Vertex center;
+	Normal center_normal;
+
 
 	Face()
 	{
 		for (int i = 0; i < 3; i++) {
-			vertices[i] = normals[i] = textures[i] = nullptr;
+			vertices[i] = nullptr;
+			normals[i] = nullptr;
+			textures[i] = nullptr;
 		}
+	}
+
+	void calcNormal() {
+		vec4 v0 = *vertices[1] - *vertices[0];
+		vec4 v1 = *vertices[2] - *vertices[1];
+		center_normal = cross(v0, v1);
+	}
+
+	void calcCenter() {
+		center = (*vertices[0] + *vertices[1] + *vertices[2]) / 3;
 	}
 
 };
@@ -107,10 +122,11 @@ class Renderer
 	Pixel viewPort(Vertex v);
 
 	vector<Pixel> transformVertices(vector<Vertex>& vertices, mat4 tm);
-	vector<Line> transformEdges(vector<vec4>& edges, mat4 tm); //Legacy, should delete this in the future.
+	//vector<Line> transformEdges(vector<vec4>& edges, mat4 tm); //Legacy, should delete this in the future.
 	vector<Line> transformEdges(vector<Edge>& edges, mat4 tm);
-	vector<Line> transformFaces(vector<vec4>& faces, mat4 tm); //TODO change this to work with face struct
-	vector<Line> transformNormals(vector<Normal>& normals, mat4 tm, mat4 ntm);
+	vector<Line> transformFaces(vector<Face>& faces, mat4 tm); 
+	vector<Line> transformVertexNormals(vector<Face>& faces, mat4 tm, mat4 ntm);
+	vector<Line> transformFaceNormals(vector<Face>& faces, mat4 tm, mat4 ntm);
 	//==========
 
 
@@ -138,12 +154,15 @@ public:
 	//==========
 
 	//===Drawing Interface===
-	void drawPoints(vector<Vertex>& points, mat4 tm, Color c);
-	void drawLines(vector<vec4>& points, mat4 tm, Color c); //Legacy, shoud delete in the future (felt legacy, might delete later)
-	void drawLines(vector<Edge>& edges, mat4 tm, Color c);
-	void drawTriangles(vector<vec4>& vertex_positions, mat4 tm, Color c);
-	void drawVertexNormals(vector<Normal>& normals, mat4 tm, mat4 ntm, Color c);
-	void drawFacesNormals(vector<Normal>& normals, mat4 tm, mat4 ntm, Color c);
+	//void drawPoints(vector<Vertex>& points, mat4 tm, Color c);
+	//void drawLines(vector<vec4>& points, mat4 tm, Color c); //Legacy, should delete in the future (felt legacy, might delete later)
+	//void drawLines(vector<Edge>& edges, mat4 tm, Color c);
+	//void drawTriangles(vector<Face>& faces, mat4 tm, Color c);
+	void drawVertices(vector<Vertex>& vertices, mat4 tm, Color c);
+	void drawEdges(vector<Edge>& edges, mat4 tm, Color c);
+	void drawEdges(vector<Face>& faces, mat4 tm, Color c);
+	void drawVertexNormals(vector<Face>& faces, mat4 tm, mat4 ntm, Color c);
+	void drawFacesNormals(vector<Face>& faces, mat4 tm, mat4 ntm, Color c);
 	void drawCamera(vec4 pos, vec4 at, vec4 up, Color c);
 
 	void SetDemoBuffer();
