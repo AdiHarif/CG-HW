@@ -36,15 +36,12 @@ public:
 	float z_far;
 	float fovy;
 	float aspect;
+	int rot_order_index;
+	int proj_radio_index;
 	CButton ortho_radio;
 	CButton frustum_radio;
 	CButton perspective_radio;
-	afx_msg void OnBnClickedOk();
-	afx_msg void OnBnClickedRadioOrtho();
-	afx_msg void OnBnClickedRadioFrustum();
-	afx_msg void OnBnClickedRadioPerspective();
 	CComboBox rot_order;
-	void initOrderCombo();
 	CEdit left_editbox;
 	CEdit right_editbox;
 	CEdit bottom_editbox;
@@ -53,4 +50,11 @@ public:
 	CEdit z_far_editbox;
 	CEdit fovy_editbox;
 	CEdit aspect_editbox;
+
+	afx_msg void OnBnClickedOk();
+	afx_msg void OnBnClickedRadioOrtho();
+	afx_msg void OnBnClickedRadioFrustum();
+	afx_msg void OnBnClickedRadioPerspective();
+	afx_msg void OnCbnSelchangeComboOrder();
+	void initOrderCombo();
 };

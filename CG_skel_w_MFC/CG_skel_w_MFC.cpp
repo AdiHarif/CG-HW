@@ -152,45 +152,63 @@ void editActiveCamera() {
 	if (dlg.DoModal() == IDOK) {
 
 		//translate:
-		if (dlg.translate_x != 0 || dlg.translate_y != 0 || dlg.translate_z != 0) {
-			scene->translateCameraWorld(vec4(dlg.translate_x, dlg.translate_y, dlg.translate_z, 1));
+		vec4 translation_vec = vec4(dlg.translate_x, dlg.translate_y, dlg.translate_z);
+		if (!(translation_vec == vec4(0, 0, 0))) {
+			scene->translateCameraWorld(translation_vec);
 		}
 
-		//rotate: TODO: add function calls
-		if (dlg.rotate_x != 0 || dlg.rotate_y != 0 || dlg.rotate_z != 0) {
-			switch (dlg.rot_order.GetCurSel()) {
+		//rotate:
+		vec4 rotation_vec = vec4(dlg.rotate_x, dlg.rotate_y, dlg.rotate_z);
+		if (!(rotation_vec == vec4(0, 0, 0)) && dlg.rot_order_index != CB_ERR) {
+			switch (dlg.rot_order_index) {
 			case 0://x->y->z
-			
+				scene->rotateCameraXWorld(rotation_vec.x);
+				scene->rotateCameraYWorld(rotation_vec.y);
+				scene->rotateCameraZWorld(rotation_vec.z);
 				break;
 			case 1://x->z->y
-
+				scene->rotateCameraXWorld(rotation_vec.x);
+				scene->rotateCameraZWorld(rotation_vec.z);
+				scene->rotateCameraYWorld(rotation_vec.y);
 				break;
 			case 2://y->x->z
-
+				scene->rotateCameraYWorld(rotation_vec.y);
+				scene->rotateCameraXWorld(rotation_vec.x);
+				scene->rotateCameraZWorld(rotation_vec.z);
 				break;
 			case 3://y->z->x
-
+				scene->rotateCameraYWorld(rotation_vec.y);
+				scene->rotateCameraZWorld(rotation_vec.z);
+				scene->rotateCameraXWorld(rotation_vec.x);
 				break;
 			case 4://z->x->y
-
+				scene->rotateCameraZWorld(rotation_vec.z);
+				scene->rotateCameraXWorld(rotation_vec.x);
+				scene->rotateCameraYWorld(rotation_vec.y);
 				break;
 			case 5://z->y->x
-
+				scene->rotateCameraZWorld(rotation_vec.z);
+				scene->rotateCameraYWorld(rotation_vec.y);
+				scene->rotateCameraXWorld(rotation_vec.x);
 				break;
 			}
 		}
 
 		//projection:
 		if (dlg.left != 0 || dlg.right != 0 || dlg.bottom != 0 || dlg.top != 0 || dlg.z_near != 0 || dlg.z_far != 0) {
-			if (dlg.ortho_radio.GetCheck()) {
+			switch (dlg.proj_radio_index) {
+			case 0: // ortho
 				scene->getActiveCamera()->ortho(dlg.left, dlg.right, dlg.bottom, dlg.top, dlg.z_near, dlg.z_far);
-			}
-			if (dlg.frustum_radio.GetCheck()) {
+				break;
+			case 1: // frustum
 				scene->getActiveCamera()->frustum(dlg.left, dlg.right, dlg.bottom, dlg.top, dlg.z_near, dlg.z_far);
+				break;
+			case 2: // perspective
+				if (dlg.z_near != 0 || dlg.z_far != 0 || dlg.fovy != 0 || dlg.aspect != 0) {
+					scene->getActiveCamera()->perspective(dlg.fovy, dlg.aspect, dlg.z_near, dlg.z_far);
+				}
+				break;
 			}
-		}
-		if (dlg.perspective_radio.GetCheck() && (dlg.z_near != 0 || dlg.z_far != 0 || dlg.fovy != 0 || dlg.aspect != 0)) {
-			scene->getActiveCamera()->perspective(dlg.fovy, dlg.aspect, dlg.z_near, dlg.z_far);
 		}
 	}
 

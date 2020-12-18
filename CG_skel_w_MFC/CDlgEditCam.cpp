@@ -28,6 +28,8 @@ CDlgEditCam::CDlgEditCam(CWnd* pParent /*=nullptr*/)
 	, z_far(0)
 	, fovy(0)
 	, aspect(0)
+	, rot_order_index(0)
+	, proj_radio_index(0)
 {
 
 }
@@ -75,6 +77,7 @@ BEGIN_MESSAGE_MAP(CDlgEditCam, CDialog)
 	ON_BN_CLICKED(IDC_RADIO_ORTHO, &CDlgEditCam::OnBnClickedRadioOrtho)
 	ON_BN_CLICKED(IDC_RADIO_FRUSTUM, &CDlgEditCam::OnBnClickedRadioFrustum)
 	ON_BN_CLICKED(IDC_RADIO_PERSPECTIVE, &CDlgEditCam::OnBnClickedRadioPerspective)
+	ON_CBN_SELCHANGE(IDC_COMBO_ORDER, &CDlgEditCam::OnCbnSelchangeComboOrder)
 END_MESSAGE_MAP()
 
 
@@ -96,6 +99,7 @@ void CDlgEditCam::OnBnClickedRadioOrtho()
 	bottom_editbox.EnableWindow(TRUE);
 	fovy_editbox.EnableWindow(FALSE);
 	aspect_editbox.EnableWindow(FALSE);
+	proj_radio_index = 0;
 }
 
 
@@ -107,6 +111,7 @@ void CDlgEditCam::OnBnClickedRadioFrustum()
 	bottom_editbox.EnableWindow(TRUE);
 	fovy_editbox.EnableWindow(FALSE);
 	aspect_editbox.EnableWindow(FALSE);
+	proj_radio_index = 1;
 }
 
 
@@ -118,6 +123,7 @@ void CDlgEditCam::OnBnClickedRadioPerspective()
 	bottom_editbox.EnableWindow(FALSE);
 	fovy_editbox.EnableWindow(TRUE);
 	aspect_editbox.EnableWindow(TRUE);
+	proj_radio_index = 2;
 }
 
 void CDlgEditCam::initOrderCombo() {
@@ -128,4 +134,10 @@ void CDlgEditCam::initOrderCombo() {
 	rot_order.AddString(_T("z->x->y"));
 	rot_order.AddString(_T("z->y->x"));
 	rot_order.SetCurSel(0);
+}
+
+void CDlgEditCam::OnCbnSelchangeComboOrder()
+{
+	rot_order_index = rot_order.GetCurSel();
+	printf("%d\n", rot_order_index);
 }
