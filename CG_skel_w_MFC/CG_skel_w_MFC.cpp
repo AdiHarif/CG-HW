@@ -21,6 +21,7 @@
 #include "Renderer.h"
 #include "CDlgNewCam.h"
 #include "CDlgEditCam.h"
+#include "CDlgTransformModel.h"
 #include <string>
 
 #define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
@@ -77,48 +78,59 @@ void transformActiveModel() {
 		cout << "There are no models </3" << endl;
 		return;
 	}
-	int action, axis, theta;
-	vec3 scale_by, translate_by;
-	cout << "What do you feel like?" << endl;
-	cout << "Scale: 0" << endl << "Rotate: 1" << endl << "Translate: 2" << endl;
-	cin >> action;
-	switch (action) {
-	case SCALE:
-		cout << "So... you wanna scale..." << endl;
-		cout << "Enter 3 numbers for X, Y and Z scaling:" << endl;
-		cin >> scale_by[0] >> scale_by[1] >> scale_by[2];
-		scene->scaleSelection(scale_by);
-		cout << "BEHOLD YOUR SCALED MODELS!" << endl;
-		break;
-	case ROTATE:
-		cout << "Rotating today, are we? Choose axis:" << endl;
-		cout << "X: 0" << endl << "Y: 1" << endl << "Z: 2" << endl;
-		cin >> axis;
-		cout << "Now - choose theta to rotate by:" << endl;
-		cin >> theta;
-		switch (axis) {
-		case X:
-			scene->rotateSelectionX(theta);
-			break;
-		case Y:
-			scene->rotateSelectionY(theta);
-			break;
-		case Z:
-			scene->rotateSelectionZ(theta);
-			break;
+
+	CDlgTransformModel dlg;
+	if (dlg.DoModal() == IDOK) {
+		vec3 scale_vec(dlg.scale_x, dlg.scale_y, dlg.scale_z);
+		vec4 translation_vec(dlg.translate_x, dlg.translate_y, dlg.translate_z);
+		vec4 rotation_vec(dlg.rotate_x, dlg.rotate_y, dlg.rotate_z);
+		
+		//scale:
+		if (!(scale_vec == vec3(0, 0, 0))) {
+			scene->scaleSelection(scale_vec);
 		}
-		cout << "BEHOLD YOUR ROTATED MODELS!" << endl;
-		break;
-	case TRANSLATE:
-		cout << "Translation it is." << endl;
-		cout << "Enter 3 numbers for X, Y and Z translation:" << endl;
-		cin >> translate_by[0] >> translate_by[1] >> translate_by[2];
-		scene->translateSelection(translate_by);
-		cout << "BEHOLD YOUR TRANSLATED MODELS!" << endl;
-		break;
+
+		//translate:
+		if (!(translation_vec == vec3(0, 0, 0))) {
+			scene->translateSelection(translation_vec);
+		}
+
+		//rotate:
+		if (!(rotation_vec == vec3(0, 0, 0)) && dlg.rot_order_index != CB_ERR) {
+			switch (dlg.rot_order_index) {
+			case 0://x->y->z
+				scene->rotateSelectionX(rotation_vec.x);
+				scene->rotateSelectionY(rotation_vec.y);
+				scene->rotateSelectionZ(rotation_vec.z);
+				break;
+			case 1://x->z->y
+				scene->rotateSelectionX(rotation_vec.x);
+				scene->rotateSelectionZ(rotation_vec.z);
+				scene->rotateSelectionY(rotation_vec.y);
+				break;
+			case 2://y->x->z
+				scene->rotateSelectionY(rotation_vec.y);
+				scene->rotateSelectionX(rotation_vec.x);
+				scene->rotateSelectionZ(rotation_vec.z);
+				break;
+			case 3://y->z->x
+				scene->rotateSelectionY(rotation_vec.y);
+				scene->rotateSelectionZ(rotation_vec.z);
+				scene->rotateSelectionX(rotation_vec.x);
+				break;
+			case 4://z->x->y
+				scene->rotateSelectionZ(rotation_vec.z);
+				scene->rotateSelectionX(rotation_vec.x);
+				scene->rotateSelectionY(rotation_vec.y);
+				break;
+			case 5://z->y->x
+				scene->rotateSelectionZ(rotation_vec.z);
+				scene->rotateSelectionY(rotation_vec.y);
+				scene->rotateSelectionX(rotation_vec.x);
+				break;
+			}
+		}
 	}
-	cout << endl;
-	scene->draw();
 }
 
 void addNewCamera() {
@@ -138,13 +150,6 @@ void addNewCamera() {
 			scene->addCamera(new_cam);
 		}		
 	}
-
-	//cout << "Enter X, Y and Z values for your brand new GoPro Hero9 Black Edition:" << endl;
-	//vec4 cam_values;
-	//cin >> cam_values[0] >> cam_values[1] >> cam_values[2];
-	//Camera* cam = new Camera(cam_values);
-	//scene->addCamera(cam);
-	//cout << "Enjoy, and bring me pictures of Spiderman!" << endl;
 }
 
 void editActiveCamera() {
@@ -211,40 +216,6 @@ void editActiveCamera() {
 			}
 		}
 	}
-
-	//cout << "How would you like to transform the active camera? (in world frame):" << endl;
-	//cout << "Translate: 0" << endl << "Rotate: 1" << endl;
-	//int trans_type;
-	//cin >> trans_type;
-	//if (trans_type == 0) {
-	//	cout << "Enter a Translation vector (X,Y,Z)" << endl;
-	//	float x, y, z;
-	//	cin >> x >> y >> z;
-	//	scene->translateCameraWorld(vec4(x, y, z, 1));
-	//}
-	//if (trans_type == 1) {
-	//	int axis;
-	//	cout << "Choose axis to rotate around:" << endl;
-	//	cout << "X: 0" << endl << "Y: 1" << endl << "Z: 2" << endl;
-	//	cin >> axis;
-	//	cout << "Please enter an angle:" << endl;
-	//	float theta;
-	//	cin >> theta;
-
-	//	switch (axis) {
-	//	case X:
-	//		scene->rotateCameraXWorld(theta);
-	//		break;
-	//	case Y:
-	//		scene->rotateCameraYWorld(theta);
-	//		break;
-	//	case Z:
-	//		scene->rotateCameraZWorld(theta);
-	//		break;
-	//	}
-
-	//}
-
 }
 
 void setProjectionSettings() {
@@ -498,18 +469,17 @@ void modelsMenuCB(int id){
 		{
 			std::string s((LPCTSTR)dlg.GetPathName());
 			scene->loadOBJModel((LPCTSTR)dlg.GetPathName());
-			scene->draw();
 		}
 		break;
 	case MODEL_MENU_ADD_PRIMITIVE:
 		scene->loadPrimModel("cube.obj");
-		scene->draw();
 		break;
 	case MODEL_MENU_TRANSFORM_ACTIVE_MODEL:
 		transformActiveModel();
 		//std::cout << "MODEL_MENU_TRANSFORM_ACTIVE_MODEL" << std::endl;
 		break;
 	}
+	scene->draw();
 }
 
 void camerasMenuCB(int id){

@@ -69,6 +69,8 @@ void CDlgEditCam::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_ASPECT, aspect_editbox);
 	initOrderCombo();
 	ortho_radio.SetCheck(TRUE);
+	fovy_editbox.EnableWindow(FALSE);
+	aspect_editbox.EnableWindow(FALSE);
 }
 
 
@@ -139,5 +141,4 @@ void CDlgEditCam::initOrderCombo() {
 void CDlgEditCam::OnCbnSelchangeComboOrder()
 {
 	rot_order_index = rot_order.GetCurSel();
-	printf("%d\n", rot_order_index);
 }
