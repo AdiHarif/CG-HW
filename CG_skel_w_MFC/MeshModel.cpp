@@ -5,7 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-
+#include "Face.h"
 
 using namespace std;
 

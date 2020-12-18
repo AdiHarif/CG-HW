@@ -5,7 +5,7 @@
 #include "mat.h"
 #include "GL/glew.h"
 #include "Color.h"
-
+#include "Face.h"
 
 #define M_OUT_BUFFER_SIZE 3*m_width*m_height
 
@@ -38,56 +38,12 @@ struct Line {
 	Line(const Line& l) : start(l.start), end(l.end) {}
 };
 
-typedef vec4 Vertex;
-
- struct Edge {
-	Vertex start;
-	Vertex end;
-
-	Edge(Vertex start, Vertex end) : start(start), end(end) {}
-};
-
-
- typedef vec4 Normal;
-
 //struct Normal {
 //	Vertex vertex;
 //	vec4 direction;
 //
 //	Normal(Vertex vertex, vec4 direction) : vertex(vertex), direction(direction) {}
 //};
-
-struct Face {
-
-	Vertex* vertices[3];
-	Normal* normals[3];
-	void* textures[3];
-
-	Vertex center;
-	Normal center_normal;
-
-
-	Face()
-	{
-		for (int i = 0; i < 3; i++) {
-			vertices[i] = nullptr;
-			normals[i] = nullptr;
-			textures[i] = nullptr;
-		}
-	}
-
-	void calcNormal() {
-		vec4 v0 = *vertices[1] - *vertices[0];
-		vec4 v1 = *vertices[2] - *vertices[1];
-		center_normal = cross(v0, v1);
-	}
-
-	void calcCenter() {
-		center = (*vertices[0] + *vertices[1] + *vertices[2]) / 3;
-	}
-
-};
-
 
 
 class Renderer
@@ -174,4 +130,5 @@ public:
 	void setProjection(const mat4& tc);
 	void setWorldTransform(const mat4& tw);
 	//==========
+
 };
