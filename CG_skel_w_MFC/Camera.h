@@ -29,6 +29,8 @@ class Camera {
 public:
 	//===C'tor===
 	Camera(vec4 position);
+	Camera(vec4 position, vec4 at);
+	Camera(vec4 position, vec4 at, vec4 up);
 	//==========
 
 	//Transformations Interface===

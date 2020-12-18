@@ -29,8 +29,7 @@
 #define MODEL_MENU_ADD_PRIMITIVE 2
 #define MODEL_MENU_TRANSFORM_ACTIVE_MODEL 3
 #define CAMERA_MENU_ADD_CAMERA 1
-#define CAMERA_MENU_TRANSFORM_ACTIVE_CAMERA 2
-#define CAMERA_MENU_PROJECTION_SETTINGS 3
+#define CAMERA_MENU_EDIT_ACTIVE_CAMERA 2
 #define MAIN_MENU_TRANSFORM_WORLD 1
 #define MAIN_MENU_PARTY 2
 #define MAIN_MENU_ABOUT 3
@@ -125,8 +124,19 @@ void transformActiveModel() {
 void addNewCamera() {
 	CDlgNewCam dlg;
 	if (dlg.DoModal() == IDOK) {
-		Camera* new_cam = new Camera(vec4(dlg.pos_x, dlg.pos_y, dlg.pos_z));
-		scene->addCamera(new_cam);
+		vec4 pos = vec4(dlg.pos_x, dlg.pos_y, dlg.pos_z);
+		vec4 lookat = vec4(dlg.lookat_x, dlg.lookat_y, dlg.lookat_z);
+		vec4 up = vec4(dlg.up_x, dlg.up_y, dlg.up_z);
+		if (!(pos == lookat)) {
+			Camera* new_cam = NULL;
+			if (up != vec4(0, 0, 0)) {
+				new_cam = new Camera(pos, lookat);
+			}
+			else {
+				new_cam = new Camera(pos, lookat, up);
+			}
+			scene->addCamera(new_cam);
+		}		
 	}
 
 	//cout << "Enter X, Y and Z values for your brand new GoPro Hero9 Black Edition:" << endl;
@@ -137,7 +147,7 @@ void addNewCamera() {
 	//cout << "Enjoy, and bring me pictures of Spiderman!" << endl;
 }
 
-void transformActiveCamera() {
+void editActiveCamera() {
 	CDlgEditCam dlg;
 	if (dlg.DoModal() == IDOK) {
 
@@ -490,13 +500,9 @@ void camerasMenuCB(int id){
 		addNewCamera();
 		//std::cout << "CAMERA_MENU_ADD_CAMERA" << std::endl;
 		break;
-	case CAMERA_MENU_TRANSFORM_ACTIVE_CAMERA:
-		transformActiveCamera();
+	case CAMERA_MENU_EDIT_ACTIVE_CAMERA:
+		editActiveCamera();
 		//std::cout << "CAMERA_MENU_TRANSFORM_ACTIVE_CAMERA" << std::endl;
-		break;
-	case CAMERA_MENU_PROJECTION_SETTINGS:
-		setProjectionSettings();
-		//std::cout << "CAMERA_MENU_PROJECTION_SETTINGS" << std::endl;
 		break;
 	}
 
@@ -617,8 +623,7 @@ void initMenu()
 	glutAddMenuEntry("Transform Active Model", MODEL_MENU_TRANSFORM_ACTIVE_MODEL);
 	int camerasMenu = glutCreateMenu(camerasMenuCB);
 	glutAddMenuEntry("Add New Camera",CAMERA_MENU_ADD_CAMERA);
-	glutAddMenuEntry("Transform Active Camera ", CAMERA_MENU_TRANSFORM_ACTIVE_CAMERA);
-	glutAddMenuEntry("Projection Settings", CAMERA_MENU_PROJECTION_SETTINGS);
+	glutAddMenuEntry("Edit Active Camera ", CAMERA_MENU_EDIT_ACTIVE_CAMERA);
 	glutCreateMenu(mainMenuCB);
 
 	/*int menuCamera = glutCreateMenu(cameraMenu);

@@ -12,6 +12,18 @@ Camera::Camera(vec4 position) {
     ortho(-3.0, 3.0, -3.0, 3.0, -5.0, -15.0);
 }
 
+Camera::Camera(vec4 position, vec4 at) {
+    this->position = position;
+    lookAt(at);
+    ortho(-3.0, 3.0, -3.0, 3.0, -5.0, -15.0);
+}
+
+Camera::Camera(vec4 position, vec4 at, vec4 up) {
+    this->position = position;
+    lookAt(at, up);
+    ortho(-3.0, 3.0, -3.0, 3.0, -5.0, -15.0);
+}
+
 //==========
 
 
