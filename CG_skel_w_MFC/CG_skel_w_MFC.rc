@@ -1,0 +1,241 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DIALOG_NEW_CAMERA DIALOGEX 0, 0, 310, 177
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "New Camera"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_EDIT_POS_X,20,25,40,11,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_POS_Y,75,25,40,11,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_POS_Z,130,25,40,11,ES_AUTOHSCROLL | ES_NUMBER
+    DEFPUSHBUTTON   "OK",IDOK,199,156,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,253,156,50,14
+    CTEXT           "Camera position:",IDC_STATIC_POS,10,10,57,10,WS_BORDER
+    LTEXT           "x:",IDC_STATIC_X,10,25,8,8
+    LTEXT           "y:",IDC_STATIC_Y,65,25,8,8
+    LTEXT           "z:",IDC_STATIC_Z,120,25,8,8
+    CTEXT           "Look at:",IDC_STATIC_LOOKAT,10,50,30,10,WS_BORDER
+    EDITTEXT        IDC_EDIT_LOOKAT_X,20,65,40,11,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_LOOKAT_Y,75,65,40,11,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_LOOKAT_Z,130,65,40,11,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "x:",IDC_STATIC_X2,10,65,8,8
+    LTEXT           "y:",IDC_STATIC_Y2,65,65,8,8
+    LTEXT           "z:",IDC_STATIC_Z2,120,65,8,8
+    CTEXT           "Up:",IDC_STATIC_UP,10,90,15,10,WS_BORDER
+    EDITTEXT        IDC_EDIT_UP_X,20,105,40,11,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_UP_Y,75,105,40,11,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "x:",IDC_STATIC_X3,10,105,8,8
+    LTEXT           "y:",IDC_STATIC_Y3,65,105,8,8
+    LTEXT           "z:",IDC_STATIC_Z3,120,105,8,8
+    EDITTEXT        IDC_EDIT_UP_Z,130,105,40,11,ES_AUTOHSCROLL | ES_NUMBER
+END
+
+IDD_DIALOG_EDIT_ACTIVE_CAMERA DIALOGEX 0, 0, 465, 207
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Edit Active Camera"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_EDIT_TRANSLATE_X,20,25,55,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_TRANSLATE_Y,94,25,55,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_TRANSLATE_Z,169,25,55,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_ROTATE_X,20,65,55,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_ROTATE_Y,94,65,55,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_ROTATE_Z,169,65,55,14,ES_AUTOHSCROLL
+    COMBOBOX        IDC_COMBO_ORDER,261,65,54,75,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Ortho",IDC_RADIO_ORTHO,"Button",BS_AUTORADIOBUTTON,20,125,35,10
+    CONTROL         "Frustum",IDC_RADIO_FRUSTUM,"Button",BS_AUTORADIOBUTTON,20,140,42,10
+    CONTROL         "Perspective",IDC_RADIO_PERSPECTIVE,"Button",BS_AUTORADIOBUTTON,20,155,53,10
+    EDITTEXT        IDC_EDIT_LEFT,125,110,55,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_RIGHT,220,110,55,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_BOTTOM,315,110,55,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_TOP,400,110,55,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_Z_NEAR,125,130,55,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_Z_FAR,220,130,55,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_FOVY,125,150,55,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_ASPECT,220,150,55,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,360,190,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,414,190,50,14
+    CTEXT           "Rotate (theta):",IDC_STATIC,10,50,55,10,WS_BORDER
+    CTEXT           "Translate:",IDC_STATIC,10,10,40,10,WS_BORDER
+    LTEXT           "X:",IDC_STATIC_TRANSLATE_X,11,27,8,8
+    LTEXT           "Y:",IDC_STATIC_TRANSLATE_Y,85,27,8,8
+    LTEXT           "Z:",IDC_STATIC_TRANSLATE_Z,160,27,8,8
+    LTEXT           "X:",IDC_STATIC_ROTATE_X,11,67,8,8
+    LTEXT           "Y:",IDC_STATIC_ROTATE_Y,85,67,8,8
+    LTEXT           "Order:",IDC_STATIC_ORDER,235,67,22,8
+    GROUPBOX        "Type",IDC_STATIC_GROUP_TYPE,10,110,70,60
+    LTEXT           "Fovy:",IDC_STATIC_FOVY,95,152,20,8
+    LTEXT           "Aspect:",IDC_STATIC_ASPECT,189,152,26,8
+    LTEXT           "Left:",IDC_STATIC_LEFT,95,112,16,8
+    LTEXT           "Right:",IDC_STATIC_RIGHT,189,112,20,8
+    LTEXT           "Bottom:",IDC_STATIC_BOTTOM,285,113,26,8
+    LTEXT           "Top:",IDC_STATIC_TOP,379,113,16,8
+    LTEXT           "Z Near:",IDC_STATIC_Z_NEAR,95,133,25,8
+    LTEXT           "Z Far:",IDC_STATIC_Z_FAR,189,133,20,8
+    LTEXT           "Z:",IDC_STATIC_ROTATE_Z2,160,67,8,8
+END
+
+IDD_DIALOG_TRANSFORM_ACTIVE_MODEL DIALOGEX 0, 0, 309, 176
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Transform Active Model(s)"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,198,155,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,252,155,50,14
+    EDITTEXT        IDC_EDIT_TRANSLATE_X,10,25,55,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_TRANSLATE_Y,84,25,55,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_TRANSLATE_Z,159,25,55,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_ROTATE_X,10,65,55,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_ROTATE_Y,84,65,55,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_ROTATE_Z,159,65,55,14,ES_AUTOHSCROLL
+    COMBOBOX        IDC_COMBO_ORDER,251,65,54,75,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CTEXT           "Rotate (theta):",IDC_STATIC,0,50,55,10,WS_BORDER
+    CTEXT           "Translate:",IDC_STATIC,0,10,40,10,WS_BORDER
+    LTEXT           "X:",IDC_STATIC_TRANSLATE_X,1,27,8,8
+    LTEXT           "Y:",IDC_STATIC_TRANSLATE_Y,75,27,8,8
+    LTEXT           "Z:",IDC_STATIC_TRANSLATE_Z,150,27,8,8
+    LTEXT           "X:",IDC_STATIC_ROTATE_X,1,67,8,8
+    LTEXT           "Y:",IDC_STATIC_ROTATE_Y,75,67,8,8
+    LTEXT           "Order:",IDC_STATIC_ORDER,225,67,22,8
+    LTEXT           "Z:",IDC_STATIC_ROTATE_Z2,150,67,8,8
+    EDITTEXT        IDC_EDIT_SCALE_X,10,105,55,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SCALE_Y,84,105,55,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SCALE_Z,159,105,55,14,ES_AUTOHSCROLL
+    CTEXT           "Scale:",IDC_STATIC,0,90,25,10,WS_BORDER
+    LTEXT           "X:",IDC_STATIC_SCALE_X,1,107,8,8
+    LTEXT           "Y:",IDC_STATIC_SCALE_Y,75,107,8,8
+    LTEXT           "Z:",IDC_STATIC_SCALE_Z,150,107,8,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_DIALOG_NEW_CAMERA, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 303
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 170
+    END
+
+    IDD_DIALOG_EDIT_ACTIVE_CAMERA, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 458
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 200
+    END
+
+    IDD_DIALOG_TRANSFORM_ACTIVE_MODEL, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 302
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 169
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_DIALOG_NEW_CAMERA AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_DIALOG_EDIT_ACTIVE_CAMERA AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_DIALOG_TRANSFORM_ACTIVE_MODEL AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_APP_TITLE           "CG_skel_w_MFC"
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

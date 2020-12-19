@@ -13,7 +13,7 @@ CG_skel_w_MFC/CG_skel_w_MFC.vcxproj
 CG_skel_w_MFC/CG_skel_w_MFC.vcxproj.filters
 CG_skel_w_MFC/InitShader.cpp
 CG_skel_w_MFC/InitShader.h
-CG_skel_w_MFC/Resource.h
+#CG_skel_w_MFC/Resource.h
 CG_skel_w_MFC/fshader.glsl
 CG_skel_w_MFC/stdafx.cpp
 CG_skel_w_MFC/stdafx.h
