@@ -74,148 +74,92 @@ float scale_step = SCALE_UP_DEF, rotation_step = ROTATE_THETA_DEF, translation_s
 //===Input Functions===
 
 void transformActiveModel() {
-	if (scene->getModels().empty()) {
-		cout << "There are no models </3" << endl;
-		return;
-	}
-
-	CDlgTransformModel dlg;
-	if (dlg.DoModal() == IDOK) {
-		vec3 scale_vec(dlg.scale_x, dlg.scale_y, dlg.scale_z);
-		vec4 translation_vec(dlg.translate_x, dlg.translate_y, dlg.translate_z);
-		vec4 rotation_vec(dlg.rotate_x, dlg.rotate_y, dlg.rotate_z);
-		
-		//scale:
-		if (!(scale_vec == vec3(0, 0, 0))) {
-			scene->scaleSelection(scale_vec);
-		}
-
-		//translate:
-		if (!(translation_vec == vec3(0, 0, 0))) {
-			scene->translateSelection(translation_vec);
-		}
-
-		//rotate:
-		if (!(rotation_vec == vec3(0, 0, 0)) && dlg.rot_order_index != CB_ERR) {
-			switch (dlg.rot_order_index) {
-			case 0://x->y->z
-				scene->rotateSelectionX(rotation_vec.x);
-				scene->rotateSelectionY(rotation_vec.y);
-				scene->rotateSelectionZ(rotation_vec.z);
-				break;
-			case 1://x->z->y
-				scene->rotateSelectionX(rotation_vec.x);
-				scene->rotateSelectionZ(rotation_vec.z);
-				scene->rotateSelectionY(rotation_vec.y);
-				break;
-			case 2://y->x->z
-				scene->rotateSelectionY(rotation_vec.y);
-				scene->rotateSelectionX(rotation_vec.x);
-				scene->rotateSelectionZ(rotation_vec.z);
-				break;
-			case 3://y->z->x
-				scene->rotateSelectionY(rotation_vec.y);
-				scene->rotateSelectionZ(rotation_vec.z);
-				scene->rotateSelectionX(rotation_vec.x);
-				break;
-			case 4://z->x->y
-				scene->rotateSelectionZ(rotation_vec.z);
-				scene->rotateSelectionX(rotation_vec.x);
-				scene->rotateSelectionY(rotation_vec.y);
-				break;
-			case 5://z->y->x
-				scene->rotateSelectionZ(rotation_vec.z);
-				scene->rotateSelectionY(rotation_vec.y);
-				scene->rotateSelectionX(rotation_vec.x);
-				break;
-			}
-		}
-	}
+ 
 }
 
 void addNewCamera() {
-	CDlgNewCam dlg;
-	if (dlg.DoModal() == IDOK) {
-		vec4 pos = vec4(dlg.pos_x, dlg.pos_y, dlg.pos_z);
-		vec4 lookat = vec4(dlg.lookat_x, dlg.lookat_y, dlg.lookat_z);
-		vec4 up = vec4(dlg.up_x, dlg.up_y, dlg.up_z);
-		if (!(pos == lookat)) {
-			Camera* new_cam = NULL;
-			if (up != vec4(0, 0, 0)) {
-				new_cam = new Camera(pos, lookat);
-			}
-			else {
-				new_cam = new Camera(pos, lookat, up);
-			}
-			scene->addCamera(new_cam);
-		}		
-	}
+	//CDlgNewCam dlg;
+	//if (dlg.DoModal() == IDOK) {
+	//	vec4 pos = vec4(dlg.pos_x, dlg.pos_y, dlg.pos_z);
+	//	vec4 lookat = vec4(dlg.lookat_x, dlg.lookat_y, dlg.lookat_z);
+	//	vec4 up = vec4(dlg.up_x, dlg.up_y, dlg.up_z);
+	//	if (!(pos == lookat)) {
+	//		Camera* new_cam = NULL;
+	//		if (up != vec4(0, 0, 0)) {
+	//			new_cam = new Camera(pos, lookat);
+	//		}
+	//		else {
+	//			new_cam = new Camera(pos, lookat, up);
+	//		}
+	//		scene->addCamera(new_cam);
+	//	}		
+	//}
 }
 
 void editActiveCamera() {
-	CDlgEditCam dlg;
-	if (dlg.DoModal() == IDOK) {
+	//CDlgEditCam dlg;
+	//if (dlg.DoModal() == IDOK) {
 
-		//translate:
-		vec4 translation_vec = vec4(dlg.translate_x, dlg.translate_y, dlg.translate_z);
-		if (!(translation_vec == vec4(0, 0, 0))) {
-			scene->translateCameraWorld(translation_vec);
-		}
+	//	//translate:
+	//	vec4 translation_vec = vec4(dlg.translate_x, dlg.translate_y, dlg.translate_z);
+	//	if (!(translation_vec == vec4(0, 0, 0))) {
+	//		scene->translateCameraWorld(translation_vec);
+	//	}
 
-		//rotate:
-		vec4 rotation_vec = vec4(dlg.rotate_x, dlg.rotate_y, dlg.rotate_z);
-		if (!(rotation_vec == vec4(0, 0, 0)) && dlg.rot_order_index != CB_ERR) {
-			switch (dlg.rot_order_index) {
-			case 0://x->y->z
-				scene->rotateCameraXWorld(rotation_vec.x);
-				scene->rotateCameraYWorld(rotation_vec.y);
-				scene->rotateCameraZWorld(rotation_vec.z);
-				break;
-			case 1://x->z->y
-				scene->rotateCameraXWorld(rotation_vec.x);
-				scene->rotateCameraZWorld(rotation_vec.z);
-				scene->rotateCameraYWorld(rotation_vec.y);
-				break;
-			case 2://y->x->z
-				scene->rotateCameraYWorld(rotation_vec.y);
-				scene->rotateCameraXWorld(rotation_vec.x);
-				scene->rotateCameraZWorld(rotation_vec.z);
-				break;
-			case 3://y->z->x
-				scene->rotateCameraYWorld(rotation_vec.y);
-				scene->rotateCameraZWorld(rotation_vec.z);
-				scene->rotateCameraXWorld(rotation_vec.x);
-				break;
-			case 4://z->x->y
-				scene->rotateCameraZWorld(rotation_vec.z);
-				scene->rotateCameraXWorld(rotation_vec.x);
-				scene->rotateCameraYWorld(rotation_vec.y);
-				break;
-			case 5://z->y->x
-				scene->rotateCameraZWorld(rotation_vec.z);
-				scene->rotateCameraYWorld(rotation_vec.y);
-				scene->rotateCameraXWorld(rotation_vec.x);
-				break;
-			}
-		}
+	//	//rotate:
+	//	vec4 rotation_vec = vec4(dlg.rotate_x, dlg.rotate_y, dlg.rotate_z);
+	//	if (!(rotation_vec == vec4(0, 0, 0)) && dlg.rot_order_index != CB_ERR) {
+	//		switch (dlg.rot_order_index) {
+	//		case 0://x->y->z
+	//			scene->rotateCameraXWorld(rotation_vec.x);
+	//			scene->rotateCameraYWorld(rotation_vec.y);
+	//			scene->rotateCameraZWorld(rotation_vec.z);
+	//			break;
+	//		case 1://x->z->y
+	//			scene->rotateCameraXWorld(rotation_vec.x);
+	//			scene->rotateCameraZWorld(rotation_vec.z);
+	//			scene->rotateCameraYWorld(rotation_vec.y);
+	//			break;
+	//		case 2://y->x->z
+	//			scene->rotateCameraYWorld(rotation_vec.y);
+	//			scene->rotateCameraXWorld(rotation_vec.x);
+	//			scene->rotateCameraZWorld(rotation_vec.z);
+	//			break;
+	//		case 3://y->z->x
+	//			scene->rotateCameraYWorld(rotation_vec.y);
+	//			scene->rotateCameraZWorld(rotation_vec.z);
+	//			scene->rotateCameraXWorld(rotation_vec.x);
+	//			break;
+	//		case 4://z->x->y
+	//			scene->rotateCameraZWorld(rotation_vec.z);
+	//			scene->rotateCameraXWorld(rotation_vec.x);
+	//			scene->rotateCameraYWorld(rotation_vec.y);
+	//			break;
+	//		case 5://z->y->x
+	//			scene->rotateCameraZWorld(rotation_vec.z);
+	//			scene->rotateCameraYWorld(rotation_vec.y);
+	//			scene->rotateCameraXWorld(rotation_vec.x);
+	//			break;
+	//		}
+	//	}
 
-		//projection:
-		if (dlg.left != 0 || dlg.right != 0 || dlg.bottom != 0 || dlg.top != 0 || dlg.z_near != 0 || dlg.z_far != 0) {
-			switch (dlg.proj_radio_index) {
-			case 0: // ortho
-				scene->getActiveCamera()->ortho(dlg.left, dlg.right, dlg.bottom, dlg.top, dlg.z_near, dlg.z_far);
-				break;
-			case 1: // frustum
-				scene->getActiveCamera()->frustum(dlg.left, dlg.right, dlg.bottom, dlg.top, dlg.z_near, dlg.z_far);
-				break;
-			case 2: // perspective
-				if (dlg.z_near != 0 || dlg.z_far != 0 || dlg.fovy != 0 || dlg.aspect != 0) {
-					scene->getActiveCamera()->perspective(dlg.fovy, dlg.aspect, dlg.z_near, dlg.z_far);
-				}
-				break;
-			}
-		}
-	}
+	//	//projection:
+	//	if (dlg.left != 0 || dlg.right != 0 || dlg.bottom != 0 || dlg.top != 0 || dlg.z_near != 0 || dlg.z_far != 0) {
+	//		switch (dlg.proj_radio_index) {
+	//		case 0: // ortho
+	//			scene->getActiveCamera()->ortho(dlg.left, dlg.right, dlg.bottom, dlg.top, dlg.z_near, dlg.z_far);
+	//			break;
+	//		case 1: // frustum
+	//			scene->getActiveCamera()->frustum(dlg.left, dlg.right, dlg.bottom, dlg.top, dlg.z_near, dlg.z_far);
+	//			break;
+	//		case 2: // perspective
+	//			if (dlg.z_near != 0 || dlg.z_far != 0 || dlg.fovy != 0 || dlg.aspect != 0) {
+	//				scene->getActiveCamera()->perspective(dlg.fovy, dlg.aspect, dlg.z_near, dlg.z_far);
+	//			}
+	//			break;
+	//		}
+	//	}
+	//}
 }
 
 void setProjectionSettings() {
@@ -325,7 +269,7 @@ void keyboard(unsigned char key, int x, int y)
 		scene->toggleCameraProjection();
 		break;
 	case DEL:
-		scene->removeModel(scene->getActiveModelIndex());
+		scene->removeSelection();
 		break;
 	case 'f':
 	case 'F':
@@ -416,11 +360,11 @@ void special(int key, int x, int y) {
 	
 	//toggles:
 	case GLUT_KEY_F1:
-		scene->toggleVertices();
+		scene->togglePolyMode();
 		break;
-	case GLUT_KEY_F2:
+	/*case GLUT_KEY_F2:
 		scene->toggleEdges();
-		break;
+		break;*/
 	case GLUT_KEY_F3:
 		scene->toggleBB();
 		break;
@@ -472,7 +416,7 @@ void modelsMenuCB(int id){
 		}
 		break;
 	case MODEL_MENU_ADD_PRIMITIVE:
-		scene->loadPrimModel("cube.obj");
+		scene->loadPrimModel();
 		break;
 	case MODEL_MENU_TRANSFORM_ACTIVE_MODEL:
 		transformActiveModel();

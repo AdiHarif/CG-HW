@@ -5,7 +5,7 @@
 #include "mat.h"
 #include "GL/glew.h"
 #include "Color.h"
-
+#include "Face.h"
 
 #define M_OUT_BUFFER_SIZE 3*m_width*m_height
 
@@ -36,31 +36,9 @@ struct Line {
 	Line(Pixel p1, Pixel p2) : start(p1), end(p2) {	}
 
 	Line(const Line& l) : start(l.start), end(l.end) {}
-
-	int findX(int y);
 };
 
-typedef vec4 Vertex;
-
- struct Edge {
-	Vertex start;
-	Vertex end;
-
-	Edge(Vertex start, Vertex end) : start(start), end(end) {}
 };
-
- struct Triangle {
-	 Line l0;
-	 Line l1;
-	 Line l2;
-
-	 Triangle(Pixel p0, Pixel p1, Pixel p2) : l0(Line(p0, p1)), l1(Line(p1,p2)), l2(Line(p2,p0)) {}
-	 Triangle(const Triangle& t) : l0(t.l0), l1(t.l1), l2(t.l2) {}
-
-	 int findMaxY();
-	 int findMinY();
-	 Line findInnerLine(int y);
- };
 
 
  typedef vec4 Normal;
@@ -71,38 +49,6 @@ typedef vec4 Vertex;
 //
 //	Normal(Vertex vertex, vec4 direction) : vertex(vertex), direction(direction) {}
 //};
-
-struct Face {
-
-	Vertex* vertices[3];
-	Normal* normals[3];
-	void* textures[3];
-
-	Vertex center;
-	Normal center_normal;
-
-
-	Face()
-	{
-		for (int i = 0; i < 3; i++) {
-			vertices[i] = nullptr;
-			normals[i] = nullptr;
-			textures[i] = nullptr;
-		}
-	}
-
-	void calcNormal() {
-		vec4 v0 = *vertices[1] - *vertices[0];
-		vec4 v1 = *vertices[2] - *vertices[1];
-		center_normal = cross(v0, v1);
-	}
-
-	void calcCenter() {
-		center = (*vertices[0] + *vertices[1] + *vertices[2]) / 3;
-	}
-
-};
-
 
 
 class Renderer
@@ -124,8 +70,8 @@ class Renderer
 
 
 	//===Inner Drawing Functions===
-	void rasterizePoint(Pixel p, Color c);
-	void rasterizeLine(Line l, Color c);
+	void drawPixel(Pixel p, Color c);
+	void drawLine(Line l, Color c);
 	void drawLineModerate(Line l, Color c);
 	void drawLineSteep(Line l, Color c);
 	void drawTriangleSolid(Triangle t, Color c);
@@ -137,12 +83,12 @@ class Renderer
 	bool isLineLegal(Line l);
 	Pixel viewPort(Vertex v);
 
-	vector<Pixel> transformVertices(vector<Vertex>& vertices, mat4 tm);
+	//vector<Pixel> transformVertices(vector<Vertex>& vertices, mat4 tm);
 	//vector<Line> transformEdges(vector<vec4>& edges, mat4 tm); //Legacy, should delete this in the future.
-	vector<Line> transformEdges(vector<Edge>& edges, mat4 tm);
-	vector<Line> transformFaces(vector<Face>& faces, mat4 tm); 
-	vector<Line> transformVertexNormals(vector<Face>& faces, mat4 tm, mat4 ntm);
-	vector<Line> transformFaceNormals(vector<Face>& faces, mat4 tm, mat4 ntm);
+	//vector<Line> transformEdges(vector<Edge>& edges, mat4 tm);
+	//vector<Line> transformFaces(vector<Face>& faces, mat4 tm); 
+	//vector<Line> transformVertexNormals(vector<Face>& faces, mat4 tm, mat4 ntm);
+	//vector<Line> transformFaceNormals(vector<Face>& faces, mat4 tm, mat4 ntm);
 	//==========
 
 
@@ -174,20 +120,29 @@ public:
 	//void drawLines(vector<vec4>& points, mat4 tm, Color c); //Legacy, should delete in the future (felt legacy, might delete later)
 	//void drawLines(vector<Edge>& edges, mat4 tm, Color c);
 	//void drawTriangles(vector<Face>& faces, mat4 tm, Color c);
-	void drawVertices(vector<Vertex>& vertices, mat4 tm, Color c);
-	void drawEdges(vector<Edge>& edges, mat4 tm, Color c);
-	void drawEdges(vector<Face>& faces, mat4 tm, Color c);
-	void drawVertexNormals(vector<Face>& faces, mat4 tm, mat4 ntm, Color c);
-	void drawFacesNormals(vector<Face>& faces, mat4 tm, mat4 ntm, Color c);
-	void drawCamera(vec4 pos, vec4 at, vec4 up, Color c);
+	//void drawVertices(vector<Vertex>& vertices, mat4 tm, Color c);
+	//void drawEdges(vector<Edge>& edges, mat4 tm, Color c);
+	//void drawEdges(vector<Face>& faces, mat4 tm, Color c);
+	//void drawVertexNormals(vector<Face>& faces, mat4 tm, mat4 ntm, Color c);
+	//void drawFacesNormals(vector<Face>& faces, mat4 tm, mat4 ntm, Color c);
+	void drawCamera(vec4 pos, Color c);
 
 	void SetDemoBuffer();
 	//==========
 
 
-	//===Transformation Setters===
+	////===Transformation Setters===
 	void setCameraTransform(const mat4& tc);
 	void setProjection(const mat4& tc);
 	void setWorldTransform(const mat4& tw);
-	//==========
+	////==========
+
+
+	void drawModel(MeshModel& model);
+
+	void drawOrigin(Color c);
+
+	//void drawTriangle();
+
+
 };
