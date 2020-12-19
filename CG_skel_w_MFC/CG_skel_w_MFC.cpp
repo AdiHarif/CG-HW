@@ -74,135 +74,144 @@ float scale_step = SCALE_UP_DEF, rotation_step = ROTATE_THETA_DEF, translation_s
 //===Input Functions===
 
 void transformActiveModel() {
- 
-}
+	CDlgTransformModel dlg;
+	if (dlg.DoModal() == IDOK) {
+		vec3 scale_vec(dlg.scale_x, dlg.scale_y, dlg.scale_z);
+		vec4 translation_vec(dlg.translate_x, dlg.translate_y, dlg.translate_z);
+		vec4 rotation_vec(dlg.rotate_x, dlg.rotate_y, dlg.rotate_z);
 
-void addNewCamera() {
-	//CDlgNewCam dlg;
-	//if (dlg.DoModal() == IDOK) {
-	//	vec4 pos = vec4(dlg.pos_x, dlg.pos_y, dlg.pos_z);
-	//	vec4 lookat = vec4(dlg.lookat_x, dlg.lookat_y, dlg.lookat_z);
-	//	vec4 up = vec4(dlg.up_x, dlg.up_y, dlg.up_z);
-	//	if (!(pos == lookat)) {
-	//		Camera* new_cam = NULL;
-	//		if (up != vec4(0, 0, 0)) {
-	//			new_cam = new Camera(pos, lookat);
-	//		}
-	//		else {
-	//			new_cam = new Camera(pos, lookat, up);
-	//		}
-	//		scene->addCamera(new_cam);
-	//	}		
-	//}
-}
+		//scale:
+		if (!(scale_vec == vec3(0, 0, 0))) {
+			scene->scaleSelection(scale_vec);
+		}
 
-void editActiveCamera() {
-	//CDlgEditCam dlg;
-	//if (dlg.DoModal() == IDOK) {
+		//translate:
+		if (!(translation_vec == vec3(0, 0, 0))) {
+			scene->translateSelection(translation_vec);
+		}
 
-	//	//translate:
-	//	vec4 translation_vec = vec4(dlg.translate_x, dlg.translate_y, dlg.translate_z);
-	//	if (!(translation_vec == vec4(0, 0, 0))) {
-	//		scene->translateCameraWorld(translation_vec);
-	//	}
-
-	//	//rotate:
-	//	vec4 rotation_vec = vec4(dlg.rotate_x, dlg.rotate_y, dlg.rotate_z);
-	//	if (!(rotation_vec == vec4(0, 0, 0)) && dlg.rot_order_index != CB_ERR) {
-	//		switch (dlg.rot_order_index) {
-	//		case 0://x->y->z
-	//			scene->rotateCameraXWorld(rotation_vec.x);
-	//			scene->rotateCameraYWorld(rotation_vec.y);
-	//			scene->rotateCameraZWorld(rotation_vec.z);
-	//			break;
-	//		case 1://x->z->y
-	//			scene->rotateCameraXWorld(rotation_vec.x);
-	//			scene->rotateCameraZWorld(rotation_vec.z);
-	//			scene->rotateCameraYWorld(rotation_vec.y);
-	//			break;
-	//		case 2://y->x->z
-	//			scene->rotateCameraYWorld(rotation_vec.y);
-	//			scene->rotateCameraXWorld(rotation_vec.x);
-	//			scene->rotateCameraZWorld(rotation_vec.z);
-	//			break;
-	//		case 3://y->z->x
-	//			scene->rotateCameraYWorld(rotation_vec.y);
-	//			scene->rotateCameraZWorld(rotation_vec.z);
-	//			scene->rotateCameraXWorld(rotation_vec.x);
-	//			break;
-	//		case 4://z->x->y
-	//			scene->rotateCameraZWorld(rotation_vec.z);
-	//			scene->rotateCameraXWorld(rotation_vec.x);
-	//			scene->rotateCameraYWorld(rotation_vec.y);
-	//			break;
-	//		case 5://z->y->x
-	//			scene->rotateCameraZWorld(rotation_vec.z);
-	//			scene->rotateCameraYWorld(rotation_vec.y);
-	//			scene->rotateCameraXWorld(rotation_vec.x);
-	//			break;
-	//		}
-	//	}
-
-	//	//projection:
-	//	if (dlg.left != 0 || dlg.right != 0 || dlg.bottom != 0 || dlg.top != 0 || dlg.z_near != 0 || dlg.z_far != 0) {
-	//		switch (dlg.proj_radio_index) {
-	//		case 0: // ortho
-	//			scene->getActiveCamera()->ortho(dlg.left, dlg.right, dlg.bottom, dlg.top, dlg.z_near, dlg.z_far);
-	//			break;
-	//		case 1: // frustum
-	//			scene->getActiveCamera()->frustum(dlg.left, dlg.right, dlg.bottom, dlg.top, dlg.z_near, dlg.z_far);
-	//			break;
-	//		case 2: // perspective
-	//			if (dlg.z_near != 0 || dlg.z_far != 0 || dlg.fovy != 0 || dlg.aspect != 0) {
-	//				scene->getActiveCamera()->perspective(dlg.fovy, dlg.aspect, dlg.z_near, dlg.z_far);
-	//			}
-	//			break;
-	//		}
-	//	}
-	//}
-}
-
-void setProjectionSettings() {
-	int type;
-	float left, right, bottom, top, z_near, z_far, fovy, aspect;
-	cout << "Choose from the following:" << endl;
-	cout << "Ortho: 0" << endl << "Frustum: 1" << endl << "Perspective: 2" << endl;
-	cin >> type;
-	switch (type) {
-	case PERSPECTIVE:
-		cout << "fovy:";
-		cin >> fovy;
-		cout << "aspect:";
-		cin >> aspect;
-		cout << "z_near:";
-		cin >> z_near;
-		cout << "z_far:";
-		cin >> z_far;
-		scene->getActiveCamera()->perspective(fovy, aspect, z_near, z_far);
-		break;
-	default:
-		cout << "left:";
-		cin >> left;
-		cout << "right:";
-		cin >> right;
-		cout << "bottom:";
-		cin >> bottom;
-		cout << "top:";
-		cin >> top;
-		cout << "z_near:";
-		cin >> z_near;
-		cout << "z_far:";
-		cin >> z_far;
-		switch (type) {
-		case ORTHO:
-			scene->getActiveCamera()->ortho(left, right, bottom, top, z_near, z_far);
-			break;
-		case FRUSTUM:
-			scene->getActiveCamera()->frustum(left, right, bottom, top, z_near, z_far);
-			break;
+		//rotate:
+		if (!(rotation_vec == vec3(0, 0, 0)) && dlg.rot_order_index != CB_ERR) {
+			switch (dlg.rot_order_index) {
+			case 0://x->y->z
+				scene->rotateSelectionX(rotation_vec.x);
+				scene->rotateSelectionY(rotation_vec.y);
+				scene->rotateSelectionZ(rotation_vec.z);
+				break;
+			case 1://x->z->y
+				scene->rotateSelectionX(rotation_vec.x);
+				scene->rotateSelectionZ(rotation_vec.z);
+				scene->rotateSelectionY(rotation_vec.y);
+				break;
+			case 2://y->x->z
+				scene->rotateSelectionY(rotation_vec.y);
+				scene->rotateSelectionX(rotation_vec.x);
+				scene->rotateSelectionZ(rotation_vec.z);
+				break;
+			case 3://y->z->x
+				scene->rotateSelectionY(rotation_vec.y);
+				scene->rotateSelectionZ(rotation_vec.z);
+				scene->rotateSelectionX(rotation_vec.x);
+				break;
+			case 4://z->x->y
+				scene->rotateSelectionZ(rotation_vec.z);
+				scene->rotateSelectionX(rotation_vec.x);
+				scene->rotateSelectionY(rotation_vec.y);
+				break;
+			case 5://z->y->x
+				scene->rotateSelectionZ(rotation_vec.z);
+				scene->rotateSelectionY(rotation_vec.y);
+				scene->rotateSelectionX(rotation_vec.x);
+				break;
+			}
 		}
 	}
 }
+
+void addNewCamera() {
+	CDlgNewCam dlg;
+	if (dlg.DoModal() == IDOK) {
+		vec4 pos = vec4(dlg.pos_x, dlg.pos_y, dlg.pos_z);
+		vec4 lookat = vec4(dlg.lookat_x, dlg.lookat_y, dlg.lookat_z);
+		vec4 up = vec4(dlg.up_x, dlg.up_y, dlg.up_z);
+		if (!(pos == lookat)) {
+			Camera* new_cam = NULL;
+			if (up != vec4(0, 0, 0)) {
+				new_cam = new Camera(pos, lookat);
+			}
+			else {
+				new_cam = new Camera(pos, lookat, up);
+			}
+			scene->addCamera(new_cam);
+		}		
+	}
+}
+
+void editActiveCamera() {
+	CDlgEditCam dlg;
+	if (dlg.DoModal() == IDOK) {
+		//translate:
+		vec4 translation_vec = vec4(dlg.translate_x, dlg.translate_y, dlg.translate_z);
+		if (!(translation_vec == vec4(0, 0, 0))) {
+			scene->translateCameraWorld(translation_vec);
+		}
+
+		//rotate:
+		vec4 rotation_vec = vec4(dlg.rotate_x, dlg.rotate_y, dlg.rotate_z);
+		if (!(rotation_vec == vec4(0, 0, 0)) && dlg.rot_order_index != CB_ERR) {
+			switch (dlg.rot_order_index) {
+			case 0://x->y->z
+				scene->rotateCameraXWorld(rotation_vec.x);
+				scene->rotateCameraYWorld(rotation_vec.y);
+				scene->rotateCameraZWorld(rotation_vec.z);
+				break;
+			case 1://x->z->y
+				scene->rotateCameraXWorld(rotation_vec.x);
+				scene->rotateCameraZWorld(rotation_vec.z);
+				scene->rotateCameraYWorld(rotation_vec.y);
+				break;
+			case 2://y->x->z
+				scene->rotateCameraYWorld(rotation_vec.y);
+				scene->rotateCameraXWorld(rotation_vec.x);
+				scene->rotateCameraZWorld(rotation_vec.z);
+				break;
+			case 3://y->z->x
+				scene->rotateCameraYWorld(rotation_vec.y);
+				scene->rotateCameraZWorld(rotation_vec.z);
+				scene->rotateCameraXWorld(rotation_vec.x);
+				break;
+			case 4://z->x->y
+				scene->rotateCameraZWorld(rotation_vec.z);
+				scene->rotateCameraXWorld(rotation_vec.x);
+				scene->rotateCameraYWorld(rotation_vec.y);
+				break;
+			case 5://z->y->x
+				scene->rotateCameraZWorld(rotation_vec.z);
+				scene->rotateCameraYWorld(rotation_vec.y);
+				scene->rotateCameraXWorld(rotation_vec.x);
+				break;
+			}
+		}
+
+		//projection:
+		if (dlg.left != 0 || dlg.right != 0 || dlg.bottom != 0 || dlg.top != 0 || dlg.z_near != 0 || dlg.z_far != 0) {
+			switch (dlg.proj_radio_index) {
+			case 0: // ortho
+				scene->getActiveCamera()->ortho(dlg.left, dlg.right, dlg.bottom, dlg.top, dlg.z_near, dlg.z_far);
+				break;
+			case 1: // frustum
+				scene->getActiveCamera()->frustum(dlg.left, dlg.right, dlg.bottom, dlg.top, dlg.z_near, dlg.z_far);
+				break;
+			case 2: // perspective
+				if (dlg.z_near != 0 || dlg.z_far != 0 || dlg.fovy != 0 || dlg.aspect != 0) {
+					scene->getActiveCamera()->perspective(dlg.fovy, dlg.aspect, dlg.z_near, dlg.z_far);
+				}
+				break;
+			}
+		}
+	}
+}
+
 
 void transformWorld() {
 

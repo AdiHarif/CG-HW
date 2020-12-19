@@ -9,9 +9,9 @@
 
 //===Line Functions===
 
-int Line::findX(int y) {
-	return (int)( ((end.x - start.x) * (y - start.y))/(end.y - start.y) + start.x + 0.5);
-}
+//int Line::findX(int y) {
+//	return (int)( ((end.x - start.x) * (y - start.y))/(end.y - start.y) + start.x + 0.5);
+//}
 
 //==========
 
@@ -27,12 +27,6 @@ int Triangle::findMinY() {
 	return min(tmp, l2.start.y);
 }
 
-Line Triangle::findInnerLine(int y) {
-	int x0 = l0.findX(y);
-	int x1 = l1.findX(y);
-	int x2 = l2.findX(y);
-
-}
 //==========
 
 
@@ -608,6 +602,7 @@ void Renderer::drawModel(MeshModel& model) {
 
 		if (model.draw_pref.poly_mode == DrawPref::FILLED) {
 			//TODO: implement
+
 		}
 
 		if (model.draw_pref.f_draw_vertex_normals) {
