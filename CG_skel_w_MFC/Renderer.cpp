@@ -7,6 +7,34 @@
 
 #define INDEX(width,x,y,c) (x+y*width)*3+c
 
+//===Line Functions===
+
+int Line::findX(int y) {
+	return (int)( ((end.x - start.x) * (y - start.y))/(end.y - start.y) + start.x + 0.5);
+}
+
+//==========
+
+//===Triangle Functions===
+
+int Triangle::findMaxY() {
+	int tmp = max(l0.start.y, l1.start.y);
+	return max(tmp, l2.start.y);
+}
+
+int Triangle::findMinY() {
+	int tmp = min(l0.start.y, l1.start.y);
+	return min(tmp, l2.start.y);
+}
+
+Line Triangle::findInnerLine(int y) {
+	int x0 = l0.findX(y);
+	int x1 = l1.findX(y);
+	int x2 = l2.findX(y);
+
+}
+//==========
+
 
 //===Buffer Functions===
 void Renderer::CreateBuffers()
@@ -107,6 +135,17 @@ void Renderer::drawLineSteep(Line l, Color c) {
 		}
 	}
 }
+
+void Renderer::drawTriangleSolid(Triangle t, Color c) {
+	int max_y = t.findMaxY();
+	int min_y = t.findMinY();
+	
+	for (int y = min_y; y < max_y; y++) {
+
+	}
+
+}
+
 //==========
 
 

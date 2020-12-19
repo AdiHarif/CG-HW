@@ -36,6 +36,8 @@ struct Line {
 	Line(Pixel p1, Pixel p2) : start(p1), end(p2) {	}
 
 	Line(const Line& l) : start(l.start), end(l.end) {}
+
+	int findX(int y);
 };
 
 typedef vec4 Vertex;
@@ -46,6 +48,19 @@ typedef vec4 Vertex;
 
 	Edge(Vertex start, Vertex end) : start(start), end(end) {}
 };
+
+ struct Triangle {
+	 Line l0;
+	 Line l1;
+	 Line l2;
+
+	 Triangle(Pixel p0, Pixel p1, Pixel p2) : l0(Line(p0, p1)), l1(Line(p1,p2)), l2(Line(p2,p0)) {}
+	 Triangle(const Triangle& t) : l0(t.l0), l1(t.l1), l2(t.l2) {}
+
+	 int findMaxY();
+	 int findMinY();
+	 Line findInnerLine(int y);
+ };
 
 
  typedef vec4 Normal;
@@ -113,6 +128,7 @@ class Renderer
 	void rasterizeLine(Line l, Color c);
 	void drawLineModerate(Line l, Color c);
 	void drawLineSteep(Line l, Color c);
+	void drawTriangleSolid(Triangle t, Color c);
 	//==========
 
 
