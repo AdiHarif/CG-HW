@@ -7,7 +7,7 @@
 glew/
 freeglut/
 CG_skel.sln
-CG_skel_w_MFC/CG_skel_w_MFC.rc
+#CG_skel_w_MFC/CG_skel_w_MFC.rc
 CG_skel_w_MFC/CG_skel_w_MFC.vcproj
 CG_skel_w_MFC/CG_skel_w_MFC.vcxproj
 CG_skel_w_MFC/CG_skel_w_MFC.vcxproj.filters
