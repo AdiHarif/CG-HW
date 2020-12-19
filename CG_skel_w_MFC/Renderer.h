@@ -81,9 +81,9 @@ class Renderer
 
 	//===Inner Drawing Functions===
 	void drawPixel(Pixel p, Color c);
-	void drawLine(Line l, Color c);
-	void drawLineModerate(Line l, Color c);
-	void drawLineSteep(Line l, Color c);
+	void drawLine(Line l, Color c, vector<Pixel>* pixels_drawn = NULL);
+	void drawLineModerate(Line l, Color c, vector<Pixel>* pixels_drawn = NULL);
+	void drawLineSteep(Line l, Color c, vector<Pixel>* pixels_drawn = NULL);
 	void drawTriangleSolid(Triangle t, Color c);
 	//==========
 

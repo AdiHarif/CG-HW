@@ -59,15 +59,15 @@ void Renderer::drawPixel(Pixel p, Color c) {
 	m_outBuffer[INDEX(m_width, p.x, p.y, 2)] = c.b;
 }
 
-void Renderer::drawLine(Line l, Color c) {
+void Renderer::drawLine(Line l, Color c, vector<Pixel>* pixels_drawn) {
 	Pixel p0 = l.start;
 	Pixel p1 = l.end;
 	if (p0.x == p1.x) {
 		if (p0.y < p1.y) {
-			drawLineSteep(Line(p0,p1), c);
+			drawLineSteep(Line(p0,p1), c, pixels_drawn);
 		}
 		else {
-			drawLineSteep(Line(p1, p0), c);
+			drawLineSteep(Line(p1, p0), c, pixels_drawn);
 		}
 	}
 	if (p0.x > p1.x) {// make sure that v0 is left of v1
@@ -76,15 +76,15 @@ void Renderer::drawLine(Line l, Color c) {
 	}
 
 	if (std::abs(p1.y - p0.y) < std::abs(p1.x - p0.x)) {//-1 <= m <= 1
-		drawLineModerate(Line(p0, p1), c);
+		drawLineModerate(Line(p0, p1), c, pixels_drawn);
 	}
 	else { //|m|>1
-		drawLineSteep(Line(p0, p1), c);
+		drawLineSteep(Line(p0, p1), c, pixels_drawn);
 	}
 }
 
 
-void Renderer::drawLineModerate(Line l, Color c) {
+void Renderer::drawLineModerate(Line l, Color c, vector<Pixel>* pixels_drawn) {
 	Pixel p0 = l.start;
 	Pixel p1 = l.end;
 	int dx = p1.x - p0.x;
@@ -97,6 +97,9 @@ void Renderer::drawLineModerate(Line l, Color c) {
 	int D = 2*dy - dx;
 	int y = p0.y;
 	for (int x = p0.x; x <= p1.x; x++) {
+		if (pixels_drawn != NULL) {
+			pixels_drawn->push_back(Pixel(x, y));
+		}
 		this->drawPixel(Pixel(x,y), c);
 		if (D > 0) {
 			y += yi;
@@ -108,7 +111,7 @@ void Renderer::drawLineModerate(Line l, Color c) {
 	}
 }
 
-void Renderer::drawLineSteep(Line l, Color c) {
+void Renderer::drawLineSteep(Line l, Color c, vector<Pixel>* pixels_drawn) {
 	//flip x<->y
 	Pixel p0 = { l.start.y, l.start.x };
 	Pixel p1 = { l.end.y, l.end.x };
@@ -128,7 +131,10 @@ void Renderer::drawLineSteep(Line l, Color c) {
 	int D = 2 * dy - dx;
 	int y = p0.y;
 	for (int x = p0.x; x <= p1.x; x++) {
-		this->drawPixel(Pixel(y,x), c);
+		if (pixels_drawn != NULL) {
+			pixels_drawn->push_back(Pixel(y, x));
+		}
+		this->drawPixel(Pixel(y, x), c);
 		if (D > 0) {
 			y += yi;
 			D += 2 * (dy - dx);
@@ -142,29 +148,48 @@ void Renderer::drawLineSteep(Line l, Color c) {
 void Renderer::drawTriangleSolid(Triangle t, Color c) {
 	int max_y = t.findMaxY();
 	int min_y = t.findMinY();
-	int rows = max_y - min_y;
-	auto draw_between = new int[rows][DRAW_BETWEEN_COLS]; // creating a [rows][2] array
+	int rows = max_y - min_y + 1;
+	//auto draw_between = new int[rows][DRAW_BETWEEN_COLS]; // creating a [rows][2] array
+
+	//// allocate 2d array
+	//int** draw_between = new int* [rows];
+	//int draw_between[rows][DRAW_BETWEEN_COLS];
+	//for (int i = 0; i < rows; i++) {
+	//	draw_between[i] = { INT_MAX, INT_MIN };
+	//}
+	//// ---
+
+	vector<Line> draw_between;
+	for (int i = 0; i < rows; i++) {
+		Pixel left = Pixel(INT_MIN, i + min_y);// TODO: add z
+		Pixel right = Pixel(INT_MAX, i + min_y);// TODO: add z
+		draw_between.push_back(Line(left, right));
+	}
 
 	for (Line l : t.lines) {
-		vector<Pixel> tmp_line; //= whatever comes back from drawLine (or getLine)
-		for (Pixel p : tmp_line) {
-			if (p.x < draw_between[p.y][LEFT_PIXEL]) {
-				draw_between[p.y][LEFT_PIXEL] = p.x;
+		vector<Pixel> pixels_drawn;
+		drawLine(l, c, &pixels_drawn);
+		for (Pixel p : pixels_drawn) {
+			if (p.x > draw_between.at(p.y - min_y).start.x) {
+				draw_between.at(p.y - min_y).start.x = p.x;
 			}
-			if (p.x > draw_between[p.y][RIGHT_PIXEL]) {
-				draw_between[p.y][RIGHT_PIXEL] = p.x;
+			if (p.x < draw_between.at(p.y - min_y).end.x) {
+				draw_between.at(p.y - min_y).end.x = p.x;
 			}
 		}
 	}
 
 	for (int i = 0; i < rows; i++) {
-		Pixel start = Pixel(draw_between[i][LEFT_PIXEL], i + min_y);
-		Pixel end = Pixel(draw_between[i][RIGHT_PIXEL], i + min_y);
-		drawLine(Line(start,end), c);
+		Line line_to_draw = Line(draw_between.at(i).start, draw_between.at(i).end);
+		drawLine(line_to_draw, c);
 	}
 
-	delete draw_between;
-
+	//// delete 2d array
+	//for (int i = 0; i < rows; ++i) {
+	//	delete[] draw_between[i];
+	//}
+	//delete[] draw_between;
+	//// ---
 }
 
 //==========
@@ -628,8 +653,8 @@ void Renderer::drawModel(MeshModel& model) {
 		}
 
 		if (model.draw_pref.poly_mode == DrawPref::FILLED) {
-			//TODO: implement
-
+			Triangle t = Triangle(px_vertices[i->vertices[0] - 1], px_vertices[i->vertices[1] - 1], px_vertices[i->vertices[2] - 1]);
+			drawTriangleSolid(t, model.mesh_color);
 		}
 
 		if (model.draw_pref.f_draw_vertex_normals) {
