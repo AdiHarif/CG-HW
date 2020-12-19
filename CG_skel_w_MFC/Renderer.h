@@ -8,6 +8,7 @@
 #include "Face.h"
 
 #define M_OUT_BUFFER_SIZE 3*m_width*m_height
+#define M_ZBUFFER_SIZE m_width*m_height
 
 #define DEFAULT_WIDTH 512
 #define DEFAULT_HEIGHT 512
@@ -19,7 +20,7 @@ struct Pixel {
 	int y;
 	float z;
 
-	Pixel(int x, int y, float z = 0) : x(x), y(y), z(z) {}
+	Pixel(int x, int y, float z) : x(x), y(y), z(z) {}
 
 	Pixel(const Pixel& p) {
 		x = p.x;
@@ -74,8 +75,8 @@ class Renderer
 
 
 	//===Buffer Functions===
-	void CreateBuffers();
-	void CreateLocalBuffer(); //unimplemented
+	void createBuffers();
+	//void CreateLocalBuffer(); //unimplemented
 	//==========
 
 
@@ -118,9 +119,10 @@ public:
 
 	//===Buffer Interface
 	void swapBuffers();
-	void clearColorBuffer();
+	void clearBuffer();
+	//void clearColorBuffer();
 	void colorBackground(Color color);
-	void clearDepthBuffer(); //unimplemented
+	//void clearDepthBuffer(); //unimplemented
 
 	void setSize(int width, int height);
 	//==========

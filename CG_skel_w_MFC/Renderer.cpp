@@ -6,6 +6,7 @@
 #include "MeshModel.h"
 
 #define INDEX(width,x,y,c) (x+y*width)*3+c
+#define Z_INDEX(width,x,y) (x+y*width)
 #define LEFT_PIXEL 0
 #define RIGHT_PIXEL 1
 #define DRAW_BETWEEN_COLS 2
@@ -40,10 +41,11 @@ int Triangle::findMinY() {
 
 
 //===Buffer Functions===
-void Renderer::CreateBuffers()
+void Renderer::createBuffers()
 {
 	CreateOpenGLBuffer(); //Do not remove this line.
 	m_outBuffer = new float[3*m_width*m_height];
+	m_zbuffer = new float[m_width * m_height];
 }
 //==========
 
@@ -51,12 +53,13 @@ void Renderer::CreateBuffers()
 //===Inner Drawing Functions===
 
 void Renderer::drawPixel(Pixel p, Color c) {
-	if (!isPixelLegal(p)) {
+	if ( (!isPixelLegal(p)) || p.z < m_zbuffer[Z_INDEX(m_width, p.x, p.y)]) {
 		return;
 	}
 	m_outBuffer[INDEX(m_width, p.x, p.y, 0)] = c.r;
 	m_outBuffer[INDEX(m_width, p.x, p.y, 1)] = c.g;
 	m_outBuffer[INDEX(m_width, p.x, p.y, 2)] = c.b;
+	m_zbuffer[Z_INDEX(m_width, p.x, p.y)] = p.z;
 }
 
 void Renderer::drawLine(Line l, Color c, vector<Pixel>* pixels_drawn) {
@@ -89,6 +92,11 @@ void Renderer::drawLineModerate(Line l, Color c, vector<Pixel>* pixels_drawn) {
 	Pixel p1 = l.end;
 	int dx = p1.x - p0.x;
 	int dy = p1.y - p0.y;
+
+	float dz = (p1.z - p0.z) / dx;
+	float z = p0.z;
+
+
 	int yi = 1;
 	if (dy < 0) {
 		yi = -1;
@@ -97,10 +105,11 @@ void Renderer::drawLineModerate(Line l, Color c, vector<Pixel>* pixels_drawn) {
 	int D = 2*dy - dx;
 	int y = p0.y;
 	for (int x = p0.x; x <= p1.x; x++) {
+		Pixel p = Pixel(x, y, z);
 		if (pixels_drawn != NULL) {
-			pixels_drawn->push_back(Pixel(x, y));
+			pixels_drawn->push_back(p);
 		}
-		this->drawPixel(Pixel(x,y), c);
+		this->drawPixel(p, c);
 		if (D > 0) {
 			y += yi;
 			D += 2*(dy-dx);
@@ -108,13 +117,14 @@ void Renderer::drawLineModerate(Line l, Color c, vector<Pixel>* pixels_drawn) {
 		else {
 			D += 2*dy;
 		}
+		z += dz;
 	}
 }
 
 void Renderer::drawLineSteep(Line l, Color c, vector<Pixel>* pixels_drawn) {
 	//flip x<->y
-	Pixel p0 = { l.start.y, l.start.x };
-	Pixel p1 = { l.end.y, l.end.x };
+	Pixel p0 = { l.start.y, l.start.x, l.start.z};
+	Pixel p1 = { l.end.y, l.end.x, l.end.z};
 	//make sure p0 is left of p1
 	if (p0.x > p1.x) {
 		Pixel tmp = p0;
@@ -123,6 +133,10 @@ void Renderer::drawLineSteep(Line l, Color c, vector<Pixel>* pixels_drawn) {
 	}
 	int dx = p1.x - p0.x;
 	int dy = p1.y - p0.y;
+
+	float dz = (p1.z - p0.z) / dx;
+	float z = p0.z;
+
 	int yi = 1;
 	if (dy < 0) {
 		yi = -1;
@@ -131,10 +145,11 @@ void Renderer::drawLineSteep(Line l, Color c, vector<Pixel>* pixels_drawn) {
 	int D = 2 * dy - dx;
 	int y = p0.y;
 	for (int x = p0.x; x <= p1.x; x++) {
+		Pixel p = Pixel(y, x, z);
 		if (pixels_drawn != NULL) {
-			pixels_drawn->push_back(Pixel(y, x));
+			pixels_drawn->push_back(p);
 		}
-		this->drawPixel(Pixel(y, x), c);
+		this->drawPixel(p, c);
 		if (D > 0) {
 			y += yi;
 			D += 2 * (dy - dx);
@@ -142,6 +157,8 @@ void Renderer::drawLineSteep(Line l, Color c, vector<Pixel>* pixels_drawn) {
 		else {
 			D += 2 * dy;
 		}
+
+		z += dz;
 	}
 }
 
@@ -161,8 +178,8 @@ void Renderer::drawTriangleSolid(Triangle t, Color c) {
 
 	vector<Line> draw_between;
 	for (int i = 0; i < rows; i++) {
-		Pixel left = Pixel(INT_MIN, i + min_y);// TODO: add z
-		Pixel right = Pixel(INT_MAX, i + min_y);// TODO: add z
+		Pixel left = Pixel(INT_MIN, i + min_y, -1);// TODO: add z
+		Pixel right = Pixel(INT_MAX, i + min_y, -1);// TODO: add z
 		draw_between.push_back(Line(left, right));
 	}
 
@@ -172,9 +189,11 @@ void Renderer::drawTriangleSolid(Triangle t, Color c) {
 		for (Pixel p : pixels_drawn) {
 			if (p.x > draw_between.at(p.y - min_y).start.x) {
 				draw_between.at(p.y - min_y).start.x = p.x;
+				draw_between.at(p.y - min_y).start.z = p.z;
 			}
 			if (p.x < draw_between.at(p.y - min_y).end.x) {
 				draw_between.at(p.y - min_y).end.x = p.x;
+				draw_between.at(p.y - min_y).end.z = p.z;
 			}
 		}
 	}
@@ -448,12 +467,13 @@ void Renderer::CreateOpenGLBuffer()
 Renderer::Renderer(int width, int height) :m_width(width), m_height(height)
 {
 	InitOpenGLRendering();
-	CreateBuffers();
+	createBuffers();
 }
 
 Renderer::~Renderer(void)
 {
 	delete[] m_outBuffer;
+	delete[] m_zbuffer;
 }
 //==========
 
@@ -479,12 +499,21 @@ void Renderer::swapBuffers()
 	a = glGetError();
 }
 
-void Renderer::clearColorBuffer() {
+void Renderer::clearBuffer() {
 	for (int i = 0; i < M_OUT_BUFFER_SIZE; i++) {
 		m_outBuffer[i] = 0.2;
 	}
+	for (int i = 0; i < M_ZBUFFER_SIZE; i++) {
+		m_zbuffer[i] = -1;
+	}
 }
 
+//void Renderer::clearColorBuffer() {
+//	for (int i = 0; i < M_OUT_BUFFER_SIZE; i++) {
+//		m_outBuffer[i] = 0.2;
+//	}
+//}
+//
 void Renderer::colorBackground(Color color) {
 	for (int i = 0; i < M_OUT_BUFFER_SIZE; i+=3) {
 		m_outBuffer[i] = color.r;
@@ -496,9 +525,10 @@ void Renderer::colorBackground(Color color) {
 
 void Renderer::setSize(int width, int height) {
 	delete[] m_outBuffer;
+	delete[] m_zbuffer;
 	m_width = width;
 	m_height = height;
-	CreateBuffers();
+	createBuffers();
 }
 //==========
 
