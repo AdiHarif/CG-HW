@@ -9,9 +9,9 @@ using namespace std;
 Color camera_plus_color = { 1.0, 1.0, 0.0 };
 
 //===Inner Getters===
-Model* Scene::getActiveModel() {
-	return models[active_model];
-}
+//Model* Scene::getActiveModel() {
+//	return models[active_model];
+//}
 
 Camera* Scene::getActiveCamera() {
 	return cameras[active_camera];
@@ -31,13 +31,13 @@ Scene::Scene(Renderer *renderer) : m_renderer(renderer){
 
 //===Getters/Setters===
 
-vector<Model*> Scene::getModels() {
-	return models;
-}
+//vector<Model*> Scene::getModels() {
+//	return models;
+//}
 
-int Scene::getActiveModelIndex() { return active_model; }
-
-int Scene::getActiveCameraIndex() { return active_camera; }
+//int Scene::getActiveModelIndex() { return active_model; }
+//
+//int Scene::getActiveCameraIndex() { return active_camera; }
 
 //==========
 
@@ -54,35 +54,29 @@ void Scene::draw()
 	// 2. Tell all models to draw themselves
 	for (vector<Model*>::iterator i = models.begin(); i!=models.end(); i++){
 		MeshModel* m = dynamic_cast<MeshModel*> ((*i));
-		m->draw(m_renderer);
+		m_renderer->drawModel(*m);
 	}
 
 	if (f_draw_cameras) {
 		for (vector<Camera*>::iterator i = cameras.begin(); i != cameras.end(); i++) {
 			if ((i - cameras.begin()) != active_camera) {
 				vec4 pos = (*i)->getPosition();
-				vec4 at = (*i)->getAt();
-				vec4 up = (*i)->getUp();
 				Color color = camera_plus_color;
-				m_renderer->drawCamera(pos, at, up, color);
+				m_renderer->drawCamera(pos, color);
 			}
 		}
 	}
 
-
-
-	vector<vec4> tmp;
-	tmp.push_back(vec4(0,0,0,1));
-	m_renderer->drawVertices(tmp, mat4(1), Color({ 1,0,0 }));
+	m_renderer->drawOrigin(RED);
 
 	m_renderer->swapBuffers();
 }
 
-void Scene::drawDemo()
-{
-	m_renderer->SetDemoBuffer();
-	m_renderer->swapBuffers();
-}
+//void Scene::drawDemo()
+//{
+//	m_renderer->SetDemoBuffer();
+//	m_renderer->swapBuffers();
+//}
 
 //==========
 
@@ -99,104 +93,89 @@ void Scene::loadOBJModel(string fileName)
 	//c->LookAt(model->getPosition());
 }
 
-void Scene::loadPrimModel(string file_name) {
+void Scene::loadPrimModel() {
 	//PrimMeshModel* model = new PrimMeshModel(file_name);
 	PrimMeshModel* model = new PrimMeshModel();
 	models.push_back(model);
 	activateLastModel();
 }
 
-void Scene::removeModel(int model) {
+void Scene::removeSelection() {
 	if (models.empty())	return;
-	if (model == ALL_MODELS_ACTIVE) {
+	if (active_model == ALL_MODELS_ACTIVE) {
 		models.clear();
 		return;
 	}
-	models.erase(models.begin() + model);
+	models.erase(models.begin() + active_model);
 	activateLastModel();
 }
 
-void Scene::scaleSelection(double scale_factor) {
-	if (false) {	//TODO: scale selected model
-
-	}
-	else {	//scale world
-		for (int i = 0; i < this->models.size(); i++) {
-			MeshModel* m = dynamic_cast<MeshModel*> (this->models[i]);
-			if (m->getIsActive()) {
-				m->scale(vec3(scale_factor));
-			}
-		}
-	}
+void Scene::scaleSelection(double factor) {
+	scaleSelection(vec3(factor));
 }
 
-void Scene::scaleSelection(vec3 scale_by) {
-	if (false) {	//TODO: scale selected model
-
-	}
-	else {	//scale world
+void Scene::scaleSelection(vec3 v) {
+	if (active_model == ALL_MODELS_ACTIVE) {
 		for (int i = 0; i < this->models.size(); i++) {
 			MeshModel* m = dynamic_cast<MeshModel*> (this->models[i]);
-			if (m->getIsActive()) {
-				m->scale(scale_by);
-			}
+			m->scale(v);
 		}
+	}
+	else {
+		MeshModel* m = dynamic_cast<MeshModel*> (this->models[active_model]);
+		m->scale(v);
 	}
 }
 
 void Scene::rotateSelectionX(double theta) {
-	if (false) {	//TODO: rotate selected model
-
-	}
-	else {	//rotate world
+	if (active_model == ALL_MODELS_ACTIVE) {
 		for (int i = 0; i < this->models.size(); i++) {
 			MeshModel* m = dynamic_cast<MeshModel*> (this->models[i]);
-			if (m->getIsActive()) {
-				m->rotateX(theta);
-			}
+			m->rotateX(theta);
 		}
+	}
+	else {
+		MeshModel* m = dynamic_cast<MeshModel*> (this->models[active_model]);
+		m->rotateX(theta);
 	}
 }
 
 void Scene::rotateSelectionY(double theta) {
-	if (false) {	//TODO: rotate selected model
-
-	}
-	else {	//rotate world
+	if (active_model == ALL_MODELS_ACTIVE) {
 		for (int i = 0; i < this->models.size(); i++) {
 			MeshModel* m = dynamic_cast<MeshModel*> (this->models[i]);
-			if (m->getIsActive()) {
-				m->rotateY(theta);
-			}
+			m->rotateY(theta);
 		}
+	}
+	else {
+		MeshModel* m = dynamic_cast<MeshModel*> (this->models[active_model]);
+		m->rotateY(theta);
 	}
 }
 
 void Scene::rotateSelectionZ(double theta) {
-	if (false) {	//TODO: rotate selected model
-
-	}
-	else {	//rotate world
+	if (active_model == ALL_MODELS_ACTIVE) {
 		for (int i = 0; i < this->models.size(); i++) {
 			MeshModel* m = dynamic_cast<MeshModel*> (this->models[i]);
-			if (m->getIsActive()) {
-				m->rotateZ(theta);
-			}
+			m->rotateZ(theta);
 		}
+	}
+	else {
+		MeshModel* m = dynamic_cast<MeshModel*> (this->models[active_model]);
+		m->rotateZ(theta);
 	}
 }
 
 void Scene::translateSelection(vec4 vec) {
-	if (false) {	//TODO: translate selected model
-
-	}
-	else {	//translate world
+	if (active_model == ALL_MODELS_ACTIVE) {
 		for (int i = 0; i < this->models.size(); i++) {
 			MeshModel* m = dynamic_cast<MeshModel*> (this->models[i]);
-			if (m->getIsActive()) {
-				m->translate(vec);
-			}
+			m->translate(vec);
 		}
+	}
+	else {
+		MeshModel* m = dynamic_cast<MeshModel*> (this->models[active_model]);
+		m->translate(vec);
 	}
 }
 
@@ -208,7 +187,7 @@ void Scene::activateNextModel() {
 		active_model = 0;
 		changeAllModelsActiveness(false);
 		m = dynamic_cast<MeshModel*> (this->models[0]);
-		m->setIsActive(true);
+		m->activate();
 		return;
 	}
 
@@ -220,7 +199,7 @@ void Scene::activateNextModel() {
 		active_model = (active_model + 1) % models.size();
 		changeAllModelsActiveness(false);
 		m = dynamic_cast<MeshModel*> (this->models[active_model]);
-		m->setIsActive(true);
+		m->activate();
 	}
 }
 
@@ -229,9 +208,9 @@ void Scene::activateLastModel() {
 	MeshModel* m = NULL;
 	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
 		m = dynamic_cast<MeshModel*> ((*i));
-		m->setIsActive(false);
+		m->deactivate();
 	}
-	m->setIsActive(true);
+	m->activate();
 	active_model = models.size() - 1;
 }
 
@@ -240,7 +219,12 @@ void Scene::changeAllModelsActiveness(bool is_active) {
 	MeshModel* m = NULL;
 	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
 		m = dynamic_cast<MeshModel*> ((*i));
-		m->setIsActive(is_active);
+		if (is_active) {
+			m->activate();
+		}
+		else {
+			m->deactivate();
+		}
 	}
 }
 
@@ -249,73 +233,86 @@ void Scene::changeAllModelsActiveness(bool is_active) {
 
 //===Display Toggles===
 
-void Scene::toggleVertices() {
-	if (false) {	//TODO: toggle selected model
+//void Scene::toggleVertices() {
+//	if (false) {	//TODO: toggle selected model
+//
+//	}
+//	else {	//toggle world
+//		for (int i = 0; i < this->models.size(); i++) {
+//			MeshModel* m = dynamic_cast<MeshModel*> (this->models[i]);
+//			m->toggleVertices();
+//		}
+//	}
+//}
+//
+//void Scene::toggleEdges() {
+//	if (false) {	//TODO: toggle selected model
+//
+//	}
+//	else {	//toggle world
+//		for (int i = 0; i < this->models.size(); i++) {
+//			MeshModel* m = dynamic_cast<MeshModel*> (this->models[i]);
+//			m->toggleEdges();
+//		}
+//	}
+//}
 
-	}
-	else {	//toggle world
+void Scene::togglePolyMode() {
+	if (active_model == ALL_MODELS_ACTIVE) {
 		for (int i = 0; i < this->models.size(); i++) {
 			MeshModel* m = dynamic_cast<MeshModel*> (this->models[i]);
-			m->toggleVertices();
+			m->togglePolyMode();
 		}
 	}
+	else {
+		MeshModel* m = dynamic_cast<MeshModel*> (this->models[active_model]);
+		m->togglePolyMode();
+	}
+
 }
 
-void Scene::toggleEdges() {
-	if (false) {	//TODO: toggle selected model
-
-	}
-	else {	//toggle world
-		for (int i = 0; i < this->models.size(); i++) {
-			MeshModel* m = dynamic_cast<MeshModel*> (this->models[i]);
-			m->toggleEdges();
-		}
-	}
-}
 
 void Scene::toggleBB() {
-	if (false) {	//TODO: toggle selected model
-
-	}
-	else {	//toggle world
+	if (active_model == ALL_MODELS_ACTIVE) {
 		for (int i = 0; i < this->models.size(); i++) {
 			MeshModel* m = dynamic_cast<MeshModel*> (this->models[i]);
 			m->toggleBB();
 		}
 	}
+	else {
+		MeshModel* m = dynamic_cast<MeshModel*> (this->models[active_model]);
+		m->toggleBB();
+	}
 }
 
 void Scene::toggleVertexNormals() {
-	if (false) {	//TODO: toggle selected model
-
-	}
-	else {	//toggle world
+	if (active_model == ALL_MODELS_ACTIVE) {
 		for (int i = 0; i < this->models.size(); i++) {
 			MeshModel* m = dynamic_cast<MeshModel*> (this->models[i]);
 			m->toggleVertexNormals();
 		}
 	}
+	else {
+		MeshModel* m = dynamic_cast<MeshModel*> (this->models[active_model]);
+		m->toggleVertexNormals();
+	}
 }
 
 void Scene::toggleFaceNormals() {
-	if (false) {	//TODO: toggle selected model
-
-	}
-	else {	//toggle world
+	if (active_model == ALL_MODELS_ACTIVE) {
 		for (int i = 0; i < this->models.size(); i++) {
 			MeshModel* m = dynamic_cast<MeshModel*> (this->models[i]);
 			m->toggleFaceNormals();
 		}
 	}
+	else {
+		MeshModel* m = dynamic_cast<MeshModel*> (this->models[active_model]);
+		m->toggleFaceNormals();
+	}
 }
 
 void Scene::toggleCameras() {
-	if (false) {	//TODO: toggle selected model
-
-	}
-	else {	//toggle world
-		f_draw_cameras = !f_draw_cameras;
-	}
+	f_draw_cameras = !f_draw_cameras;
 }
 
 //==========
@@ -371,7 +368,8 @@ void Scene::activeCameraToPerspective(const float fovy, const float aspect,
 }
 
 void Scene::lookAtActiveModel() {
-	MeshModel* m = dynamic_cast<MeshModel*> (getActiveModel());
+	if (models.empty() || active_model == ALL_MODELS_ACTIVE) return;
+	MeshModel* m = dynamic_cast<MeshModel*> (models[active_model]);
 	Camera* c = getActiveCamera();
 	c->lookAt(m->getPosition(), c->getUp());
 }

@@ -44,23 +44,24 @@ public:
 	//==========
 
 	//===Getters/Setters===
-	vector<Model*> getModels();
-	int getActiveModelIndex();
-	Model* getActiveModel();
-	int getActiveCameraIndex();
+	//vector<Model*> getModels();
+	//int getActiveModelIndex();
+	//Model* getActiveModel();
+	//int getActiveCameraIndex();
 	Camera* getActiveCamera();
 	//==========
 
 
 	//===Drawing Functions===
 	void draw();
-	void drawDemo();
+	//void drawDemo();
 	//==========
 
 	//===Models Interface===
 	void loadOBJModel(string fileName);
-	void loadPrimModel(string file_name);
-	void removeModel(int model);
+	void loadPrimModel();
+	//void removeModel(int model);
+	void removeSelection();
 
 	void scaleSelection(double scale_factor);
 	void scaleSelection(vec3 scale_by);
@@ -75,8 +76,9 @@ public:
 	//==========
 
 	//===Display Toggles===
-	void toggleVertices();
-	void toggleEdges();
+	/*void toggleVertices();
+	void toggleEdges();*/
+	void togglePolyMode();
 	void toggleBB();
 	void toggleVertexNormals();
 	void toggleFaceNormals();

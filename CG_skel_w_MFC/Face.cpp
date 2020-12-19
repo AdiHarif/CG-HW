@@ -1,20 +1,49 @@
 #include "Face.h"
 
+
+Edge operator*(mat4& m, Edge& e) {
+	return Edge(m * e.start, m * e.end);
+}
+
 Face::Face()
 {
 	for (int i = 0; i < 3; i++) {
-		vertices[i] = nullptr;
-		normals[i] = nullptr;
-		textures[i] = nullptr;
+		vertices[i] = vertex_normals[i] = textures[i] = 0;
 	}
+	normal = 0;
 }
 
-void Face::calcNormal() {
-	vec4 v0 = *vertices[1] - *vertices[0];
-	vec4 v1 = *vertices[2] - *vertices[1];
-	center_normal = cross(v0, v1);
+Face::Face(vec3 v, int normal_index) {
+	for (int i = 0; i < 3; i++) {
+		vertices[i] = v[i];
+	}
+	normal = normal_index;
 }
 
-void Face::calcCenter() {
-	center = (*vertices[0] + *vertices[1] + *vertices[2]) / 3;
+
+Face::Face(std::istream& s, int normal_index) {
+	for (int i = 0; i < 3; i++) {
+		vertices[i] = vertex_normals[i] = textures[i] = 0;
+	}
+
+	char c;
+	for (int i = 0; i < 3; i++)
+	{
+		s >> std::ws >> vertices[i] >> std::ws;
+		if (s.peek() != '/')
+			continue;
+		s >> c >> std::ws;
+		if (s.peek() == '/')
+		{
+			s >> c >> std::ws >> vertex_normals[i];
+			continue;
+		}
+		else
+			s >> textures[i];
+		if (s.peek() != '/')
+			continue;
+		s >> c >> vertex_normals[i];
+	}
+
+	normal = normal_index;
 }

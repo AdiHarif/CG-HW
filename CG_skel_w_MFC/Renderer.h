@@ -36,6 +36,7 @@ struct Line {
 	Line(Pixel p1, Pixel p2) : start(p1), end(p2) {	}
 
 	Line(const Line& l) : start(l.start), end(l.end) {}
+
 };
 
 //struct Normal {
@@ -65,8 +66,8 @@ class Renderer
 
 
 	//===Inner Drawing Functions===
-	void rasterizePoint(Pixel p, Color c);
-	void rasterizeLine(Line l, Color c);
+	void drawPixel(Pixel p, Color c);
+	void drawLine(Line l, Color c);
 	void drawLineModerate(Line l, Color c);
 	void drawLineSteep(Line l, Color c);
 	//==========
@@ -77,12 +78,12 @@ class Renderer
 	bool isLineLegal(Line l);
 	Pixel viewPort(Vertex v);
 
-	vector<Pixel> transformVertices(vector<Vertex>& vertices, mat4 tm);
+	//vector<Pixel> transformVertices(vector<Vertex>& vertices, mat4 tm);
 	//vector<Line> transformEdges(vector<vec4>& edges, mat4 tm); //Legacy, should delete this in the future.
-	vector<Line> transformEdges(vector<Edge>& edges, mat4 tm);
-	vector<Line> transformFaces(vector<Face>& faces, mat4 tm); 
-	vector<Line> transformVertexNormals(vector<Face>& faces, mat4 tm, mat4 ntm);
-	vector<Line> transformFaceNormals(vector<Face>& faces, mat4 tm, mat4 ntm);
+	//vector<Line> transformEdges(vector<Edge>& edges, mat4 tm);
+	//vector<Line> transformFaces(vector<Face>& faces, mat4 tm); 
+	//vector<Line> transformVertexNormals(vector<Face>& faces, mat4 tm, mat4 ntm);
+	//vector<Line> transformFaceNormals(vector<Face>& faces, mat4 tm, mat4 ntm);
 	//==========
 
 
@@ -114,21 +115,29 @@ public:
 	//void drawLines(vector<vec4>& points, mat4 tm, Color c); //Legacy, should delete in the future (felt legacy, might delete later)
 	//void drawLines(vector<Edge>& edges, mat4 tm, Color c);
 	//void drawTriangles(vector<Face>& faces, mat4 tm, Color c);
-	void drawVertices(vector<Vertex>& vertices, mat4 tm, Color c);
-	void drawEdges(vector<Edge>& edges, mat4 tm, Color c);
-	void drawEdges(vector<Face>& faces, mat4 tm, Color c);
-	void drawVertexNormals(vector<Face>& faces, mat4 tm, mat4 ntm, Color c);
-	void drawFacesNormals(vector<Face>& faces, mat4 tm, mat4 ntm, Color c);
-	void drawCamera(vec4 pos, vec4 at, vec4 up, Color c);
+	//void drawVertices(vector<Vertex>& vertices, mat4 tm, Color c);
+	//void drawEdges(vector<Edge>& edges, mat4 tm, Color c);
+	//void drawEdges(vector<Face>& faces, mat4 tm, Color c);
+	//void drawVertexNormals(vector<Face>& faces, mat4 tm, mat4 ntm, Color c);
+	//void drawFacesNormals(vector<Face>& faces, mat4 tm, mat4 ntm, Color c);
+	void drawCamera(vec4 pos, Color c);
 
 	void SetDemoBuffer();
 	//==========
 
 
-	//===Transformation Setters===
+	////===Transformation Setters===
 	void setCameraTransform(const mat4& tc);
 	void setProjection(const mat4& tc);
 	void setWorldTransform(const mat4& tw);
-	//==========
+	////==========
+
+
+	void drawModel(MeshModel& model);
+
+	void drawOrigin(Color c);
+
+	//void drawTriangle();
+
 
 };

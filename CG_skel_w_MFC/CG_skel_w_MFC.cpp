@@ -269,7 +269,7 @@ void keyboard(unsigned char key, int x, int y)
 		scene->toggleCameraProjection();
 		break;
 	case DEL:
-		scene->removeModel(scene->getActiveModelIndex());
+		scene->removeSelection();
 		break;
 	case 'f':
 	case 'F':
@@ -360,11 +360,11 @@ void special(int key, int x, int y) {
 	
 	//toggles:
 	case GLUT_KEY_F1:
-		scene->toggleVertices();
+		scene->togglePolyMode();
 		break;
-	case GLUT_KEY_F2:
+	/*case GLUT_KEY_F2:
 		scene->toggleEdges();
-		break;
+		break;*/
 	case GLUT_KEY_F3:
 		scene->toggleBB();
 		break;
@@ -416,7 +416,7 @@ void modelsMenuCB(int id){
 		}
 		break;
 	case MODEL_MENU_ADD_PRIMITIVE:
-		scene->loadPrimModel("cube.obj");
+		scene->loadPrimModel();
 		break;
 	case MODEL_MENU_TRANSFORM_ACTIVE_MODEL:
 		transformActiveModel();

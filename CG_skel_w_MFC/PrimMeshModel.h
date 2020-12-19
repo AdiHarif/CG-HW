@@ -19,18 +19,26 @@ public:
 		vertices.push_back(vec4(-1.0, 1.0, 1.0));
 		vertices.push_back(vec4(-1.0, 1.0, -1.0));
 
-		/*faces.push_back(FaceIdcs(vec4(2, 3, 4)));
-		faces.push_back(FaceIdcs(vec4(8, 7, 6)));
-		faces.push_back(FaceIdcs(vec4(5, 6, 2)));
-		faces.push_back(FaceIdcs(vec4(6, 7, 3)));
-		faces.push_back(FaceIdcs(vec4(3, 7, 8)));
-		faces.push_back(FaceIdcs(vec4(1, 4, 8)));
-		faces.push_back(FaceIdcs(vec4(1, 2, 4)));
-		faces.push_back(FaceIdcs(vec4(5, 8, 6)));
-		faces.push_back(FaceIdcs(vec4(1, 5, 2)));
-		faces.push_back(FaceIdcs(vec4(2, 6, 3)));
-		faces.push_back(FaceIdcs(vec4(4, 3, 8)));
-		faces.push_back(FaceIdcs(vec4(5, 1, 8)));*/
+		faces.push_back(Face(vec3(2, 3, 4)));
+		faces.push_back(Face(vec3(8, 7, 6)));
+		faces.push_back(Face(vec3(5, 6, 2)));
+		faces.push_back(Face(vec3(6, 7, 3)));
+		faces.push_back(Face(vec3(3, 7, 8)));
+		faces.push_back(Face(vec3(1, 4, 8)));
+		faces.push_back(Face(vec3(1, 2, 4)));
+		faces.push_back(Face(vec3(5, 8, 6)));
+		faces.push_back(Face(vec3(1, 5, 2)));
+		faces.push_back(Face(vec3(2, 6, 3)));
+		faces.push_back(Face(vec3(4, 3, 8)));
+		faces.push_back(Face(vec3(5, 1, 8)));
+
+		for (int i = 0; i < faces.size(); i++) {
+			vec4 v0 = vertices[faces[i].vertices[1] - 1] - vertices[faces[i].vertices[0] - 1];
+			vec4 v1 = vertices[faces[i].vertices[2] - 1] - vertices[faces[i].vertices[1] - 1];
+			Normal n = cross(v0, v1);
+			face_normals.push_back(n);
+			faces[i].normal = i;
+		}
 
 		vec4 min = vec4(-1.0, -1.0, -1.0);
 		vec4 max = vec4(1.0, 1.0, 1.0);
@@ -43,7 +51,7 @@ public:
 		for (vector<vec4>::iterator i = vertices.begin(); i != vertices.end(); i++) {
 			(*i) = t * (*i);
 		}
-		for (vector<vec4>::iterator i = bounding_box_vertices.begin(); i != bounding_box_vertices.end(); i++) {
+		for (vector<Edge>::iterator i = bb_edges.begin(); i != bb_edges.end(); i++) {
 			(*i) = t * (*i);
 		}
 
@@ -56,10 +64,10 @@ public:
 
 		computeFacesNormals();*/
 		position = vec4(0.0, 0.0, 0.0, 1.0);
-		active_mesh_color = { 0.0, 1.0, 0.0 };
+		/*active_mesh_color = { 0.0, 1.0, 0.0 };
 		inactive_mesh_color = { 0.4, 0.4, 0.4 };
 		vertex_normals_color = { 1.0, 0.0, 1.0 };
 		faces_normals_color = { 1.0, 0.0, 0.0 };
-		bb_color = { 1.0, 1.0, 1.0 };
+		bb_color = { 1.0, 1.0, 1.0 };*/
 	}
 };
