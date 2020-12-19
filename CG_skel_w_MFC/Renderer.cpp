@@ -6,6 +6,9 @@
 #include "MeshModel.h"
 
 #define INDEX(width,x,y,c) (x+y*width)*3+c
+#define LEFT_PIXEL 0
+#define RIGHT_PIXEL 1
+#define DRAW_BETWEEN_COLS 2
 
 //===Line Functions===
 
@@ -17,14 +20,20 @@
 
 //===Triangle Functions===
 
+Triangle::Triangle(Pixel p0, Pixel p1, Pixel p2) {
+	this->lines.push_back(Line(p0, p1));
+	this->lines.push_back(Line(p1, p2));
+	this->lines.push_back(Line(p2, p0));
+}
+
 int Triangle::findMaxY() {
-	int tmp = max(l0.start.y, l1.start.y);
-	return max(tmp, l2.start.y);
+	int tmp = max(lines[0].start.y, lines[1].start.y);
+	return max(tmp, lines[2].start.y);
 }
 
 int Triangle::findMinY() {
-	int tmp = min(l0.start.y, l1.start.y);
-	return min(tmp, l2.start.y);
+	int tmp = min(lines[0].start.y, lines[1].start.y);
+	return min(tmp, lines[2].start.y);
 }
 
 //==========
@@ -133,10 +142,28 @@ void Renderer::drawLineSteep(Line l, Color c) {
 void Renderer::drawTriangleSolid(Triangle t, Color c) {
 	int max_y = t.findMaxY();
 	int min_y = t.findMinY();
-	
-	for (int y = min_y; y < max_y; y++) {
+	int rows = max_y - min_y;
+	auto draw_between = new int[rows][DRAW_BETWEEN_COLS]; // creating a [rows][2] array
 
+	for (Line l : t.lines) {
+		vector<Pixel> tmp_line; //= whatever comes back from drawLine (or getLine)
+		for (Pixel p : tmp_line) {
+			if (p.x < draw_between[p.y][LEFT_PIXEL]) {
+				draw_between[p.y][LEFT_PIXEL] = p.x;
+			}
+			if (p.x > draw_between[p.y][RIGHT_PIXEL]) {
+				draw_between[p.y][RIGHT_PIXEL] = p.x;
+			}
+		}
 	}
+
+	for (int i = 0; i < rows; i++) {
+		Pixel start = Pixel(draw_between[i][LEFT_PIXEL], i + min_y);
+		Pixel end = Pixel(draw_between[i][RIGHT_PIXEL], i + min_y);
+		drawLine(Line(start,end), c);
+	}
+
+	delete draw_between;
 
 }
 

@@ -41,12 +41,11 @@ struct Line {
 
 
 struct Triangle {
-	Line l0;
-	Line l1;
-	Line l2;
+	vector<Line> lines;
 
-	Triangle(Pixel p0, Pixel p1, Pixel p2) : l0(p0, p1), l1(p1, p2), l2(p2, p0) {}
-	Triangle(const Triangle& t) : l0(t.l0), l1(t.l1), l2(t.l2) {}
+	Triangle(vector<Line> lines) : lines(lines) {}
+	Triangle(Pixel p0, Pixel p1, Pixel p2);
+	Triangle(const Triangle& t) : lines(t.lines) {}
 
 	int findMaxY();
 	int findMinY();
