@@ -1,4 +1,4 @@
-	#pragma once
+#pragma once
 
 #include "gl/glew.h"
 #include <vector>
@@ -6,6 +6,7 @@
 #include "Renderer.h"
 #include "Color.h"
 #include "Camera.h"
+#include "Light.h"
 
 #define ALL_MODELS_ACTIVE -2
 
@@ -18,14 +19,12 @@ protected:
 };
 
 
-class Light {
-
-};
-
 class Scene {
 
 	vector<Model*> models;
-	vector<Light*> lights;
+	//vector<Light*> lights;
+	vector<ParallelSource*> parallel_sources;
+	vector<PointSource*> point_sources;
 	vector<Camera*> cameras;
 	Renderer *m_renderer;
 
@@ -38,9 +37,10 @@ class Scene {
 	mat4 tw;
 
 public:
-	//===C'tors===
+	//===C'tors / Destructors===
 	Scene() {}; //unimplemented
 	Scene(Renderer *renderer);
+	~Scene();
 	//==========
 
 	//===Getters/Setters===
@@ -113,8 +113,17 @@ public:
 	void rotateCameraYWorld(float theta);
 	void rotateCameraZWorld(float theta);
 
-
 	void zoom(float amount);
+	//==========
+
+	//===Lights Interface===
+	//ParallelSource Interface
+	void addParallelSource(ParallelSource* parallel_source);
+	//====
+	
+	//PointSource Interface
+	void addPointSource(PointSource* point_source);
+	//====
 	//==========
 
 	//===Other===

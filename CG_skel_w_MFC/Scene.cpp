@@ -18,15 +18,31 @@ Camera* Scene::getActiveCamera() {
 }
 //==========
 
-//===C'tors===
+//===C'tors / Destructors===
 
 Scene::Scene(Renderer *renderer) : m_renderer(renderer){
 	active_model = -1;
 	active_camera = -1;
 	Camera* def_cam = new Camera(vec4(0.0, 0.0, 10.0));
 	addCamera(def_cam);
+	ParallelSource* def_parallel_source = new ParallelSource(vec3(1.0, 1.0, 1.0));
+	addParallelSource(def_parallel_source);
 }
 
+Scene::~Scene() {
+	for (vector<ParallelSource*>::iterator i = parallel_sources.begin(); i != parallel_sources.end(); i++) {
+		ParallelSource* ps = dynamic_cast<ParallelSource*> ((*i));
+		delete ps;
+	}
+	for (vector<PointSource*>::iterator i = point_sources.begin(); i != point_sources.end(); i++) {
+		PointSource* ps = dynamic_cast<PointSource*> ((*i));
+		delete ps;
+	}
+	for (vector<Camera*>::iterator i = cameras.begin(); i != cameras.end(); i++) {
+		Camera* c = dynamic_cast<Camera*> ((*i));
+		delete c;
+	}
+}
 //==========
 
 //===Getters/Setters===
@@ -424,6 +440,20 @@ void Scene::zoom(float amount) {
 
 }
 
+//==========
+
+//===Lights Interface===
+//ParallelSource Interface
+void Scene::addParallelSource(ParallelSource* parallel_source) {
+	parallel_sources.push_back(parallel_source);
+}
+//====
+
+//PointSource Interface
+void Scene::addPointSource(PointSource* point_source) {
+	point_sources.push_back(point_source);
+}
+//====
 //==========
 
 //===Other===
