@@ -464,7 +464,8 @@ void Renderer::CreateOpenGLBuffer()
 
 
 //===C'tor\D'tor===
-Renderer::Renderer(int width, int height) :m_width(width), m_height(height)
+Renderer::Renderer(int width, int height) :m_width(width), m_height(height),
+	f_anti_aliasing(false)
 {
 	InitOpenGLRendering();
 	createBuffers();
@@ -487,7 +488,16 @@ void Renderer::swapBuffers()
 	a = glGetError();
 	glBindTexture(GL_TEXTURE_2D, gScreenTex);
 	a = glGetError();
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GL_RGB, GL_FLOAT, m_outBuffer);
+
+	float* anti_aliased_buffer;
+	if (f_anti_aliasing) {
+		anti_aliased_buffer = createAntiAliasedBuffer();
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width/2, m_height/2, GL_RGB, GL_FLOAT, anti_aliased_buffer);
+	}
+	else {
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GL_RGB, GL_FLOAT, m_outBuffer);
+	}
+
 	glGenerateMipmap(GL_TEXTURE_2D);
 	a = glGetError();
 
@@ -497,6 +507,10 @@ void Renderer::swapBuffers()
 	a = glGetError();
 	glutSwapBuffers();
 	a = glGetError();
+
+	if (f_anti_aliasing) {
+		delete[] anti_aliased_buffer;
+	}
 }
 
 void Renderer::clearBuffer() {
@@ -528,6 +542,10 @@ void Renderer::setSize(int width, int height) {
 	delete[] m_zbuffer;
 	m_width = width;
 	m_height = height;
+	if (f_anti_aliasing) {
+		m_height *= 2;
+		m_width *= 2;
+	}
 	createBuffers();
 }
 //==========
@@ -720,4 +738,42 @@ void Renderer::drawOrigin(Color c){
 	mat4 t_tot = tp * tc * tw;
 	drawPixel(viewPort(t_tot * v), c);
 
+}
+
+void Renderer::toggleAntiAliasing() {
+	
+	f_anti_aliasing = !f_anti_aliasing;
+	if (f_anti_aliasing) {
+		m_width *=2;
+		m_height *=2;
+	}
+	else {
+		m_width /= 2;
+		m_height /= 2;
+	}
+	createBuffers();
+}
+
+
+float* Renderer::createAntiAliasedBuffer() {
+	float* new_buff = new float[(m_height * m_width * 3) / 4];
+
+	for (int y = 0; y < m_height / 2; y++) {
+		for (int x = 0; x < m_width / 2; x++) {
+			for (int k = 0; k < 3; k++) {
+				new_buff[INDEX((m_width / 2), x, y, k)] =
+					(m_outBuffer[INDEX(m_width, (x * 2), (y * 2), k)] +
+						m_outBuffer[INDEX(m_width, ((x * 2) + 1), (y * 2), k)] +
+						m_outBuffer[INDEX(m_width, (x * 2), ((y * 2) + 1), k)] +
+						m_outBuffer[INDEX(m_width, ((x * 2) + 1), ((y * 2) + 1), k)]) / 4;
+			}
+			//std::cout << "new_buff: (" << x << ", " << y << ")" << std::endl;
+			//std::cout << "m_buff: (" << x*2 << ", " << y*2 << ") (" << x * 2 +1<< ", " << y * 2 << ") (" << x * 2 << ", " << y * 2+1 << ") (" << x * 2 +1<< ", " << y * 2 +1<< ")" << std::endl;
+
+		}
+	}
+
+	//new_buff[INDEX(m_width / 2, 1, 1, 0)] = new_buff[INDEX(m_width / 2, 1, 1, 1)] = new_buff[INDEX(m_width / 2, 1, 1, 2)] = 1.0;
+
+	return new_buff;
 }

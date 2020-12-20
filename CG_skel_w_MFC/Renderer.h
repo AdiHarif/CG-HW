@@ -72,7 +72,7 @@ class Renderer
 	mat4 tc;
 	mat4 tp;
 
-
+	bool f_anti_aliasing;
 
 	//===Buffer Functions===
 	void createBuffers();
@@ -156,5 +156,8 @@ public:
 
 	//void drawTriangle();
 
+	void toggleAntiAliasing();
+
+	float* createAntiAliasedBuffer();
 
 };

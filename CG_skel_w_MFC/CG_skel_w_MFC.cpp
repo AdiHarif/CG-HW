@@ -386,6 +386,9 @@ void special(int key, int x, int y) {
 	case GLUT_KEY_F6:
 		scene->toggleCameras();
 		break;
+	case GLUT_KEY_F7:
+		scene->toggleAntiAliasing();
+		break;
 	}
 	
 
