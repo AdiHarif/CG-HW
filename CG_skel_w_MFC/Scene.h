@@ -144,4 +144,7 @@ public:
 	//===Other===
 	void party();
 	//==========
+
+
+	void toggleAntiAliasing();
 };

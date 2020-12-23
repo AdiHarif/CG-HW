@@ -73,6 +73,7 @@ class Renderer
 	mat4 tc;
 	mat4 tp;
 
+	bool f_anti_aliasing;
 	vector<ParallelSource*>* parallel_sources = NULL;
 	vector<PointSource*>* point_sources = NULL;
 
@@ -169,6 +170,9 @@ public:
 
 	//void drawTriangle();
 
+	void toggleAntiAliasing();
+
+	float* createAntiAliasedBuffer();
 	////===Lighting Calculations===
 	Color calculateAmbientColor(MeshModel& m);
 	Color calculateDiffuse(Face f);
