@@ -755,7 +755,6 @@ Color Renderer::calculateAmbientColor(MeshModel& m) {
 	return *scene_ambient_light_color * m.ambient_color;
 }
 
-}
 
 void Renderer::toggleAntiAliasing() {
 	
