@@ -3,8 +3,12 @@
 //===ParallelSource===
 
 ParallelSource::ParallelSource(vec3 direction, Color color) {
-	direction = direction;
-	color = color;
+	this->direction = direction;
+	this->color = color;
+}
+
+vec3 ParallelSource::getDirection() {
+	return direction;
 }
 
 //==========

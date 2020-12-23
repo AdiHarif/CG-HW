@@ -171,12 +171,11 @@ public:
 	//void drawTriangle();
 
 	void toggleAntiAliasing();
-
 	float* createAntiAliasedBuffer();
+
 	////===Lighting Calculations===
 	Color calculateAmbientColor(MeshModel& m);
-	Color calculateDiffuse(Face f);
-
+	Color calculateDiffuseColor(MeshModel& m, Face f);
 	////==========
 
 };

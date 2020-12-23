@@ -14,13 +14,13 @@ using namespace std;
 
 class Model {
 protected:
+	Color ambient_color = WHITE;
 	Color diffuse_color;
 	Color specular_color;
-	Color ambient_color = WHITE;
 	Color emit_color;
 
-	GLfloat specular_reflection;
-	GLfloat	diffuse_reflection;
+	//GLfloat specular_reflection;
+	//GLfloat diffuse_reflection;
 	//GLfloat ambient_reflection = 1;
 	GLfloat shininess;
 

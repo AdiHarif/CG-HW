@@ -36,10 +36,10 @@ MeshModel::MeshModel(string fileName)
 	loadFile(fileName);
 	//computeFacesNormals();
 	position = vec4(0.0, 0.0, 0.0, 1.0);
-	diffuse_color = PURPLE;
-	specular_color = WHITE;
-	ambient_color = BLUE;
-	emit_color = YELLOW;
+	//diffuse_color = PURPLE;
+	//specular_color = WHITE;
+	//ambient_color = BLUE;
+	//emit_color = YELLOW;
 }
 
 MeshModel::~MeshModel(void)

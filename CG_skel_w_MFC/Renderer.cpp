@@ -713,9 +713,9 @@ void Renderer::drawModel(MeshModel& model) {
 
 		if (model.draw_pref.poly_mode == DrawPref::FILLED) {
 			Triangle t = Triangle(px_vertices[i->vertices[0] - 1], px_vertices[i->vertices[1] - 1], px_vertices[i->vertices[2] - 1]);
-			//vec3 color_vec = vec3(model.mesh_color.r, model.mesh_color.g, model.mesh_color.b);
-			//color_vec = color_vec * model_ambient_factor;
-			drawTriangleSolid(t, model_ambient_color);
+			Color face_diffuse_color = calculateDiffuseColor(model, *i);
+			Color face_final_color = model_ambient_color + face_diffuse_color;
+			drawTriangleSolid(t, face_final_color);
 		}
 
 		if (model.draw_pref.f_draw_vertex_normals) {
@@ -750,11 +750,6 @@ void Renderer::drawOrigin(Color c){
 	mat4 t_tot = tp * tc * tw;
 	drawPixel(viewPort(t_tot * v), c);
 }
-
-Color Renderer::calculateAmbientColor(MeshModel& m) {
-	return *scene_ambient_light_color * m.ambient_color;
-}
-
 
 void Renderer::toggleAntiAliasing() {
 	
@@ -793,8 +788,23 @@ float* Renderer::createAntiAliasedBuffer() {
 
 	return new_buff;
 }
-Color Renderer::calculateDiffuse(Face f) {
-	Color c = { 0,0,0 };
-	return c;
+
+
+////===Lighting Calculations===
+Color Renderer::calculateAmbientColor(MeshModel& m) {
+	return *scene_ambient_light_color * m.ambient_color;
 }
 
+Color Renderer::calculateDiffuseColor(MeshModel& m, Face f) {
+	Color diffuse_color = { 0,0,0 };
+	float theta;
+
+	for (vector<ParallelSource*>::iterator i = parallel_sources->begin(); i != parallel_sources->end(); i++) {
+		ParallelSource* parallel_s = dynamic_cast<ParallelSource*> ((*i));
+		theta = (m.face_normals.at(f.normal) * parallel_s->getDirection());
+		diffuse_color += (m.diffuse_color * parallel_s->getColor()) * theta;
+	}
+
+	return diffuse_color;
+}
+////==========

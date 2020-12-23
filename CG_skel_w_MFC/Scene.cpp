@@ -23,11 +23,11 @@ Camera* Scene::getActiveCamera() {
 Scene::Scene(Renderer* renderer) : m_renderer(renderer) {
 	active_model = -1;
 	active_camera = -1;
-	ambient_light_color = { 0.3, 0.3, 1 };
+	ambient_light_color = { 0.1, 0.1, 0.1 };
 	//ambient_light_intensity = 0.5;
 	Camera* def_cam = new Camera(vec4(0.0, 0.0, 10.0));
 	addCamera(def_cam);
-	ParallelSource* def_parallel_source = new ParallelSource(vec3(1.0, 1.0, 1.0));
+	ParallelSource* def_parallel_source = new ParallelSource(vec3(1.0, 1.0, 1.0), { 0.3, 0.1, 0.1 });
 	addParallelSource(def_parallel_source);
 	m_renderer->setParallelSources(&parallel_sources);
 	m_renderer->setPointSources(&point_sources);

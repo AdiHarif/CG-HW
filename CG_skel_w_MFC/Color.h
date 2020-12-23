@@ -1,6 +1,6 @@
 #pragma once
 #include "vec.h"
-
+#include "StdAfx.h"
 
 #define RED { 1.0, 0.0, 0.0 }
 #define GREEN { 0.0, 1.0, 0.0 }
@@ -44,6 +44,11 @@ struct Color{
 
 	bool operator ==(Color c) {
 		return (r == c.r) && (g == c.g) && (b == c.b);
+	}
+
+	Color operator * (const GLfloat s) const
+	{
+		return { s * r, s * g, s * b };
 	}
 	//==========
 
