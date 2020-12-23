@@ -11,6 +11,7 @@ protected:
 
 public:
 	Color getColor() { return color; }
+	
 };
 
 class ParallelSource : public Light {

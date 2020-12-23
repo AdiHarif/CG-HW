@@ -36,12 +36,10 @@ MeshModel::MeshModel(string fileName)
 	loadFile(fileName);
 	//computeFacesNormals();
 	position = vec4(0.0, 0.0, 0.0, 1.0);
-	/*active_mesh_color = { 0.0, 1.0, 0.0 };
-	inactive_mesh_color = { 0.4, 0.4, 0.4 };*/
-	/*mesh_color = { 0.0, 1.0, 0.0 };
-	vertex_normals_color = { 1.0, 0.0, 1.0 };
-	face_normals_color = { 1.0, 0.0, 0.0 };
-	bb_color = { 1.0, 1.0, 1.0 };*/
+	diffuse_color = PURPLE;
+	specular_color = WHITE;
+	ambient_color = BLUE;
+	emit_color = YELLOW;
 }
 
 MeshModel::~MeshModel(void)

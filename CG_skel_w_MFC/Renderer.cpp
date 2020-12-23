@@ -634,6 +634,16 @@ void Renderer::setProjection(const mat4& tp) { this->tp = tp; }
 void Renderer::setWorldTransform(const mat4& tw) { this->tw = tw; }
 ////==========
 
+////===Light Setters===
+void Renderer::setParallelSources(vector<ParallelSource*>* parallel_sources) { this->parallel_sources = parallel_sources; }
+void Renderer::setPointSources(vector<PointSource*>* point_sources) { this->point_sources = point_sources; }
+//void Renderer::setAmbientConstants(Color* color, GLfloat* intensity) {
+//	scene_ambient_light_color = color;
+//	//scene_ambient_light_intensity = intensity;
+//}
+void Renderer::setAmbientColor(Color* color) { scene_ambient_light_color = color; }
+////==========
+
 
 void Renderer::drawModel(MeshModel& model) {
 	mat4 tm_tot = tp * tc * tw * model.tm;
@@ -657,6 +667,7 @@ void Renderer::drawModel(MeshModel& model) {
 		tr_vertex_normals.push_back(n);
 	}
 
+	vec3 model_ambient_factor = calculateAmbientFactor(model);
 	vector<Normal> tr_face_normals;
 	for (vector<Normal>::iterator i = model.face_normals.begin(); i != model.face_normals.end(); i++) {
 		vec4 n = ntm_t1 * (*i);
@@ -684,7 +695,10 @@ void Renderer::drawModel(MeshModel& model) {
 
 		if (model.draw_pref.poly_mode == DrawPref::FILLED) {
 			Triangle t = Triangle(px_vertices[i->vertices[0] - 1], px_vertices[i->vertices[1] - 1], px_vertices[i->vertices[2] - 1]);
-			drawTriangleSolid(t, model.mesh_color);
+			//vec3 color_vec = vec3(model.mesh_color.r, model.mesh_color.g, model.mesh_color.b);
+			//color_vec = color_vec * model_ambient_factor;
+			Color solid_color = { model_ambient_factor.x, model_ambient_factor.y, model_ambient_factor.z };
+			drawTriangleSolid(t, solid_color);
 		}
 
 		if (model.draw_pref.f_draw_vertex_normals) {
@@ -715,9 +729,27 @@ void Renderer::drawModel(MeshModel& model) {
 }
 
 void Renderer::drawOrigin(Color c){
-
 	vec4 v = vec4(0,0,0,1);
 	mat4 t_tot = tp * tc * tw;
 	drawPixel(viewPort(t_tot * v), c);
-
 }
+
+vec3 Renderer::calculateAmbientFactor(MeshModel& m) {//TODO: add constructors, this is HIDEOUS
+	vec3 ambient_light_vec = vec3(scene_ambient_light_color->r, scene_ambient_light_color->g, scene_ambient_light_color->b);
+	vec3 m_ambient_color_vec = vec3(m.ambient_color.r, m.ambient_color.g, m.ambient_color.b);
+	//vec3 result =  ambient_light_vec * m_ambient_color_vec;
+	vec3 result;
+	result.x = ambient_light_vec.x * m_ambient_color_vec.x;
+	result.y = ambient_light_vec.y * m_ambient_color_vec.y;
+	result.z = ambient_light_vec.z * m_ambient_color_vec.z;
+	if (result.x > 1)	result.x = 1;
+	if (result.y > 1)	result.y = 1;
+	if (result.z > 1)	result.z = 1;
+	return result;
+}
+
+Color Renderer::calculateDiffuse(Face f) {
+	Color c = { 0,0,0 };
+	return c;
+}
+

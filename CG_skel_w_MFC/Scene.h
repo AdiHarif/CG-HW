@@ -14,6 +14,16 @@ using namespace std;
 
 class Model {
 protected:
+	Color diffuse_color;
+	Color specular_color;
+	Color ambient_color = WHITE;
+	Color emit_color;
+
+	GLfloat specular_reflection;
+	GLfloat	diffuse_reflection;
+	//GLfloat ambient_reflection = 1;
+	GLfloat shininess;
+
 	virtual ~Model() {}
 	//void virtual draw()=0;
 };
@@ -31,6 +41,8 @@ class Scene {
 	int active_model;
 	int active_light;
 	int active_camera;
+	Color ambient_light_color;
+	//GLfloat ambient_light_intensity;
 
 	bool f_draw_cameras = false;
 
@@ -117,6 +129,9 @@ public:
 	//==========
 
 	//===Lights Interface===
+	//General
+
+	//====
 	//ParallelSource Interface
 	void addParallelSource(ParallelSource* parallel_source);
 	//====

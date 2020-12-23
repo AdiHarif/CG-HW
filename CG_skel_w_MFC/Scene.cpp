@@ -20,13 +20,19 @@ Camera* Scene::getActiveCamera() {
 
 //===C'tors / Destructors===
 
-Scene::Scene(Renderer *renderer) : m_renderer(renderer){
+Scene::Scene(Renderer* renderer) : m_renderer(renderer) {
 	active_model = -1;
 	active_camera = -1;
+	ambient_light_color = { 0.3, 0.3, 1 };
+	//ambient_light_intensity = 0.5;
 	Camera* def_cam = new Camera(vec4(0.0, 0.0, 10.0));
 	addCamera(def_cam);
 	ParallelSource* def_parallel_source = new ParallelSource(vec3(1.0, 1.0, 1.0));
 	addParallelSource(def_parallel_source);
+	m_renderer->setParallelSources(&parallel_sources);
+	m_renderer->setPointSources(&point_sources);
+	//m_renderer->setAmbientConstants(&ambient_light_color, &ambient_light_intensity);
+	m_renderer->setAmbientColor(&ambient_light_color);
 }
 
 Scene::~Scene() {
@@ -443,6 +449,9 @@ void Scene::zoom(float amount) {
 //==========
 
 //===Lights Interface===
+//General
+
+//====
 //ParallelSource Interface
 void Scene::addParallelSource(ParallelSource* parallel_source) {
 	parallel_sources.push_back(parallel_source);

@@ -6,6 +6,7 @@
 #include "GL/glew.h"
 #include "Color.h"
 #include "Face.h"
+#include "Light.h"
 
 #define M_OUT_BUFFER_SIZE 3*m_width*m_height
 #define M_ZBUFFER_SIZE m_width*m_height
@@ -72,6 +73,11 @@ class Renderer
 	mat4 tc;
 	mat4 tp;
 
+	vector<ParallelSource*>* parallel_sources = NULL;
+	vector<PointSource*>* point_sources = NULL;
+
+	Color* scene_ambient_light_color;
+	//GLfloat* scene_ambient_light_intensity;
 
 
 	//===Buffer Functions===
@@ -149,6 +155,13 @@ public:
 	void setWorldTransform(const mat4& tw);
 	////==========
 
+	////===Lights Setters===
+	void setParallelSources(vector<ParallelSource*>* parallel_sources);
+	void setPointSources(vector<PointSource*>* point_sources);
+	//void setAmbientConstants(Color* color, GLfloat* intensity);
+	void setAmbientColor(Color* color);
+	////==========
+
 
 	void drawModel(MeshModel& model);
 
@@ -156,5 +169,10 @@ public:
 
 	//void drawTriangle();
 
+	////===Lighting Calculations===
+	vec3 calculateAmbientFactor(MeshModel& m);
+	Color calculateDiffuse(Face f);
+
+	////==========
 
 };
