@@ -170,7 +170,7 @@ public:
 	//void drawTriangle();
 
 	////===Lighting Calculations===
-	vec3 calculateAmbientFactor(MeshModel& m);
+	Color calculateAmbientColor(MeshModel& m);
 	Color calculateDiffuse(Face f);
 
 	////==========

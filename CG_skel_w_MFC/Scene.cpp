@@ -90,7 +90,7 @@ void Scene::draw()
 		}
 	}
 
-	m_renderer->drawOrigin(RED);
+	m_renderer->drawOrigin(Color(RED));
 
 	m_renderer->swapBuffers();
 }
@@ -468,10 +468,10 @@ void Scene::addPointSource(PointSource* point_source) {
 //===Other===
 void Scene::party() {
 	for (int i = 0; i < 10; i++) {
-		double r = ((double)rand() / (RAND_MAX));
-		double g = ((double)rand() / (RAND_MAX));
-		double b = ((double)rand() / (RAND_MAX));
-		Color color = { r,g,b };
+		float r = ((double)rand() / (RAND_MAX));
+		float g = ((double)rand() / (RAND_MAX));
+		float b = ((double)rand() / (RAND_MAX));
+		Color color = { r, g, b };
 		m_renderer->colorBackground(color);
 		m_renderer->swapBuffers();
 		Sleep(500);

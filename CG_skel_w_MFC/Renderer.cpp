@@ -667,7 +667,7 @@ void Renderer::drawModel(MeshModel& model) {
 		tr_vertex_normals.push_back(n);
 	}
 
-	vec3 model_ambient_factor = calculateAmbientFactor(model);
+	Color model_ambient_color = calculateAmbientColor(model);
 	vector<Normal> tr_face_normals;
 	for (vector<Normal>::iterator i = model.face_normals.begin(); i != model.face_normals.end(); i++) {
 		vec4 n = ntm_t1 * (*i);
@@ -697,8 +697,7 @@ void Renderer::drawModel(MeshModel& model) {
 			Triangle t = Triangle(px_vertices[i->vertices[0] - 1], px_vertices[i->vertices[1] - 1], px_vertices[i->vertices[2] - 1]);
 			//vec3 color_vec = vec3(model.mesh_color.r, model.mesh_color.g, model.mesh_color.b);
 			//color_vec = color_vec * model_ambient_factor;
-			Color solid_color = { model_ambient_factor.x, model_ambient_factor.y, model_ambient_factor.z };
-			drawTriangleSolid(t, solid_color);
+			drawTriangleSolid(t, model_ambient_color);
 		}
 
 		if (model.draw_pref.f_draw_vertex_normals) {
@@ -734,18 +733,8 @@ void Renderer::drawOrigin(Color c){
 	drawPixel(viewPort(t_tot * v), c);
 }
 
-vec3 Renderer::calculateAmbientFactor(MeshModel& m) {//TODO: add constructors, this is HIDEOUS
-	vec3 ambient_light_vec = vec3(scene_ambient_light_color->r, scene_ambient_light_color->g, scene_ambient_light_color->b);
-	vec3 m_ambient_color_vec = vec3(m.ambient_color.r, m.ambient_color.g, m.ambient_color.b);
-	//vec3 result =  ambient_light_vec * m_ambient_color_vec;
-	vec3 result;
-	result.x = ambient_light_vec.x * m_ambient_color_vec.x;
-	result.y = ambient_light_vec.y * m_ambient_color_vec.y;
-	result.z = ambient_light_vec.z * m_ambient_color_vec.z;
-	if (result.x > 1)	result.x = 1;
-	if (result.y > 1)	result.y = 1;
-	if (result.z > 1)	result.z = 1;
-	return result;
+Color Renderer::calculateAmbientColor(MeshModel& m) {
+	return *scene_ambient_light_color * m.ambient_color;
 }
 
 Color Renderer::calculateDiffuse(Face f) {
