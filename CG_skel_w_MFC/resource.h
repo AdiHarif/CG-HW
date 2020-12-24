@@ -6,17 +6,22 @@
 #define IDD_DIALOG_NEW_CAMERA           112
 #define IDD_DIALOG_EDIT_ACTIVE_CAMERA   116
 #define IDD_DIALOG_TRANSFORM_ACTIVE_MODEL 118
+#define IDD_DIALOG_NEW_LIGHT            120
 #define IDC_EDIT_POS_X                  1015
 #define IDC_STATIC_X                    1016
 #define IDC_STATIC_POS                  1017
 #define IDC_EDIT_LOOKAT_X               1018
+#define IDC_EDIT_DIR_X                  1018
 #define IDC_STATIC_Y                    1019
 #define IDC_EDIT_POS_Y                  1020
 #define IDC_STATIC_Z                    1021
 #define IDC_EDIT_POS_Z                  1022
 #define IDC_STATIC_LOOKAT               1023
+#define IDC_EDIT_DIR_Y                  1023
 #define IDC_EDIT_LOOKAT_Y               1024
+#define IDC_EDIT_DIR_Z                  1024
 #define IDC_EDIT_LOOKAT_Z               1025
+#define IDC_STATIC_DIRECTION            1025
 #define IDC_STATIC_X2                   1026
 #define IDC_STATIC_Y2                   1027
 #define IDC_STATIC_Z2                   1028
@@ -51,12 +56,37 @@
 #define IDC_EDIT_SCALE_Z                1064
 #define IDC_STATIC_SCALE_X              1065
 #define IDC_STATIC_SCALE_Y              1066
+#define IDC_STATIC_COLOR                1066
 #define IDC_STATIC_SCALE_Z              1067
+#define IDC_STATIC_AMBIENT              1067
+#define IDC_STATIC_AMBIENT_R            1068
+#define IDC_STATIC_AMBIENT_G            1069
+#define IDC_STATIC_AMBIENT_B            1070
+#define IDC_EDIT_AMBIENT_R              1071
+#define IDC_EDIT_AMBIENT_B              1073
+#define IDC_EDIT_DIFFUSE_R              1074
+#define IDC_EDIT_DIFFUSE_G              1075
+#define IDC_EDIT_DIFFUSE_B              1076
+#define IDC_STATIC_DIFFUSE_R            1077
+#define IDC_STATIC_DIFFUSE_B            1078
+#define IDC_STATIC_DIFFUSE_G            1079
+#define IDC_STATIC_DIFFUSE              1080
+#define IDC_EDIT_AMBIENT_G              1081
+#define IDC_RADIO_PARALLEL              1082
+#define IDC_RADIO_POINT                 1083
 #define IDC_RADIO_FRUSTUM               1084
+#define IDC_RADIO_AMBIENT               1084
 #define IDC_RADIO_PERSPECTIVE           1085
+#define IDC_EDIT_SPECULAR_R             1088
+#define IDC_EDIT_SPECULAR_G             1089
+#define IDC_EDIT_SPECULAR_B             1090
+#define IDC_STATIC_SPECULAR_R           1091
 #define IDC_STATIC_FOVY                 1092
+#define IDC_STATIC_SPECULAR_B           1092
 #define IDC_EDIT_FOVY                   1093
+#define IDC_STATIC_SPECULAR_G           1093
 #define IDC_STATIC_ASPECT               1094
+#define IDC_STATIC_SPECULAR             1094
 #define IDC_EDIT_ASPECT                 1095
 #define IDC_STATIC_LEFT                 1096
 #define IDC_EDIT_LEFT                   1097
@@ -73,9 +103,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        120
+#define _APS_NEXT_RESOURCE_VALUE        122
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1065
+#define _APS_NEXT_CONTROL_VALUE         1084
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

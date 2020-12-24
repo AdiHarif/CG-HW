@@ -22,6 +22,7 @@
 #include "CDlgNewCam.h"
 #include "CDlgEditCam.h"
 #include "CDlgTransformModel.h"
+#include "CDlgNewLight.h"
 #include <string>
 
 #define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
@@ -31,6 +32,7 @@
 #define MODEL_MENU_TRANSFORM_ACTIVE_MODEL 3
 #define CAMERA_MENU_ADD_CAMERA 1
 #define CAMERA_MENU_EDIT_ACTIVE_CAMERA 2
+#define LIGHT_MENU_ADD_LIGHT 1
 #define MAIN_MENU_TRANSFORM_WORLD 1
 #define MAIN_MENU_PARTY 2
 #define MAIN_MENU_ABOUT 3
@@ -50,6 +52,9 @@
 #define ORTHO 0
 #define FRUSTUM 1
 #define PERSPECTIVE 2
+#define AMBIENT 0
+#define PARALLEL 1
+#define POINT 2
 
 #define SCALE_UP_DEF 1.1
 //#define SCALE_DOWN_DEF (1/1.1)
@@ -196,19 +201,49 @@ void editActiveCamera() {
 		//projection:
 		if (dlg.left != 0 || dlg.right != 0 || dlg.bottom != 0 || dlg.top != 0 || dlg.z_near != 0 || dlg.z_far != 0) {
 			switch (dlg.proj_radio_index) {
-			case 0: // ortho
+			case ORTHO:
 				scene->getActiveCamera()->ortho(dlg.left, dlg.right, dlg.bottom, dlg.top, dlg.z_near, dlg.z_far);
 				break;
-			case 1: // frustum
+			case FRUSTUM:
 				scene->getActiveCamera()->frustum(dlg.left, dlg.right, dlg.bottom, dlg.top, dlg.z_near, dlg.z_far);
 				break;
-			case 2: // perspective
+			case PERSPECTIVE:
 				if (dlg.z_near != 0 || dlg.z_far != 0 || dlg.fovy != 0 || dlg.aspect != 0) {
 					scene->getActiveCamera()->perspective(dlg.fovy, dlg.aspect, dlg.z_near, dlg.z_far);
 				}
 				break;
 			}
 		}
+	}
+}
+
+void addNewLight() {
+	CDlgNewLight dlg;
+	if (dlg.DoModal() == IDOK) {
+		switch (dlg.type_radio_index) {
+		case AMBIENT:
+
+			break;
+		case PARALLEL:
+
+			break;
+		case POINT:
+
+			break;
+		}
+		/*vec4 pos = vec4(dlg.pos_x, dlg.pos_y, dlg.pos_z);
+		vec4 lookat = vec4(dlg.lookat_x, dlg.lookat_y, dlg.lookat_z);
+		vec4 up = vec4(dlg.up_x, dlg.up_y, dlg.up_z);
+		if (!(pos == lookat)) {
+			Camera* new_cam = NULL;
+			if (up != vec4(0, 0, 0)) {
+				new_cam = new Camera(pos, lookat);
+			}
+			else {
+				new_cam = new Camera(pos, lookat, up);
+			}
+			scene->addCamera(new_cam);
+		}*/
 	}
 }
 
@@ -453,6 +488,17 @@ void camerasMenuCB(int id){
 	scene->draw();
 }
 
+void lightsMenuCB(int id) {
+	switch (id) {
+	case LIGHT_MENU_ADD_LIGHT:
+		addNewLight();
+		break;
+	}
+
+	scene->draw();
+}
+
+
 
 //void cameraMenu(int id) {
 //	CFileDialog dlg(TRUE, _T(".obj"), NULL, NULL, _T("*.obj|*.*"));
@@ -568,6 +614,9 @@ void initMenu()
 	int camerasMenu = glutCreateMenu(camerasMenuCB);
 	glutAddMenuEntry("Add New Camera",CAMERA_MENU_ADD_CAMERA);
 	glutAddMenuEntry("Edit Active Camera ", CAMERA_MENU_EDIT_ACTIVE_CAMERA);
+	int lightsMenu = glutCreateMenu(lightsMenuCB);
+	glutAddMenuEntry("Add New Light", LIGHT_MENU_ADD_LIGHT);
+
 	glutCreateMenu(mainMenuCB);
 
 	/*int menuCamera = glutCreateMenu(cameraMenu);
@@ -577,6 +626,7 @@ void initMenu()
 
 	glutAddSubMenu("Models",modelsMenu);
 	glutAddSubMenu("Cameras",camerasMenu);
+	glutAddSubMenu("Lights",lightsMenu);
 	//glutAddMenuEntry("Transform World", MAIN_MENU_TRANSFORM_WORLD);
 	glutAddMenuEntry("Party For 5 Seconds",MAIN_MENU_PARTY);
 	glutAddMenuEntry("About",MAIN_MENU_ABOUT);

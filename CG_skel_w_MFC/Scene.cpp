@@ -27,7 +27,7 @@ Scene::Scene(Renderer* renderer) : m_renderer(renderer) {
 	//ambient_light_intensity = 0.5;
 	Camera* def_cam = new Camera(vec4(0.0, 0.0, 10.0));
 	addCamera(def_cam);
-	ParallelSource* def_parallel_source = new ParallelSource(vec3(1.0, 1.0, 1.0), { 0.3, 0.1, 0.1 });
+	ParallelSource* def_parallel_source = new ParallelSource(vec3(0.0, 0.0, -1.0), { 0.3, 0.1, 0.1 });
 	addParallelSource(def_parallel_source);
 	m_renderer->setParallelSources(&parallel_sources);
 	m_renderer->setPointSources(&point_sources);

@@ -25,6 +25,7 @@ private:
 	int textures[3];
 
 	int normal;
+	Vertex center;
 
 public:
 
