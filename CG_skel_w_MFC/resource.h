@@ -68,6 +68,7 @@
 #define IDC_EDIT_AMBIENT_B              1073
 #define IDC_EDIT_DIFFUSE_R              1074
 #define IDC_EDIT_DIFFUSE_G              1075
+#define IDC_EDIT_COLOR_G                1075
 #define IDC_EDIT_DIFFUSE_B              1076
 #define IDC_STATIC_DIFFUSE_R            1077
 #define IDC_STATIC_DIFFUSE_B            1078
@@ -80,11 +81,15 @@
 #define IDC_RADIO_AMBIENT               1084
 #define IDC_RADIO_PERSPECTIVE           1085
 #define IDC_EDIT_NAME                   1085
-#define IDC_COMBO_NAME                  1085
 #define IDC_COMBO_NAMES                 1085
+#define IDC_EDIT_COLOR_R                1086
+#define IDC_STATIC_COLOR_R              1087
 #define IDC_EDIT_SPECULAR_R             1088
+#define IDC_STATIC_COLOR_G              1088
 #define IDC_EDIT_SPECULAR_G             1089
+#define IDC_STATIC_COLOR_B              1089
 #define IDC_EDIT_SPECULAR_B             1090
+#define IDC_EDIT_COLOR_B                1090
 #define IDC_STATIC_SPECULAR_R           1091
 #define IDC_STATIC_FOVY                 1092
 #define IDC_STATIC_SPECULAR_B           1092
@@ -110,7 +115,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        126
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1086
+#define _APS_NEXT_CONTROL_VALUE         1091
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

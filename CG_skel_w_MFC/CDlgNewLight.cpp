@@ -14,12 +14,9 @@ IMPLEMENT_DYNAMIC(CDlgNewLight, CDialog)
 
 CDlgNewLight::CDlgNewLight(CWnd* pParent /*=nullptr*/)
 	: CDialog(IDD_DIALOG_NEW_LIGHT, pParent)
-	, diffuse_r(0)
-	, diffuse_g(0)
-	, diffuse_b(0)
-	, specular_r(0)
-	, specular_g(0)
-	, specular_b(0)
+	, color_r(0)
+	, color_g(0)
+	, color_b(0)
 	, dir_x(0)
 	, dir_y(0)
 	, dir_z(0)
@@ -38,12 +35,9 @@ void CDlgNewLight::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	DDX_Text(pDX, IDC_EDIT_NAME, name);
-	DDX_Text(pDX, IDC_EDIT_DIFFUSE_R, diffuse_r);
-	DDX_Text(pDX, IDC_EDIT_DIFFUSE_G, diffuse_g);
-	DDX_Text(pDX, IDC_EDIT_DIFFUSE_B, diffuse_b);
-	DDX_Text(pDX, IDC_EDIT_SPECULAR_R, specular_r);
-	DDX_Text(pDX, IDC_EDIT_SPECULAR_G, specular_g);
-	DDX_Text(pDX, IDC_EDIT_SPECULAR_B, specular_b);
+	DDX_Text(pDX, IDC_EDIT_COLOR_R, color_r);
+	DDX_Text(pDX, IDC_EDIT_COLOR_G, color_g);
+	DDX_Text(pDX, IDC_EDIT_COLOR_B, color_b);
 	DDX_Text(pDX, IDC_EDIT_DIR_X, dir_x);
 	DDX_Text(pDX, IDC_EDIT_DIR_Y, dir_y);
 	DDX_Text(pDX, IDC_EDIT_DIR_Z, dir_z);

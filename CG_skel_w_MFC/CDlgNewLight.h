@@ -23,12 +23,9 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	CString name;
-	float diffuse_r;
-	float diffuse_g;
-	float diffuse_b;
-	float specular_r;
-	float specular_g;
-	float specular_b;
+	float color_r;
+	float color_g;
+	float color_b;
 	float dir_x;
 	float dir_y;
 	float dir_z;

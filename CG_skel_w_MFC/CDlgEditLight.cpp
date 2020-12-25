@@ -14,12 +14,9 @@ IMPLEMENT_DYNAMIC(CDlgEditLight, CDialog)
 
 CDlgEditLight::CDlgEditLight(CWnd* pParent /*=nullptr*/)
 	: CDialog(IDD_DIALOG_EDIT_LIGHT, pParent)
-	, diffuse_r(0)
-	, diffuse_g(0)
-	, diffuse_b(0)
-	, specular_r(0)
-	, specular_g(0)
-	, specular_b(0)
+	, color_r(0)
+	, color_g(0)
+	, color_b(0)
 	, dir_x(0)
 	, dir_y(0)
 	, dir_z(0)
@@ -40,12 +37,9 @@ void CDlgEditLight::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_COMBO_NAMES, names);
-	DDX_Text(pDX, IDC_EDIT_DIFFUSE_R, diffuse_r);
-	DDX_Text(pDX, IDC_EDIT_DIFFUSE_G, diffuse_g);
-	DDX_Text(pDX, IDC_EDIT_DIFFUSE_B, diffuse_b);
-	DDX_Text(pDX, IDC_EDIT_SPECULAR_R, specular_r);
-	DDX_Text(pDX, IDC_EDIT_SPECULAR_G, specular_g);
-	DDX_Text(pDX, IDC_EDIT_SPECULAR_B, specular_b);
+	DDX_Text(pDX, IDC_EDIT_COLOR_R, color_r);
+	DDX_Text(pDX, IDC_EDIT_COLOR_G, color_g);
+	DDX_Text(pDX, IDC_EDIT_COLOR_B, color_b);
 	DDX_Text(pDX, IDC_EDIT_DIR_X, dir_x);
 	DDX_Text(pDX, IDC_EDIT_DIR_Y, dir_y);
 	DDX_Text(pDX, IDC_EDIT_DIR_Z, dir_z);
@@ -62,9 +56,9 @@ void CDlgEditLight::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_POS_Y, pos_y_editbox);
 	DDX_Control(pDX, IDC_EDIT_POS_Z, pos_z_editbox);
 	parallel_radio.SetCheck(TRUE);
-	dir_x_editbox.EnableWindow(FALSE);
-	dir_y_editbox.EnableWindow(FALSE);
-	dir_z_editbox.EnableWindow(FALSE);
+	pos_x_editbox.EnableWindow(FALSE);
+	pos_y_editbox.EnableWindow(FALSE);
+	pos_z_editbox.EnableWindow(FALSE);
 	updateComboParallel();
 }
 
@@ -73,7 +67,7 @@ BEGIN_MESSAGE_MAP(CDlgEditLight, CDialog)
 	ON_BN_CLICKED(IDC_RADIO_AMBIENT, &CDlgEditLight::OnBnClickedRadioAmbient)
 	ON_BN_CLICKED(IDC_RADIO_PARALLEL, &CDlgEditLight::OnBnClickedRadioParallel)
 	ON_BN_CLICKED(IDC_RADIO_POINT, &CDlgEditLight::OnBnClickedRadioPoint)
-	ON_CBN_SELCHANGE(IDC_COMBO_NAME, &CDlgEditLight::OnCbnSelchangeComboName)
+	ON_CBN_SELCHANGE(IDC_COMBO_NAMES, &CDlgEditLight::OnCbnSelchangeComboName)
 	ON_BN_CLICKED(IDOK, &CDlgEditLight::OnBnClickedOk)
 END_MESSAGE_MAP()
 
