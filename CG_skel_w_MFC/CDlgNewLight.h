@@ -22,9 +22,7 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
-	float ambient_r;
-	float ambient_g;
-	float ambient_b;
+	CString name;
 	float diffuse_r;
 	float diffuse_g;
 	float diffuse_b;
@@ -40,7 +38,6 @@ public:
 	int type_radio_index;
 	CButton parallel_radio;
 	CButton point_radio;
-	CButton ambient_radio;
 	CEdit pos_x_editbox;
 	CEdit pos_y_editbox;
 	CEdit pos_z_editbox;
@@ -51,5 +48,4 @@ public:
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnBnClickedRadioParallel();
 	afx_msg void OnBnClickedRadioPoint();
-	afx_msg void OnBnClickedRadioAmbient();
 };

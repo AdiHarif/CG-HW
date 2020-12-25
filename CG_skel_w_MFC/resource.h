@@ -7,6 +7,7 @@
 #define IDD_DIALOG_EDIT_ACTIVE_CAMERA   116
 #define IDD_DIALOG_TRANSFORM_ACTIVE_MODEL 118
 #define IDD_DIALOG_NEW_LIGHT            120
+#define IDD_DIALOG_EDIT_LIGHT           124
 #define IDC_EDIT_POS_X                  1015
 #define IDC_STATIC_X                    1016
 #define IDC_STATIC_POS                  1017
@@ -63,6 +64,7 @@
 #define IDC_STATIC_AMBIENT_G            1069
 #define IDC_STATIC_AMBIENT_B            1070
 #define IDC_EDIT_AMBIENT_R              1071
+#define IDC_STATIC_NAME                 1072
 #define IDC_EDIT_AMBIENT_B              1073
 #define IDC_EDIT_DIFFUSE_R              1074
 #define IDC_EDIT_DIFFUSE_G              1075
@@ -77,6 +79,9 @@
 #define IDC_RADIO_FRUSTUM               1084
 #define IDC_RADIO_AMBIENT               1084
 #define IDC_RADIO_PERSPECTIVE           1085
+#define IDC_EDIT_NAME                   1085
+#define IDC_COMBO_NAME                  1085
+#define IDC_COMBO_NAMES                 1085
 #define IDC_EDIT_SPECULAR_R             1088
 #define IDC_EDIT_SPECULAR_G             1089
 #define IDC_EDIT_SPECULAR_B             1090
@@ -103,9 +108,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        122
+#define _APS_NEXT_RESOURCE_VALUE        126
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1084
+#define _APS_NEXT_CONTROL_VALUE         1086
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -130,7 +130,8 @@ public:
 
 	//===Lights Interface===
 	//General
-
+	vector<ParallelSource*>* getParallelSources() { return &parallel_sources; }
+	vector<PointSource*>* getPointSources() { return &point_sources; }
 	//====
 	//ParallelSource Interface
 	void addParallelSource(ParallelSource* parallel_source);

@@ -23,7 +23,7 @@
 #include "CDlgEditCam.h"
 #include "CDlgTransformModel.h"
 #include "CDlgNewLight.h"
-#include <string>
+#include "CDlgEditLight.h"
 
 #define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
 
@@ -33,6 +33,7 @@
 #define CAMERA_MENU_ADD_CAMERA 1
 #define CAMERA_MENU_EDIT_ACTIVE_CAMERA 2
 #define LIGHT_MENU_ADD_LIGHT 1
+#define LIGHT_MENU_EDIT_LIGHT 2
 #define MAIN_MENU_TRANSFORM_WORLD 1
 #define MAIN_MENU_PARTY 2
 #define MAIN_MENU_ABOUT 3
@@ -244,6 +245,15 @@ void addNewLight() {
 			}
 			scene->addCamera(new_cam);
 		}*/
+	}
+}
+
+void editLight() {
+	CDlgEditLight dlg;
+	dlg.setParallelSources(scene->getParallelSources());
+	dlg.setPointSources(scene->getPointSources());
+	if (dlg.DoModal() == IDOK) {
+
 	}
 }
 
@@ -493,6 +503,9 @@ void lightsMenuCB(int id) {
 	case LIGHT_MENU_ADD_LIGHT:
 		addNewLight();
 		break;
+	case LIGHT_MENU_EDIT_LIGHT:
+		editLight();
+		break;
 	}
 
 	scene->draw();
@@ -616,6 +629,7 @@ void initMenu()
 	glutAddMenuEntry("Edit Active Camera ", CAMERA_MENU_EDIT_ACTIVE_CAMERA);
 	int lightsMenu = glutCreateMenu(lightsMenuCB);
 	glutAddMenuEntry("Add New Light", LIGHT_MENU_ADD_LIGHT);
+	glutAddMenuEntry("Edit Lights", LIGHT_MENU_EDIT_LIGHT);
 
 	glutCreateMenu(mainMenuCB);
 
