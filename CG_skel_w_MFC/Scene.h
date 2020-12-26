@@ -15,10 +15,10 @@ using namespace std;
 
 class Model {
 protected:
-	Color ambient_color = WHITE;
-	Color diffuse_color;
-	Color specular_color;
-	Color emit_color;
+	Color ambient_color = PURPLE;
+	Color diffuse_color = WHITE;
+	Color specular_color = YELLOW;
+	Color emit_color = RED;
 
 	//GLfloat specular_reflection;
 	//GLfloat diffuse_reflection;

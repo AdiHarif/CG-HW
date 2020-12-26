@@ -618,6 +618,7 @@ void mainMenuCB(int id){
 						"White: Bounding box\r\n");
 			break;
 	}
+	scene->draw();
 }
 
 void mainMenu(int id)
