@@ -23,6 +23,7 @@ CDlgNewLight::CDlgNewLight(CWnd* pParent /*=nullptr*/)
 	, pos_x(0)
 	, pos_y(0)
 	, pos_z(0)
+	, type_radio_index(0)
 {
 
 }

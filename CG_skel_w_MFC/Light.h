@@ -13,6 +13,7 @@ protected:
 public:
 	CString getName() { return name; }
 	Color getColor() { return color; }
+	void setColor(Color c) { color = c; }
 	
 };
 
@@ -23,6 +24,7 @@ public:
 	ParallelSource(CString name, vec3 direction, Color color = WHITE);
 	
 	vec3 getDirection();
+	void setDirection(vec3 dir);
 };
 
 class PointSource : public Light {
@@ -31,5 +33,7 @@ class PointSource : public Light {
 public:
 	PointSource(CString name, vec3 position, Color color = WHITE);
 
+	vec3 getPosition();
+	void setPosition(vec3 pos);
 	vec3 directionToPoint(vec3 to);
 };

@@ -53,9 +53,9 @@
 #define ORTHO 0
 #define FRUSTUM 1
 #define PERSPECTIVE 2
-#define AMBIENT 0
-#define PARALLEL 1
-#define POINT 2
+#define PARALLEL 0
+#define POINT 1
+#define AMBIENT 2
 
 #define SCALE_UP_DEF 1.1
 //#define SCALE_DOWN_DEF (1/1.1)
@@ -221,30 +221,23 @@ void editActiveCamera() {
 void addNewLight() {
 	CDlgNewLight dlg;
 	if (dlg.DoModal() == IDOK) {
+		Color c = Color(dlg.color_r, dlg.color_g, dlg.color_b);
+		vec3 dir;
+		vec3 pos;
+		ParallelSource* parallel_s = NULL;
+		PointSource* point_s = NULL;
 		switch (dlg.type_radio_index) {
-		case AMBIENT:
-
-			break;
 		case PARALLEL:
-
+			dir = vec3(dlg.dir_x, dlg.dir_y, dlg.dir_z);
+			parallel_s = new ParallelSource(dlg.name, dir, c);
+			scene->addParallelSource(parallel_s);
 			break;
 		case POINT:
-
+			pos = vec3(dlg.pos_x, dlg.pos_y, dlg.pos_z);
+			point_s = new PointSource(dlg.name, pos, c);
+			scene->addPointSource(point_s);
 			break;
 		}
-		/*vec4 pos = vec4(dlg.pos_x, dlg.pos_y, dlg.pos_z);
-		vec4 lookat = vec4(dlg.lookat_x, dlg.lookat_y, dlg.lookat_z);
-		vec4 up = vec4(dlg.up_x, dlg.up_y, dlg.up_z);
-		if (!(pos == lookat)) {
-			Camera* new_cam = NULL;
-			if (up != vec4(0, 0, 0)) {
-				new_cam = new Camera(pos, lookat);
-			}
-			else {
-				new_cam = new Camera(pos, lookat, up);
-			}
-			scene->addCamera(new_cam);
-		}*/
 	}
 }
 
@@ -253,7 +246,28 @@ void editLight() {
 	dlg.setParallelSources(scene->getParallelSources());
 	dlg.setPointSources(scene->getPointSources());
 	if (dlg.DoModal() == IDOK) {
-
+		Color c = Color(dlg.color_r, dlg.color_g, dlg.color_b);
+		vec3 dir;
+		vec3 pos;
+		ParallelSource* parallel_s = NULL;
+		PointSource* point_s = NULL;
+		switch (dlg.type_radio_index) {
+		case PARALLEL:
+			dir = vec3(dlg.dir_x, dlg.dir_y, dlg.dir_z);
+			parallel_s = scene->getParallelSources()->at(dlg.names_index);
+			parallel_s->setColor(c);
+			parallel_s->setDirection(dir);
+			break;
+		case POINT:
+			pos = vec3(dlg.pos_x, dlg.pos_y, dlg.pos_z);
+			point_s = scene->getPointSources()->at(dlg.names_index);
+			point_s->setColor(c);
+			point_s->setPosition(pos);
+			break;
+		case AMBIENT:
+			scene->setAmbientColor(c);
+			break;
+		}
 	}
 }
 
@@ -507,7 +521,6 @@ void lightsMenuCB(int id) {
 		editLight();
 		break;
 	}
-
 	scene->draw();
 }
 

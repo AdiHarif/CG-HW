@@ -12,6 +12,10 @@ vec3 ParallelSource::getDirection() {
 	return direction;
 }
 
+void ParallelSource::setDirection(vec3 dir) {
+	direction = dir;
+}
+
 //==========
 
 
@@ -21,6 +25,14 @@ PointSource::PointSource(CString name, vec3 position, Color color) {
 	this->name = name;
 	position = position;
 	color = color;
+}
+
+vec3 PointSource::getPosition() {
+	return position;
+}
+
+void PointSource::setPosition(vec3 pos) {
+	position = pos;
 }
 
 vec3 PointSource::directionToPoint(vec3 to) {//TODO: implement

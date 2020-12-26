@@ -5,6 +5,7 @@
 #include "afxdialogex.h"
 #include <vector>
 #include "Light.h"
+#include "vec.h"
 
 using std::vector;
 
@@ -17,7 +18,7 @@ public:
 	CDlgEditLight(CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CDlgEditLight();
 
-// Dialog Data
+	// Dialog Data
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG_EDIT_LIGHT };
 #endif
@@ -42,6 +43,9 @@ public:
 	CButton parallel_radio;
 	CButton point_radio;
 	CButton ambient_radio;
+	CEdit color_r_editbox;
+	CEdit color_g_editbox;
+	CEdit color_b_editbox;
 	CEdit pos_x_editbox;
 	CEdit pos_y_editbox;
 	CEdit pos_z_editbox;
@@ -61,4 +65,7 @@ public:
 	void setPointSources(vector<PointSource*>* point_sources);
 	void updateComboParallel();
 	void updateComboPoint();
+	void clearAllEditBoxes();
+	ParallelSource* getSelectedParallelSource();
+	PointSource* getSelectedPointSource();
 };

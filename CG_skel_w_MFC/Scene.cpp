@@ -456,12 +456,14 @@ void Scene::zoom(float amount) {
 void Scene::addParallelSource(ParallelSource* parallel_source) {
 	parallel_sources.push_back(parallel_source);
 }
+
 //====
 
 //PointSource Interface
 void Scene::addPointSource(PointSource* point_source) {
 	point_sources.push_back(point_source);
 }
+
 //====
 //==========
 

@@ -49,6 +49,9 @@ void CDlgEditLight::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_RADIO_AMBIENT, ambient_radio);
 	DDX_Control(pDX, IDC_RADIO_PARALLEL, parallel_radio);
 	DDX_Control(pDX, IDC_RADIO_POINT, point_radio);
+	DDX_Control(pDX, IDC_EDIT_COLOR_R, color_r_editbox);
+	DDX_Control(pDX, IDC_EDIT_COLOR_G, color_g_editbox);
+	DDX_Control(pDX, IDC_EDIT_COLOR_B, color_b_editbox);
 	DDX_Control(pDX, IDC_EDIT_DIR_X, dir_x_editbox);
 	DDX_Control(pDX, IDC_EDIT_DIR_Y, dir_y_editbox);
 	DDX_Control(pDX, IDC_EDIT_DIR_Z, dir_z_editbox);
@@ -86,8 +89,10 @@ void CDlgEditLight::OnBnClickedRadioParallel()
 	pos_z_editbox.EnableWindow(FALSE);
 	type_radio_index = 0;
 
+	clearAllEditBoxes();
 	names.Clear();
 	names.ResetContent();
+	names_index = -1;
 	updateComboParallel();
 }
 
@@ -102,8 +107,10 @@ void CDlgEditLight::OnBnClickedRadioPoint()
 	pos_z_editbox.EnableWindow(TRUE);
 	type_radio_index = 1;
 
+	clearAllEditBoxes();
 	names.Clear();
 	names.ResetContent();
+	names_index = -1;
 	updateComboPoint();
 }
 
@@ -117,13 +124,52 @@ void CDlgEditLight::OnBnClickedRadioAmbient()
 	pos_z_editbox.EnableWindow(FALSE);
 	type_radio_index = 2;
 
+	clearAllEditBoxes();
 	names.Clear();
 	names.ResetContent();
+	names_index = -1;
 }
 
 void CDlgEditLight::OnCbnSelchangeComboName()
 {
 	names_index = names.GetCurSel();
+	clearAllEditBoxes();
+	if (type_radio_index == 0) {// Parallel
+		ParallelSource* l = getSelectedParallelSource();
+		Color c = l->getColor();
+		vec3 dir = l->getDirection();
+		CString str;
+		str.Format("%f", c.r);
+		color_r_editbox.SetWindowText(str);
+		str.Format("%f", c.g);
+		color_g_editbox.SetWindowText(str);
+		str.Format("%f", c.b);
+		color_b_editbox.SetWindowText(str);
+		str.Format("%f", dir.x);
+		dir_x_editbox.SetWindowText(str);
+		str.Format("%f", dir.y);
+		dir_y_editbox.SetWindowText(str);
+		str.Format("%f", dir.z);
+		dir_z_editbox.SetWindowText(str);
+	}
+	else {// Point
+		PointSource* l = getSelectedPointSource();
+		Color c = l->getColor();
+		vec3 pos = l->getPosition();
+		CString str;
+		str.Format("%f", c.r);
+		color_r_editbox.SetWindowText(str);
+		str.Format("%f", c.g);
+		color_g_editbox.SetWindowText(str);
+		str.Format("%f", c.b);
+		color_b_editbox.SetWindowText(str);
+		str.Format("%f", pos.x);
+		pos_x_editbox.SetWindowText(str);
+		str.Format("%f", pos.y);
+		pos_y_editbox.SetWindowText(str);
+		str.Format("%f", pos.z);
+		pos_z_editbox.SetWindowText(str);
+	}
 }
 
 
@@ -154,4 +200,30 @@ void CDlgEditLight::updateComboPoint() {
 		PointSource* point_s = dynamic_cast<PointSource*> ((*i));
 		names.AddString(_T(point_s->getName()));
 	}
+}
+
+void CDlgEditLight::clearAllEditBoxes() {
+	color_r_editbox.SetWindowText(TEXT("0"));
+	color_g_editbox.SetWindowText(TEXT("0"));
+	color_b_editbox.SetWindowText(TEXT("0"));
+	dir_x_editbox.SetWindowText(TEXT("0"));
+	dir_y_editbox.SetWindowText(TEXT("0"));
+	dir_z_editbox.SetWindowText(TEXT("0"));
+	pos_x_editbox.SetWindowText(TEXT("0"));
+	pos_y_editbox.SetWindowText(TEXT("0"));
+	pos_z_editbox.SetWindowText(TEXT("0"));
+}
+
+ParallelSource* CDlgEditLight::getSelectedParallelSource() {
+	if (names_index == -1) {
+		return NULL;
+	}
+	return parallel_sources->at(names_index);
+}
+
+PointSource* CDlgEditLight::getSelectedPointSource() {
+	if (names_index == -1) {
+		return NULL;
+	}
+	return point_sources->at(names_index);
 }

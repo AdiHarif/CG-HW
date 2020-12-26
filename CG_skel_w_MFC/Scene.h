@@ -132,6 +132,8 @@ public:
 	//General
 	vector<ParallelSource*>* getParallelSources() { return &parallel_sources; }
 	vector<PointSource*>* getPointSources() { return &point_sources; }
+	Color getAmbientColor() { return ambient_light_color; }
+	void setAmbientColor(Color c) { ambient_light_color = c; }
 	//====
 	//ParallelSource Interface
 	void addParallelSource(ParallelSource* parallel_source);
