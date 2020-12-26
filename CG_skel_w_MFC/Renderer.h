@@ -191,4 +191,5 @@ public:
 
 	void drawAxes();
 
+	void applyBlur();
 };
