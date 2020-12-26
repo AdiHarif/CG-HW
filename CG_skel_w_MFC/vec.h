@@ -183,7 +183,7 @@ struct vec3 {
 	{ return vec3( s*x, s*y, s*z ); }
 
     GLfloat operator * ( const vec3& v ) const
-	{ return (v.x*v.x)+(v.y*v.y)+(v.z*v.z); }
+	{ return (x*v.x)+(y*v.y)+(z*v.z); }
 
     friend vec3 operator * ( const GLfloat s, const vec3& v )
 	{ return v * s; }
