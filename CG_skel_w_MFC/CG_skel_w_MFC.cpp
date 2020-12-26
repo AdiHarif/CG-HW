@@ -22,7 +22,9 @@
 #include "CDlgNewCam.h"
 #include "CDlgEditCam.h"
 #include "CDlgTransformModel.h"
-#include <string>
+#include "CDlgNewLight.h"
+#include "CDlgEditLight.h"
+#include "CDlgEditModelColor.h"
 
 #define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
 
@@ -31,9 +33,12 @@
 #define MODEL_MENU_TRANSFORM_ACTIVE_MODEL 3
 #define CAMERA_MENU_ADD_CAMERA 1
 #define CAMERA_MENU_EDIT_ACTIVE_CAMERA 2
+#define LIGHT_MENU_ADD_LIGHT 1
+#define LIGHT_MENU_EDIT_LIGHT 2
 #define MAIN_MENU_TRANSFORM_WORLD 1
-#define MAIN_MENU_PARTY 2
-#define MAIN_MENU_ABOUT 3
+#define MAIN_MENU_EDIT_ACTIVE_MODEL_COLOR 2
+#define MAIN_MENU_PARTY 3
+#define MAIN_MENU_ABOUT 4
 
 #define SCROLL_UP 3
 #define SCROLL_DOWN 4
@@ -50,6 +55,9 @@
 #define ORTHO 0
 #define FRUSTUM 1
 #define PERSPECTIVE 2
+#define PARALLEL 0
+#define POINT 1
+#define AMBIENT 2
 
 #define SCALE_UP_DEF 1.1
 //#define SCALE_DOWN_DEF (1/1.1)
@@ -196,13 +204,13 @@ void editActiveCamera() {
 		//projection:
 		if (dlg.left != 0 || dlg.right != 0 || dlg.bottom != 0 || dlg.top != 0 || dlg.z_near != 0 || dlg.z_far != 0) {
 			switch (dlg.proj_radio_index) {
-			case 0: // ortho
+			case ORTHO:
 				scene->getActiveCamera()->ortho(dlg.left, dlg.right, dlg.bottom, dlg.top, dlg.z_near, dlg.z_far);
 				break;
-			case 1: // frustum
+			case FRUSTUM:
 				scene->getActiveCamera()->frustum(dlg.left, dlg.right, dlg.bottom, dlg.top, dlg.z_near, dlg.z_far);
 				break;
-			case 2: // perspective
+			case PERSPECTIVE:
 				if (dlg.z_near != 0 || dlg.z_far != 0 || dlg.fovy != 0 || dlg.aspect != 0) {
 					scene->getActiveCamera()->perspective(dlg.fovy, dlg.aspect, dlg.z_near, dlg.z_far);
 				}
@@ -212,9 +220,79 @@ void editActiveCamera() {
 	}
 }
 
+void addNewLight() {
+	CDlgNewLight dlg;
+	if (dlg.DoModal() == IDOK) {
+		Color c = Color(dlg.color_r, dlg.color_g, dlg.color_b);
+		vec3 dir;
+		vec3 pos;
+		ParallelSource* parallel_s = NULL;
+		PointSource* point_s = NULL;
+		switch (dlg.type_radio_index) {
+		case PARALLEL:
+			dir = vec3(dlg.dir_x, dlg.dir_y, dlg.dir_z);
+			parallel_s = new ParallelSource(dlg.name, dir, c);
+			scene->addParallelSource(parallel_s);
+			break;
+		case POINT:
+			pos = vec3(dlg.pos_x, dlg.pos_y, dlg.pos_z);
+			point_s = new PointSource(dlg.name, pos, c);
+			scene->addPointSource(point_s);
+			break;
+		}
+	}
+}
+
+void editLight() {
+	CDlgEditLight dlg;
+	dlg.setParallelSources(scene->getParallelSources());
+	dlg.setPointSources(scene->getPointSources());
+	if (dlg.DoModal() == IDOK) {
+		Color c = Color(dlg.color_r, dlg.color_g, dlg.color_b);
+		vec3 dir;
+		vec3 pos;
+		ParallelSource* parallel_s = NULL;
+		PointSource* point_s = NULL;
+		switch (dlg.type_radio_index) {
+		case PARALLEL:
+			dir = vec3(dlg.dir_x, dlg.dir_y, dlg.dir_z);
+			parallel_s = scene->getParallelSources()->at(dlg.names_index);
+			parallel_s->setColor(c);
+			parallel_s->setDirection(dir);
+			break;
+		case POINT:
+			pos = vec3(dlg.pos_x, dlg.pos_y, dlg.pos_z);
+			point_s = scene->getPointSources()->at(dlg.names_index);
+			point_s->setColor(c);
+			point_s->setPosition(pos);
+			break;
+		case AMBIENT:
+			scene->setAmbientColor(c);
+			break;
+		}
+	}
+}
+
 
 void transformWorld() {
 
+}
+
+void editActiveModelColor() {
+	CDlgEditModelColor dlg;
+	Model* m = scene->getActiveModel();
+	if (!m)	return;
+	dlg.setModel(m);
+	if (dlg.DoModal() == IDOK) {
+		Color ambient_color = Color(dlg.ambient_r, dlg.ambient_g, dlg.ambient_b);
+		Color diffuse_color = Color(dlg.diffuse_r, dlg.diffuse_g, dlg.diffuse_b);
+		Color specular_color = Color(dlg.specular_r, dlg.specular_g, dlg.specular_b);
+		Color emit_color = Color(dlg.emit_r, dlg.emit_g, dlg.emit_b);
+		m->setAmbientColor(ambient_color);
+		m->setDiffuseColor(diffuse_color);
+		m->setSpecularColor(specular_color);
+		m->setEmitColor(emit_color);
+	}
 }
 
 void changeAllSteps(float step_change) {
@@ -454,6 +532,19 @@ void camerasMenuCB(int id){
 	scene->draw();
 }
 
+void lightsMenuCB(int id) {
+	switch (id) {
+	case LIGHT_MENU_ADD_LIGHT:
+		addNewLight();
+		break;
+	case LIGHT_MENU_EDIT_LIGHT:
+		editLight();
+		break;
+	}
+	scene->draw();
+}
+
+
 
 //void cameraMenu(int id) {
 //	CFileDialog dlg(TRUE, _T(".obj"), NULL, NULL, _T("*.obj|*.*"));
@@ -478,6 +569,9 @@ void mainMenuCB(int id){
 		case MAIN_MENU_TRANSFORM_WORLD:
 			transformWorld();
 			//std::cout << "MAIN_MENU_TRANSFORM_WORLD" << std::endl;
+			break;
+		case MAIN_MENU_EDIT_ACTIVE_MODEL_COLOR:
+			editActiveModelColor();
 			break;
 		case MAIN_MENU_PARTY:
 			scene->party();
@@ -525,6 +619,7 @@ void mainMenuCB(int id){
 						"White: Bounding box\r\n");
 			break;
 	}
+	scene->draw();
 }
 
 void mainMenu(int id)
@@ -569,6 +664,10 @@ void initMenu()
 	int camerasMenu = glutCreateMenu(camerasMenuCB);
 	glutAddMenuEntry("Add New Camera",CAMERA_MENU_ADD_CAMERA);
 	glutAddMenuEntry("Edit Active Camera ", CAMERA_MENU_EDIT_ACTIVE_CAMERA);
+	int lightsMenu = glutCreateMenu(lightsMenuCB);
+	glutAddMenuEntry("Add New Light", LIGHT_MENU_ADD_LIGHT);
+	glutAddMenuEntry("Edit Lights", LIGHT_MENU_EDIT_LIGHT);
+
 	glutCreateMenu(mainMenuCB);
 
 	/*int menuCamera = glutCreateMenu(cameraMenu);
@@ -576,11 +675,13 @@ void initMenu()
 	glutAddMenuEntry("Select Camera", CAMERA_SELECT);
 	glutCreateMenu(mainMenu);*/
 
-	glutAddSubMenu("Models",modelsMenu);
-	glutAddSubMenu("Cameras",camerasMenu);
+	glutAddSubMenu("Models", modelsMenu);
+	glutAddSubMenu("Cameras", camerasMenu);
+	glutAddSubMenu("Lights", lightsMenu);
 	//glutAddMenuEntry("Transform World", MAIN_MENU_TRANSFORM_WORLD);
-	glutAddMenuEntry("Party For 5 Seconds",MAIN_MENU_PARTY);
-	glutAddMenuEntry("About",MAIN_MENU_ABOUT);
+	glutAddMenuEntry("Edit Active Model Color", MAIN_MENU_EDIT_ACTIVE_MODEL_COLOR);
+	glutAddMenuEntry("Party For 5 Seconds", MAIN_MENU_PARTY);
+	glutAddMenuEntry("About", MAIN_MENU_ABOUT);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 //----------------------------------------------------------------------------

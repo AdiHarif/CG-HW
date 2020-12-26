@@ -21,13 +21,13 @@ Camera* Scene::getActiveCamera() {
 //===C'tors / Destructors===
 
 Scene::Scene(Renderer* renderer) : m_renderer(renderer) {
-	active_model = -1;
+	active_model = NO_MODELS_ACTIVE;
 	active_camera = -1;
 	ambient_light_color = { 0.1, 0.1, 0.1 };
 	//ambient_light_intensity = 0.5;
 	Camera* def_cam = new Camera(vec4(0.0, 0.0, 10.0));
 	addCamera(def_cam);
-	ParallelSource* def_parallel_source = new ParallelSource(vec3(1.0, 1.0, 1.0), { 0.3, 0.1, 0.1 });
+	ParallelSource* def_parallel_source = new ParallelSource("Parallel Light 0", vec3(0.0, 0.0, -1.0), { 0.3, 0.1, 0.1 });
 	addParallelSource(def_parallel_source);
 	m_renderer->setParallelSources(&parallel_sources);
 	m_renderer->setPointSources(&point_sources);
@@ -131,6 +131,13 @@ void Scene::removeSelection() {
 	}
 	models.erase(models.begin() + active_model);
 	activateLastModel();
+}
+
+Model* Scene::getActiveModel() {
+	if (active_model == NO_MODELS_ACTIVE || active_model == ALL_MODELS_ACTIVE) {
+		return NULL;
+	}
+	return models.at(active_model);
 }
 
 void Scene::scaleSelection(double factor) {
@@ -456,12 +463,14 @@ void Scene::zoom(float amount) {
 void Scene::addParallelSource(ParallelSource* parallel_source) {
 	parallel_sources.push_back(parallel_source);
 }
+
 //====
 
 //PointSource Interface
 void Scene::addPointSource(PointSource* point_source) {
 	point_sources.push_back(point_source);
 }
+
 //====
 //==========
 
