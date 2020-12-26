@@ -35,8 +35,8 @@ void PointSource::setPosition(vec3 pos) {
 	position = pos;
 }
 
-vec3 PointSource::directionToPoint(vec3 to) {//TODO: implement
-	return vec3(0, 0, 0);
+vec3 PointSource::directionToPoint(vec3 to) {
+	return position - to;
 }
 
 //==========

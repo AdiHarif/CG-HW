@@ -7,6 +7,7 @@ class Light {
 protected:
 	Color color;
 	CString name;
+	//GLfloat intensity;
 
 	virtual ~Light() {}
 

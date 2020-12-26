@@ -799,13 +799,23 @@ Color Renderer::calculateAmbientColor(MeshModel& m) {
 
 Color Renderer::calculateDiffuseColor(MeshModel& m, Face f) {
 	Color diffuse_color = { 0,0,0 };
-	float theta;
+	float cos_theta;
 
 	for (vector<ParallelSource*>::iterator i = parallel_sources->begin(); i != parallel_sources->end(); i++) {
 		ParallelSource* parallel_s = dynamic_cast<ParallelSource*> ((*i));
-		theta = (m.face_normals.at(f.normal) * parallel_s->getDirection());
-		diffuse_color += (m.diffuse_color * parallel_s->getColor()) * theta;
+		cos_theta = cos((m.face_normals.at(f.normal) * parallel_s->getDirection()));
+		if (cos_theta > 0) {
+			diffuse_color += (m.diffuse_color * parallel_s->getColor()) * cos_theta;
+		}
 	}
+
+	/*for (vector<PointSource*>::iterator i = point_sources->begin(); i != point_sources->end(); i++) {
+		PointSource* point_s = dynamic_cast<PointSource*> ((*i));
+		
+		theta = (m.face_normals.at(f.normal) * point_s->getDirection());
+		diffuse_color += (m.diffuse_color * point_s->getColor()) * theta;
+	}*/
+
 
 	return diffuse_color;
 }
