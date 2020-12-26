@@ -223,6 +223,9 @@ void editActiveCamera() {
 void addNewLight() {
 	CDlgNewLight dlg;
 	if (dlg.DoModal() == IDOK) {
+		if (strcmp(dlg.name, "") == 0) {
+			return;
+		}
 		Color c = Color(dlg.color_r, dlg.color_g, dlg.color_b);
 		vec3 dir;
 		vec3 pos;
