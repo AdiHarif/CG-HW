@@ -87,6 +87,7 @@ void CDlgEditLight::OnBnClickedRadioParallel()
 	pos_x_editbox.EnableWindow(FALSE);
 	pos_y_editbox.EnableWindow(FALSE);
 	pos_z_editbox.EnableWindow(FALSE);
+	names.EnableWindow(TRUE);
 	type_radio_index = 0;
 
 	clearAllEditBoxes();
@@ -105,6 +106,7 @@ void CDlgEditLight::OnBnClickedRadioPoint()
 	pos_x_editbox.EnableWindow(TRUE);
 	pos_y_editbox.EnableWindow(TRUE);
 	pos_z_editbox.EnableWindow(TRUE);
+	names.EnableWindow(TRUE);
 	type_radio_index = 1;
 
 	clearAllEditBoxes();
@@ -122,6 +124,7 @@ void CDlgEditLight::OnBnClickedRadioAmbient()
 	pos_x_editbox.EnableWindow(FALSE);
 	pos_y_editbox.EnableWindow(FALSE);
 	pos_z_editbox.EnableWindow(FALSE);
+	names.EnableWindow(FALSE);
 	type_radio_index = 2;
 
 	clearAllEditBoxes();

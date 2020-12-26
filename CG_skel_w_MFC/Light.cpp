@@ -23,8 +23,8 @@ void ParallelSource::setDirection(vec3 dir) {
 
 PointSource::PointSource(CString name, vec3 position, Color color) {
 	this->name = name;
-	position = position;
-	color = color;
+	this->position = position;
+	this->color = color;
 }
 
 vec3 PointSource::getPosition() {

@@ -77,6 +77,9 @@ void CDlgNewLight::OnBnClickedRadioParallel()
 	pos_x_editbox.EnableWindow(FALSE);
 	pos_y_editbox.EnableWindow(FALSE);
 	pos_z_editbox.EnableWindow(FALSE);
+	pos_x_editbox.SetWindowText(TEXT("0"));
+	pos_y_editbox.SetWindowText(TEXT("0"));
+	pos_z_editbox.SetWindowText(TEXT("0"));
 	type_radio_index = 0;
 }
 
@@ -89,6 +92,9 @@ void CDlgNewLight::OnBnClickedRadioPoint()
 	pos_x_editbox.EnableWindow(TRUE);
 	pos_y_editbox.EnableWindow(TRUE);
 	pos_z_editbox.EnableWindow(TRUE);
+	dir_x_editbox.SetWindowText(TEXT("0"));
+	dir_y_editbox.SetWindowText(TEXT("0"));
+	dir_z_editbox.SetWindowText(TEXT("0"));
 	type_radio_index = 1;
 }
 

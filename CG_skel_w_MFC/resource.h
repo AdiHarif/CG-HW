@@ -59,11 +59,6 @@
 #define IDC_STATIC_SCALE_Y              1066
 #define IDC_STATIC_COLOR                1066
 #define IDC_STATIC_SCALE_Z              1067
-#define IDC_STATIC_AMBIENT              1067
-#define IDC_STATIC_AMBIENT_R            1068
-#define IDC_STATIC_AMBIENT_G            1069
-#define IDC_STATIC_AMBIENT_B            1070
-#define IDC_EDIT_AMBIENT_R              1071
 #define IDC_STATIC_NAME                 1072
 #define IDC_EDIT_AMBIENT_B              1073
 #define IDC_EDIT_DIFFUSE_R              1074
@@ -73,8 +68,6 @@
 #define IDC_STATIC_DIFFUSE_R            1077
 #define IDC_STATIC_DIFFUSE_B            1078
 #define IDC_STATIC_DIFFUSE_G            1079
-#define IDC_STATIC_DIFFUSE              1080
-#define IDC_EDIT_AMBIENT_G              1081
 #define IDC_RADIO_PARALLEL              1082
 #define IDC_RADIO_POINT                 1083
 #define IDC_RADIO_FRUSTUM               1084
@@ -113,7 +106,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        126
+#define _APS_NEXT_RESOURCE_VALUE        128
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1091
 #define _APS_NEXT_SYMED_VALUE           101
