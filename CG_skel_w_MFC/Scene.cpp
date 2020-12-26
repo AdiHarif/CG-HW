@@ -92,6 +92,8 @@ void Scene::draw()
 
 	m_renderer->drawOrigin(Color(RED));
 
+	m_renderer->drawAxes();
+
 	m_renderer->swapBuffers();
 }
 

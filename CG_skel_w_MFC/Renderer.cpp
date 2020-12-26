@@ -465,7 +465,7 @@ void Renderer::CreateOpenGLBuffer()
 
 //===C'tor\D'tor===
 Renderer::Renderer(int width, int height) :m_width(width), m_height(height),
-	f_anti_aliasing(false), fog({ {1,1,1}, 0.5 }), f_fog(false)
+	f_anti_aliasing(false), fog({ {1,1,1}, 0.5 }), f_fog(false), f_axes(true)
 {
 	InitOpenGLRendering();
 	createBuffers();
@@ -827,4 +827,29 @@ void Renderer::applyFog() {
 			m_outBuffer[INDEX(m_width, x, y, 2)] = c.b;
 		}
 	}
+}
+
+void Renderer::drawAxes() {
+	mat4 t_tot = this->tp * this->tc;
+	vec4 axes[3];
+	axes[0] = t_tot * vec4(1, 0, 0, 0);
+	axes[1] = t_tot * vec4(0, 1, 0, 0);
+	axes[2] = t_tot * vec4(0, 0, 1, 0);
+
+	Color colors[3];
+	colors[0] = { 1,0,0 };
+	colors[1] = { 0,1,0 };
+	colors[2] = { 0,0,1 };
+
+	vec4 origin = vec4(-0.8, 0.8, 0, 1);
+
+
+	for (int i = 0; i < 3; i++) {
+		axes[i].w = 0;
+		axes[i] = normalize(axes[i]) / 10;
+		
+		drawLine(Line(viewPort(origin), viewPort(origin + axes[i])), colors[i]);
+	
+	}
+	
 }

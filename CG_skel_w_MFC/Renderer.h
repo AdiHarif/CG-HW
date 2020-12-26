@@ -75,6 +75,7 @@ class Renderer
 
 	bool f_anti_aliasing;
 	bool f_fog;
+	bool f_axes;
 
 	struct Fog {
 		Color c;
@@ -187,4 +188,7 @@ public:
 
 	void toggleFog();
 	void applyFog();
+
+	void drawAxes();
+
 };
