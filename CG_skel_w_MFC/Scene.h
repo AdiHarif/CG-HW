@@ -147,4 +147,5 @@ public:
 
 
 	void toggleAntiAliasing();
+	void toggleFog();
 };

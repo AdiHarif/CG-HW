@@ -465,7 +465,7 @@ void Renderer::CreateOpenGLBuffer()
 
 //===C'tor\D'tor===
 Renderer::Renderer(int width, int height) :m_width(width), m_height(height),
-	f_anti_aliasing(false)
+	f_anti_aliasing(false), fog({ {1,1,1}, 0.5 }), f_fog(false)
 {
 	InitOpenGLRendering();
 	createBuffers();
@@ -482,7 +482,9 @@ Renderer::~Renderer(void)
 //===Buffer Interface
 void Renderer::swapBuffers()
 {
-
+	if (f_fog) {
+		applyFog();
+	}
 	int a = glGetError();
 	glActiveTexture(GL_TEXTURE0);
 	a = glGetError();
@@ -808,3 +810,21 @@ Color Renderer::calculateDiffuseColor(MeshModel& m, Face f) {
 	return diffuse_color;
 }
 ////==========
+
+
+void Renderer::toggleFog() {
+	f_fog = !f_fog;
+}
+
+void Renderer::applyFog() {
+	for (int x = 0; x < m_width; x++) {
+		for (int y = 0; y < m_height; y++) {
+			Color c = { m_outBuffer[INDEX(m_width, x, y, 0)], m_outBuffer[INDEX(m_width, x, y, 1)], m_outBuffer[INDEX(m_width, x, y, 2)] };
+			float fog_percent = ((1 - m_zbuffer[Z_INDEX(m_width, x, y)]) * fog.max_density) / 2;
+			c = (c * (1 - fog_percent)) + (fog.c * fog_percent);
+			m_outBuffer[INDEX(m_width, x, y, 0)] = c.r;
+			m_outBuffer[INDEX(m_width, x, y, 1)] = c.g;
+			m_outBuffer[INDEX(m_width, x, y, 2)] = c.b;
+		}
+	}
+}

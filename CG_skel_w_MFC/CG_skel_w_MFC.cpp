@@ -389,9 +389,10 @@ void special(int key, int x, int y) {
 	case GLUT_KEY_F7:
 		scene->toggleAntiAliasing();
 		break;
+	case GLUT_KEY_F8:
+		scene->toggleFog();
+		break;
 	}
-	
-
 	scene->draw();
 }
 

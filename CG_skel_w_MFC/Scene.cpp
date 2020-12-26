@@ -482,3 +482,7 @@ void Scene::party() {
 void Scene::toggleAntiAliasing() {
 	m_renderer->toggleAntiAliasing();
 }
+
+void Scene::toggleFog() {
+	m_renderer->toggleFog();
+}

@@ -74,9 +74,16 @@ class Renderer
 	mat4 tp;
 
 	bool f_anti_aliasing;
+	bool f_fog;
+
+	struct Fog {
+		Color c;
+		float max_density;
+		//float curve;
+	} fog;
+
 	vector<ParallelSource*>* parallel_sources = NULL;
 	vector<PointSource*>* point_sources = NULL;
-
 	Color* scene_ambient_light_color;
 	//GLfloat* scene_ambient_light_intensity;
 
@@ -178,4 +185,6 @@ public:
 	Color calculateDiffuseColor(MeshModel& m, Face f);
 	////==========
 
+	void toggleFog();
+	void applyFog();
 };
