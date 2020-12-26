@@ -17,17 +17,13 @@ struct Edge {
 
 
 class Face {
-
-private:
-
+public:
 	int vertices[3];
 	int vertex_normals[3];
 	int textures[3];
 
 	int normal;
 	Vertex center;
-
-public:
 
 	Face();
 	Face(vec3, int normal_index = 0);

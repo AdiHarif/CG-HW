@@ -476,9 +476,6 @@ void special(int key, int x, int y) {
 	case GLUT_KEY_F8:
 		scene->toggleFog();
 		break;
-	case GLUT_KEY_F9:
-		scene->toggleBlur();
-		break;
 	}
 	scene->draw();
 }

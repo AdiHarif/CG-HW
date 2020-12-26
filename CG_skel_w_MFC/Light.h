@@ -2,6 +2,7 @@
 
 #include "Color.h"
 #include "vec.h"
+#include "Face.h"
 
 class Light {
 protected:
@@ -36,5 +37,5 @@ public:
 
 	vec3 getPosition();
 	void setPosition(vec3 pos);
-	vec3 directionToPoint(vec3 to);
+	vec3 getDirectionToPoint(Vertex to);
 };

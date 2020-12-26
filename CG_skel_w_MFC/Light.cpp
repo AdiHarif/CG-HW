@@ -35,7 +35,7 @@ void PointSource::setPosition(vec3 pos) {
 	position = pos;
 }
 
-vec3 PointSource::directionToPoint(vec3 to) {
+vec3 PointSource::getDirectionToPoint(Vertex to) {
 	return position - to;
 }
 

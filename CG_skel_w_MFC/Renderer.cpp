@@ -809,12 +809,13 @@ Color Renderer::calculateDiffuseColor(MeshModel& m, Face f) {
 		}
 	}
 
-	/*for (vector<PointSource*>::iterator i = point_sources->begin(); i != point_sources->end(); i++) {
+	for (vector<PointSource*>::iterator i = point_sources->begin(); i != point_sources->end(); i++) {
 		PointSource* point_s = dynamic_cast<PointSource*> ((*i));
-		
-		theta = (m.face_normals.at(f.normal) * point_s->getDirection());
-		diffuse_color += (m.diffuse_color * point_s->getColor()) * theta;
-	}*/
+		cos_theta = cos(m.face_normals.at(f.normal) * point_s->getDirectionToPoint(f.center));
+		if (cos_theta > 0) {
+			diffuse_color += (m.diffuse_color * point_s->getColor()) * cos_theta;
+		}
+	}
 
 
 	return diffuse_color;
