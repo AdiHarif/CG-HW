@@ -47,3 +47,12 @@ Face::Face(std::istream& s, int normal_index) {
 
 	normal = normal_index;
 }
+
+
+void Face::calcCenter(Vertex v0, Vertex v1, Vertex v2) {
+	v0 = v0 / v0.w;
+	v1 = v1 / v1.w;
+	v2 = v2 / v2.w;
+
+	center = (v0 + v1 + v2) / 3;
+}

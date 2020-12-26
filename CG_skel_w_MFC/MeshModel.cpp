@@ -138,9 +138,19 @@ void MeshModel::loadFile(string fileName)
 	//}
 
 	for (int i = 0; i < faces.size(); i++) {
-		vec4 v0 = vertices[faces[i].vertices[1]-1] - vertices[faces[i].vertices[0]-1];
-		vec4 v1 = vertices[faces[i].vertices[2]-1] - vertices[faces[i].vertices[1]-1];
-		Normal n = cross(v0, v1);
+
+		Face f = faces[i];
+
+		Vertex v0, v1, v2;
+		v0 = vertices[f.vertices[0] - 1];
+		v1 = vertices[f.vertices[1] - 1];
+		v2 = vertices[f.vertices[2] - 1];
+
+		f.calcCenter(v0, v1, v2); 
+
+		vec4 e0 = v1 - v0;
+		vec4 e1 = v2 - v1;
+		Normal n = cross(e0, e1);
 		face_normals.push_back(n);
 		faces[i].normal = i;
 	}

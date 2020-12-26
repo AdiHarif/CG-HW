@@ -17,7 +17,7 @@ struct Edge {
 
 
 class Face {
-public:
+private:
 	int vertices[3];
 	int vertex_normals[3];
 	int textures[3];
@@ -25,9 +25,13 @@ public:
 	int normal;
 	Vertex center;
 
+public:
 	Face();
 	Face(vec3, int normal_index = 0);
 	Face(std::istream&, int normal_index = 0);
+
+	void calcCenter(Vertex v0, Vertex v1, Vertex v2);
+	
 
 	friend class Renderer;
 	friend class MeshModel;
