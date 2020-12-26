@@ -8,6 +8,7 @@
 #define IDD_DIALOG_TRANSFORM_ACTIVE_MODEL 118
 #define IDD_DIALOG_NEW_LIGHT            120
 #define IDD_DIALOG_EDIT_LIGHT           124
+#define IDD_DIALOG_EDIT_MODEL_COLOR     128
 #define IDC_EDIT_POS_X                  1015
 #define IDC_STATIC_X                    1016
 #define IDC_STATIC_POS                  1017
@@ -59,6 +60,10 @@
 #define IDC_STATIC_SCALE_Y              1066
 #define IDC_STATIC_COLOR                1066
 #define IDC_STATIC_SCALE_Z              1067
+#define IDC_STATIC_AMBIENT              1067
+#define IDC_STATIC_DIFFUSE              1068
+#define IDC_STATIC_SPECULAR2            1069
+#define IDC_STATIC_EMIT                 1070
 #define IDC_STATIC_NAME                 1072
 #define IDC_EDIT_AMBIENT_B              1073
 #define IDC_EDIT_DIFFUSE_R              1074
@@ -70,13 +75,18 @@
 #define IDC_STATIC_DIFFUSE_G            1079
 #define IDC_RADIO_PARALLEL              1082
 #define IDC_RADIO_POINT                 1083
+#define IDC_STATIC_SPECULAR_R2          1083
 #define IDC_RADIO_FRUSTUM               1084
 #define IDC_RADIO_AMBIENT               1084
+#define IDC_STATIC_SPECULAR_B2          1084
 #define IDC_RADIO_PERSPECTIVE           1085
 #define IDC_EDIT_NAME                   1085
 #define IDC_COMBO_NAMES                 1085
+#define IDC_STATIC_SPECULAR_G2          1085
 #define IDC_EDIT_COLOR_R                1086
+#define IDC_STATIC_EMIT_R               1086
 #define IDC_STATIC_COLOR_R              1087
+#define IDC_STATIC_EMIT_B               1087
 #define IDC_EDIT_SPECULAR_R             1088
 #define IDC_STATIC_COLOR_G              1088
 #define IDC_EDIT_SPECULAR_G             1089
@@ -84,17 +94,26 @@
 #define IDC_EDIT_SPECULAR_B             1090
 #define IDC_EDIT_COLOR_B                1090
 #define IDC_STATIC_SPECULAR_R           1091
+#define IDC_STATIC_AMBIENT_R            1091
 #define IDC_STATIC_FOVY                 1092
 #define IDC_STATIC_SPECULAR_B           1092
+#define IDC_EDIT_AMBIENT_R              1092
 #define IDC_EDIT_FOVY                   1093
 #define IDC_STATIC_SPECULAR_G           1093
+#define IDC_STATIC_AMBIENT_G            1093
 #define IDC_STATIC_ASPECT               1094
 #define IDC_STATIC_SPECULAR             1094
+#define IDC_EDIT_AMBIENT_G              1094
 #define IDC_EDIT_ASPECT                 1095
+#define IDC_STATIC_AMBIENT_B            1095
 #define IDC_STATIC_LEFT                 1096
+#define IDC_EDIT_EMIT_R                 1096
 #define IDC_EDIT_LEFT                   1097
+#define IDC_EDIT_EMIT_G                 1097
 #define IDC_STATIC_RIGHT                1098
+#define IDC_EDIT_EMIT_B                 1098
 #define IDC_EDIT_RIGHT                  1099
+#define IDC_STATIC_EMIT_G               1099
 #define IDC_STATIC_BOTTOM               1100
 #define IDC_EDIT_BOTTOM                 1101
 #define IDC_EDIT_TOP                    1103
@@ -106,9 +125,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        128
+#define _APS_NEXT_RESOURCE_VALUE        130
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1091
+#define _APS_NEXT_CONTROL_VALUE         1096
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

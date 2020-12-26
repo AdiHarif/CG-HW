@@ -8,7 +8,8 @@
 #include "Camera.h"
 #include "Light.h"
 
-#define ALL_MODELS_ACTIVE -2
+#define ALL_MODELS_ACTIVE -1
+#define NO_MODELS_ACTIVE -2
 
 using namespace std;
 
@@ -26,6 +27,19 @@ protected:
 
 	virtual ~Model() {}
 	//void virtual draw()=0;
+
+public:
+	Color getAmbientColor() { return ambient_color; }
+	void setAmbientColor(Color c) { ambient_color = c; }
+
+	Color getDiffuseColor() { return diffuse_color; }
+	void setDiffuseColor(Color c) { diffuse_color = c; }
+
+	Color getSpecularColor() { return specular_color; }
+	void setSpecularColor(Color c) { specular_color = c; }
+
+	Color getEmitColor() { return emit_color; }
+	void setEmitColor(Color c) { emit_color = c; }
 };
 
 
@@ -74,6 +88,7 @@ public:
 	void loadPrimModel();
 	//void removeModel(int model);
 	void removeSelection();
+	Model* getActiveModel();
 
 	void scaleSelection(double scale_factor);
 	void scaleSelection(vec3 scale_by);

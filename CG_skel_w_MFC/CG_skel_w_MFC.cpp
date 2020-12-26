@@ -24,6 +24,7 @@
 #include "CDlgTransformModel.h"
 #include "CDlgNewLight.h"
 #include "CDlgEditLight.h"
+#include "CDlgEditModelColor.h"
 
 #define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
 
@@ -35,8 +36,9 @@
 #define LIGHT_MENU_ADD_LIGHT 1
 #define LIGHT_MENU_EDIT_LIGHT 2
 #define MAIN_MENU_TRANSFORM_WORLD 1
-#define MAIN_MENU_PARTY 2
-#define MAIN_MENU_ABOUT 3
+#define MAIN_MENU_EDIT_ACTIVE_MODEL_COLOR 2
+#define MAIN_MENU_PARTY 3
+#define MAIN_MENU_ABOUT 4
 
 #define SCROLL_UP 3
 #define SCROLL_DOWN 4
@@ -274,6 +276,23 @@ void editLight() {
 
 void transformWorld() {
 
+}
+
+void editActiveModelColor() {
+	CDlgEditModelColor dlg;
+	Model* m = scene->getActiveModel();
+	if (!m)	return;
+	dlg.setModel(m);
+	if (dlg.DoModal() == IDOK) {
+		Color ambient_color = Color(dlg.ambient_r, dlg.ambient_g, dlg.ambient_b);
+		Color diffuse_color = Color(dlg.diffuse_r, dlg.diffuse_g, dlg.diffuse_b);
+		Color specular_color = Color(dlg.specular_r, dlg.specular_g, dlg.specular_b);
+		Color emit_color = Color(dlg.emit_r, dlg.emit_g, dlg.emit_b);
+		m->setAmbientColor(ambient_color);
+		m->setDiffuseColor(diffuse_color);
+		m->setSpecularColor(specular_color);
+		m->setEmitColor(emit_color);
+	}
 }
 
 void changeAllSteps(float step_change) {
@@ -550,6 +569,9 @@ void mainMenuCB(int id){
 			transformWorld();
 			//std::cout << "MAIN_MENU_TRANSFORM_WORLD" << std::endl;
 			break;
+		case MAIN_MENU_EDIT_ACTIVE_MODEL_COLOR:
+			editActiveModelColor();
+			break;
 		case MAIN_MENU_PARTY:
 			scene->party();
 			break;
@@ -651,12 +673,13 @@ void initMenu()
 	glutAddMenuEntry("Select Camera", CAMERA_SELECT);
 	glutCreateMenu(mainMenu);*/
 
-	glutAddSubMenu("Models",modelsMenu);
-	glutAddSubMenu("Cameras",camerasMenu);
-	glutAddSubMenu("Lights",lightsMenu);
+	glutAddSubMenu("Models", modelsMenu);
+	glutAddSubMenu("Cameras", camerasMenu);
+	glutAddSubMenu("Lights", lightsMenu);
 	//glutAddMenuEntry("Transform World", MAIN_MENU_TRANSFORM_WORLD);
-	glutAddMenuEntry("Party For 5 Seconds",MAIN_MENU_PARTY);
-	glutAddMenuEntry("About",MAIN_MENU_ABOUT);
+	glutAddMenuEntry("Edit Active Model Color", MAIN_MENU_EDIT_ACTIVE_MODEL_COLOR);
+	glutAddMenuEntry("Party For 5 Seconds", MAIN_MENU_PARTY);
+	glutAddMenuEntry("About", MAIN_MENU_ABOUT);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 //----------------------------------------------------------------------------

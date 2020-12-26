@@ -21,7 +21,7 @@ Camera* Scene::getActiveCamera() {
 //===C'tors / Destructors===
 
 Scene::Scene(Renderer* renderer) : m_renderer(renderer) {
-	active_model = -1;
+	active_model = NO_MODELS_ACTIVE;
 	active_camera = -1;
 	ambient_light_color = { 0.1, 0.1, 0.1 };
 	//ambient_light_intensity = 0.5;
@@ -131,6 +131,13 @@ void Scene::removeSelection() {
 	}
 	models.erase(models.begin() + active_model);
 	activateLastModel();
+}
+
+Model* Scene::getActiveModel() {
+	if (active_model == NO_MODELS_ACTIVE || active_model == ALL_MODELS_ACTIVE) {
+		return NULL;
+	}
+	return models.at(active_model);
 }
 
 void Scene::scaleSelection(double factor) {
