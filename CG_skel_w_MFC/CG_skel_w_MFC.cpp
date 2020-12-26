@@ -248,6 +248,9 @@ void editLight() {
 	dlg.setParallelSources(scene->getParallelSources());
 	dlg.setPointSources(scene->getPointSources());
 	if (dlg.DoModal() == IDOK) {
+		if (dlg.names_index < 0) {
+			return;
+		}
 		Color c = Color(dlg.color_r, dlg.color_g, dlg.color_b);
 		vec3 dir;
 		vec3 pos;
