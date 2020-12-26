@@ -21,6 +21,7 @@ Camera* Scene::getActiveCamera() {
 //===C'tors / Destructors===
 
 Scene::Scene(Renderer* renderer) : m_renderer(renderer) {
+	f_blur = false;
 	active_model = NO_MODELS_ACTIVE;
 	active_camera = -1;
 	ambient_light_color = { 0.1, 0.1, 0.1 };
@@ -92,8 +93,11 @@ void Scene::draw()
 
 	m_renderer->drawOrigin(Color(RED));
 
-	m_renderer->drawAxes();
+	if (f_blur) {
+		m_renderer->applyBlur();
+	}
 
+	m_renderer->drawAxes();
 	m_renderer->swapBuffers();
 }
 
@@ -496,4 +500,8 @@ void Scene::toggleAntiAliasing() {
 
 void Scene::toggleFog() {
 	m_renderer->toggleFog();
+}
+
+void Scene::toggleBlur() {
+	f_blur = !f_blur;
 }

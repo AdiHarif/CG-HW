@@ -863,3 +863,57 @@ void Renderer::drawAxes() {
 	}
 	
 }
+
+void Renderer::applyBlur() {
+	float weight[9] = {
+		0.016216,
+		0.054054,
+		0.1216216,
+		0.1945946,
+		0.227027,
+		0.1945946,
+		0.1216216,
+		0.054054,
+		0.016216,
+	};
+	int buff_size = m_width * m_height * 3;
+	float* tmp_buff = new float[buff_size];
+
+	for (int i = 0; i < buff_size; i++) {
+		tmp_buff[i] = m_outBuffer[i];
+		m_outBuffer[i] = 0;
+	}
+
+	//horizontal blur
+	for (int x = 0; x < m_width; x++) {
+		for (int y = 0; y < m_height; y++) {
+			for (int k = -4; k <= 4; k++) {
+				if (x+k>=0 && x+k<m_width) {
+					for (int c = 0; c < 3;c++) {
+						m_outBuffer[INDEX(m_width, (x + k), y, c)] += tmp_buff[INDEX(m_width, x, y, c)] * weight[4 + k];
+					}
+				}
+			}
+		}
+	}
+
+	for (int i = 0; i < buff_size; i++) {
+		tmp_buff[i] = m_outBuffer[i];
+		m_outBuffer[i] = 0;
+	}
+
+	//vertical blur
+	for (int x = 0; x < m_width; x++) {
+		for (int y = 0; y < m_height; y++) {
+			for (int k = -4; k <= 4; k++) {
+				if (y + k >= 0 && y + k < m_height) {
+					for (int c = 0; c < 3;c++) {
+						m_outBuffer[INDEX(m_width, x, (y+k), c)] += tmp_buff[INDEX(m_width, x, y, c)] * weight[4 + k];
+					}
+				}
+			}
+		}
+	}
+
+	delete tmp_buff;
+}

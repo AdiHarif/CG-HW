@@ -60,6 +60,8 @@ class Scene {
 
 	bool f_draw_cameras = false;
 
+	bool f_blur;
+
 	mat4 tw;
 
 public:
@@ -166,6 +168,6 @@ public:
 
 	void toggleAntiAliasing();
 	void toggleFog();
-
+	void toggleBlur();
 
 };
