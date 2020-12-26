@@ -139,7 +139,7 @@ void MeshModel::loadFile(string fileName)
 
 	for (int i = 0; i < faces.size(); i++) {
 
-		Face f = faces[i];
+		Face& f = faces[i];
 
 		Vertex v0, v1, v2;
 		v0 = vertices[f.vertices[0] - 1];

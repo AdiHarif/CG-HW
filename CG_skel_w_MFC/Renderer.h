@@ -183,7 +183,7 @@ public:
 
 	////===Lighting Calculations===
 	Color calculateAmbientColor(MeshModel& m);
-	Color calculateDiffuseColor(MeshModel& m, Face f);
+	Color calculateDiffuseColor(MeshModel& m, Vertex center, Normal noraml);
 	////==========
 
 	void toggleFog();

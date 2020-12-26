@@ -705,6 +705,10 @@ void Renderer::drawModel(MeshModel& model) {
 	}
 
 	for (vector<Face>::iterator i = model.faces.begin(); i != model.faces.end(); i++) {
+
+		Vertex center = tm_tot * i->center;
+		center = center / center.w;
+
 		if (model.draw_pref.poly_mode == DrawPref::EDGES_ONLY) {
 			int* indexes = i->vertices;
 			for (int j = 0; j < 3; j++) {
@@ -715,7 +719,8 @@ void Renderer::drawModel(MeshModel& model) {
 
 		if (model.draw_pref.poly_mode == DrawPref::FILLED) {
 			Triangle t = Triangle(px_vertices[i->vertices[0] - 1], px_vertices[i->vertices[1] - 1], px_vertices[i->vertices[2] - 1]);
-			Color face_diffuse_color = calculateDiffuseColor(model, *i);
+			Normal normal = tr_face_normals[i->normal];
+			Color face_diffuse_color = calculateDiffuseColor(model, center, normal);
 			Color face_final_color = model_ambient_color + face_diffuse_color;
 			drawTriangleSolid(t, face_final_color);
 		}
@@ -797,30 +802,40 @@ Color Renderer::calculateAmbientColor(MeshModel& m) {
 	return *scene_ambient_light_color * m.ambient_color;
 }
 
-Color Renderer::calculateDiffuseColor(MeshModel& m, Face f) {
+Color Renderer::calculateDiffuseColor(MeshModel& m, Vertex center, Normal normal) {
 	Color diffuse_color = { 0,0,0 };
-	float cos_theta;
-
+	float factor;
+	
 	for (vector<ParallelSource*>::iterator i = parallel_sources->begin(); i != parallel_sources->end(); i++) {
 		ParallelSource* parallel_s = dynamic_cast<ParallelSource*> ((*i));
-		cos_theta = cos((m.face_normals.at(f.normal) * parallel_s->getDirection()));
-		if (cos_theta > 0) {
-			diffuse_color += (m.diffuse_color * parallel_s->getColor()) * cos_theta;
+		vec4 dir = parallel_s->getDirection();
+
+		vec3 v0 = normalize(vec3(normal.x, normal.y, normal.z));
+		vec3 v1 = -normalize(vec3(dir.x, dir.y, dir.z));
+
+		factor = v0 * v1;
+		if (factor > 0) {
+			diffuse_color += (m.diffuse_color * parallel_s->getColor()) * factor;
 		}
 	}
 
 	for (vector<PointSource*>::iterator i = point_sources->begin(); i != point_sources->end(); i++) {
 		PointSource* point_s = dynamic_cast<PointSource*> ((*i));
-		cos_theta = cos(m.face_normals.at(f.normal) * point_s->getDirectionToPoint(f.center));
-		if (cos_theta > 0) {
-			diffuse_color += (m.diffuse_color * point_s->getColor()) * cos_theta;
+		vec4 dir =center - point_s->getPosition();
+
+		vec3 v0 = normalize(vec3(normal.x, normal.y, normal.z));
+		vec3 v1 = -normalize(vec3(dir.x, dir.y, dir.z));
+
+		factor = v0 * v1;
+		if (factor > 0) {
+			diffuse_color += (m.diffuse_color * point_s->getColor()) * factor;
 		}
 	}
 
 
 	return diffuse_color;
 }
-////==========
+////==========A
 
 
 void Renderer::toggleFog() {
