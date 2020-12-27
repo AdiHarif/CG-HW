@@ -574,6 +574,7 @@ Color Renderer::calculateSpecularColor(MeshModel& m, Vertex point, Normal normal
 	for (vector<PointSource*>::iterator i = point_sources->begin(); i != point_sources->end(); i++) {
 		PointSource* point_s = dynamic_cast<PointSource*> ((*i));
 		vec4 l = normalize(point - point_s->getPosition());
+		l.w = 1;
 		vec4 n = normalize(vec4(normal.x, normal.y, normal.z));
 		vec4 r = 2 * (l * n) * n - l;
 
