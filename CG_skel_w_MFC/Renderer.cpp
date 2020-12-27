@@ -858,9 +858,9 @@ void Renderer::applyFog() {
 void Renderer::drawAxes() {
 	mat4 t_tot = this->tp * this->tc;
 	vec4 axes[3];
-	axes[0] = t_tot * vec4(1, 0, 0, 0);
-	axes[1] = t_tot * vec4(0, 1, 0, 0);
-	axes[2] = t_tot * vec4(0, 0, 1, 0);
+	axes[0] = t_tot * vec4(1, 0, 0, 1);
+	axes[1] = t_tot * vec4(0, 1, 0, 1);
+	axes[2] = t_tot * vec4(0, 0, 1, 1);
 
 	Color colors[3];
 	colors[0] = { 1,0,0 };
@@ -871,6 +871,7 @@ void Renderer::drawAxes() {
 
 
 	for (int i = 0; i < 3; i++) {
+		axes[i] /= axes[i].w;
 		axes[i].w = 0;
 		axes[i] = normalize(axes[i]) / 10;
 		
