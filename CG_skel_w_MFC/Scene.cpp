@@ -9,10 +9,6 @@ using namespace std;
 Color camera_plus_color = { 1.0, 1.0, 0.0 };
 
 //===Inner Getters===
-//Model* Scene::getActiveModel() {
-//	return models[active_model];
-//}
-
 Camera* Scene::getActiveCamera() {
 	return cameras[active_camera];
 }
@@ -32,7 +28,6 @@ Scene::Scene(Renderer* renderer) : m_renderer(renderer) {
 	addParallelSource(def_parallel_source);
 	m_renderer->setParallelSources(&parallel_sources);
 	m_renderer->setPointSources(&point_sources);
-	//m_renderer->setAmbientConstants(&ambient_light_color, &ambient_light_intensity);
 	m_renderer->setAmbientColor(&ambient_light_color);
 }
 
@@ -52,23 +47,10 @@ Scene::~Scene() {
 }
 //==========
 
-//===Getters/Setters===
-
-//vector<Model*> Scene::getModels() {
-//	return models;
-//}
-
-//int Scene::getActiveModelIndex() { return active_model; }
-//
-//int Scene::getActiveCameraIndex() { return active_camera; }
-
-//==========
-
 //===Drawing Functions===
 
 void Scene::draw()
 {
-	//m_renderer->clearColorBuffer();
 	m_renderer->clearBuffer();
 	// 1. Send the renderer the current camera transform and the projection
 	m_renderer->setCameraTransform(getActiveCamera()->getTransform());
@@ -101,12 +83,6 @@ void Scene::draw()
 	m_renderer->swapBuffers();
 }
 
-//void Scene::drawDemo()
-//{
-//	m_renderer->SetDemoBuffer();
-//	m_renderer->swapBuffers();
-//}
-
 //==========
 
 
@@ -117,13 +93,9 @@ void Scene::loadOBJModel(string fileName)
 	MeshModel *model = new MeshModel(fileName);
 	models.push_back(model);
 	activateLastModel();
-	//Camera* c = cameras[activeCamera];
-
-	//c->LookAt(model->getPosition());
 }
 
 void Scene::loadPrimModel() {
-	//PrimMeshModel* model = new PrimMeshModel(file_name);
 	PrimMeshModel* model = new PrimMeshModel();
 	models.push_back(model);
 	activateLastModel();
@@ -268,31 +240,6 @@ void Scene::changeAllModelsActiveness(bool is_active) {
 
 
 //===Display Toggles===
-
-//void Scene::toggleVertices() {
-//	if (false) {	//TODO: toggle selected model
-//
-//	}
-//	else {	//toggle world
-//		for (int i = 0; i < this->models.size(); i++) {
-//			MeshModel* m = dynamic_cast<MeshModel*> (this->models[i]);
-//			m->toggleVertices();
-//		}
-//	}
-//}
-//
-//void Scene::toggleEdges() {
-//	if (false) {	//TODO: toggle selected model
-//
-//	}
-//	else {	//toggle world
-//		for (int i = 0; i < this->models.size(); i++) {
-//			MeshModel* m = dynamic_cast<MeshModel*> (this->models[i]);
-//			m->toggleEdges();
-//		}
-//	}
-//}
-
 void Scene::togglePolyMode() {
 	if (active_model == ALL_MODELS_ACTIVE) {
 		for (int i = 0; i < this->models.size(); i++) {
@@ -364,22 +311,16 @@ void Scene::addCamera(Camera* camera) {
 void Scene::activateNextCamera() {
 	if (models.size() < 1)	return;
 	active_camera = (active_camera + 1) % cameras.size();
-	//deactivateAllCameras();
-	//getActiveCamera()->setIsActive(true);
 }
 
 void Scene::activatePrevCamera() {
 	if (models.size() < 1)	return;
 	active_camera = (active_camera - 1);
 	if (active_camera < 0)	active_camera += cameras.size();
-	//deactivateAllCameras();
-	//getActiveCamera()->setIsActive(true);
 }
 
 void Scene::activateLastCamera() {
 	if (cameras.empty())	return;
-	//deactivateAllCameras();
-	//c->setIsActive(true);
 	active_camera = cameras.size() - 1;
 }
 
@@ -409,15 +350,6 @@ void Scene::lookAtActiveModel() {
 	Camera* c = getActiveCamera();
 	c->lookAt(m->getPosition(), c->getUp());
 }
-
-
-//void Scene::deactivateAllCameras() {
-//	Camera* c = NULL;
-//	for (vector<Camera*>::iterator i = cameras.begin(); i != cameras.end(); i++) {
-//		c = dynamic_cast<Camera*> ((*i));
-//		c->setIsActive(false);
-//	}
-//}
 
 void Scene::toggleCameraProjection() {
 	getActiveCamera()->toggleProjection();

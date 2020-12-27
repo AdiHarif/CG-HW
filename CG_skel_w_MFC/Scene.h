@@ -46,7 +46,6 @@ public:
 class Scene {
 
 	vector<Model*> models;
-	//vector<Light*> lights;
 	vector<ParallelSource*> parallel_sources;
 	vector<PointSource*> point_sources;
 	vector<Camera*> cameras;
@@ -72,10 +71,7 @@ public:
 	//==========
 
 	//===Getters/Setters===
-	//vector<Model*> getModels();
-	//int getActiveModelIndex();
-	//Model* getActiveModel();
-	//int getActiveCameraIndex();
+	Model* getActiveModel();
 	Camera* getActiveCamera();
 	//==========
 
@@ -88,9 +84,7 @@ public:
 	//===Models Interface===
 	void loadOBJModel(string fileName);
 	void loadPrimModel();
-	//void removeModel(int model);
 	void removeSelection();
-	Model* getActiveModel();
 
 	void scaleSelection(double scale_factor);
 	void scaleSelection(vec3 scale_by);
@@ -105,8 +99,6 @@ public:
 	//==========
 
 	//===Display Toggles===
-	/*void toggleVertices();
-	void toggleEdges();*/
 	void togglePolyMode();
 	void toggleBB();
 	void toggleVertexNormals();
@@ -128,7 +120,6 @@ public:
 	void activeCameraToPerspective(const float fovy, const float aspect,
 			const float z_near, const float z_far);
 	void lookAtActiveModel();
-	//void deactivateAllCameras();
 
 	void toggleCameraProjection();
 

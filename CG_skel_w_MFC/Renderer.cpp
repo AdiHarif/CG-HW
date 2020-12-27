@@ -11,14 +11,6 @@
 #define RIGHT_PIXEL 1
 #define DRAW_BETWEEN_COLS 2
 
-//===Line Functions===
-
-//int Line::findX(int y) {
-//	return (int)( ((end.x - start.x) * (y - start.y))/(end.y - start.y) + start.x + 0.5);
-//}
-
-//==========
-
 //===Triangle Functions===
 
 Triangle::Triangle(Pixel p0, Pixel p1, Pixel p2) {
@@ -166,15 +158,6 @@ void Renderer::drawTriangleSolid(Triangle t, Color c) {
 	int max_y = t.findMaxY();
 	int min_y = t.findMinY();
 	int rows = max_y - min_y + 1;
-	//auto draw_between = new int[rows][DRAW_BETWEEN_COLS]; // creating a [rows][2] array
-
-	//// allocate 2d array
-	//int** draw_between = new int* [rows];
-	//int draw_between[rows][DRAW_BETWEEN_COLS];
-	//for (int i = 0; i < rows; i++) {
-	//	draw_between[i] = { INT_MAX, INT_MIN };
-	//}
-	//// ---
 
 	vector<Line> draw_between;
 	for (int i = 0; i < rows; i++) {
@@ -202,13 +185,6 @@ void Renderer::drawTriangleSolid(Triangle t, Color c) {
 		Line line_to_draw = Line(draw_between.at(i).start, draw_between.at(i).end);
 		drawLine(line_to_draw, c);
 	}
-
-	//// delete 2d array
-	//for (int i = 0; i < rows; ++i) {
-	//	delete[] draw_between[i];
-	//}
-	//delete[] draw_between;
-	//// ---
 }
 
 //==========
@@ -238,170 +214,6 @@ Pixel Renderer::viewPort(Vertex v) {
 	};
 	return p;
 }
-
-//vector<Pixel> Renderer::transformVertices(vector<Vertex>& vertices, mat4 tm){ //TODO: improve clipping
-//	vector<Pixel> pixels;
-//	mat4 t_tot = tp * tc * tw * tm;
-//	for (vector<vec4>::iterator i = vertices.begin(); i != vertices.end(); i++) {
-//		vec4 v = t_tot * (*i);
-//		v = v/v.w;
-//		if (v.z < -1 || v.z > 1) continue;
-//		Pixel p = viewPort(v);
-//		if (isPixelLegal(p)) {
-//			pixels.push_back(p);
-//		}
-//	}
-//	return pixels;
-//}
-
-
-//vector<Line> Renderer::transformEdges(vector<vec4>& edges, mat4 tm) { //TODO:delete
-//	vector<Line> lines;
-//	mat4 t_tot = tp * tc * tw * tm;
-//	for (vector<vec4>::iterator i = edges.begin(); i != edges.end(); i += 2) {
-//		vec4 v0 = t_tot * (*i);
-//		v0 = v0 / v0.w;
-//		vec4 v1 = t_tot * (*(i + 1));
-//		v1 = v1 / v1.w;
-//		if ((v0.z < -1 && v1.z < -1) || (v0.z > 1 && v1.z > 1)) continue;
-//		/*if (v0.z > v1.z) {
-//			vec4 tmp = v0;
-//			v0 = v1;
-//			v1 = tmp;
-//		}
-//		if (v0.z < -1) {
-//			vec4 correction = (v1 - v0) * ( (-1-v0.z)/(v1.z-v0.z));
-//			v0 = v0 + correction;
-//		}
-//		if (v1.z > 1) {
-//			vec4 correction = (v0-v1) * ((1 - v1.z) / (v0.z - v1.z));
-//			v0 = v0 + correction;
-//		}*/
-//
-//
-//		Line l = Line(viewPort(v0), viewPort(v1));
-//		if (isLineLegal(l)) {
-//			lines.push_back(l);
-//		}
-//	}
-//	return lines;
-//}
-
-//vector<Line> Renderer::transformEdges(vector<Edge>& edges, mat4 tm) { //TODO: improve clipping
-//	vector<Line> lines;
-//	mat4 t_tot = tp * tc * tw * tm;
-//	for (vector<Edge>::iterator i = edges.begin(); i != edges.end(); i++) {
-//		vec4 v0 = t_tot * (i->start);
-//		v0 = v0 / v0.w;
-//		vec4 v1 = t_tot * (i->end);
-//		v1 = v1 / v1.w;
-//		if ((v0.z < -1 && v1.z < -1) || (v0.z > 1 && v1.z > 1)) continue;
-//		/*if (v0.z > v1.z) {
-//			vec4 tmp = v0;
-//			v0 = v1;
-//			v1 = tmp;
-//		}
-//		if (v0.z < -1) {
-//			vec4 correction = (v1 - v0) * ((-1 - v0.z) / (v1.z - v0.z));
-//			v0 = v0 + correction;
-//		}
-//		if (v1.z > 1) {
-//			vec4 correction = (v0 - v1) * ((1 - v1.z) / (v0.z - v1.z));
-//			v0 = v0 + correction;
-//		}*/
-//		Line l = Line(viewPort(v0),viewPort(v1));
-//		if (isLineLegal(l)) {
-//			lines.push_back(l);
-//		}
-//	}
-//	return lines;
-//}
-//
-//vector<Line> Renderer::transformFaces(vector<Face>& faces, mat4 tm) {
-//	vector<Line> lines;
-//	mat4 t_tot = tp * tc * tw * tm;
-//	for (vector<Face>::iterator i = faces.begin(); i != faces.end(); i++) {
-//		Face f = (*i);
-//		for (int j = 0; j < 3; j++) {
-//			vec4 v0 = t_tot * (*f.vertices[j]);
-//			v0 = v0 / v0.w;
-//			vec4 v1 = t_tot * (*f.vertices[(j + 1) % 3]);
-//			v1 = v1 / v1.w;
-//			if ((v0.z < -1 && v1.z < -1) || (v0.z > 1 && v1.z > 1)) continue;
-//			/*if (v0.z > v1.z) {
-//				vec4 tmp = v0;
-//				v0 = v1;
-//				v1 = tmp;
-//			}
-//			if (v0.z < -1) {
-//				vec4 correction = (v1 - v0) * ((-1 - v0.z) / (v1.z - v0.z));
-//				v0 = v0 + correction;
-//			}
-//			if (v1.z > 1) {
-//				vec4 correction = (v0 - v1) * ((1 - v1.z) / (v0.z - v1.z));
-//				v0 = v0 + correction;
-//			}*/
-//			Line l = Line(viewPort(v0),viewPort(v1));
-//			if (isLineLegal(l)) {
-//				lines.push_back(l);
-//			}
-//		}
-//	}
-//	return lines;
-//}
-
-//vector<Line> Renderer::transformVertexNormals(vector<Face>& faces, mat4 tm, mat4 ntm) {
-//	vector<Line> lines;
-//	mat4 tm_tot = tp * tc * tw * tm;
-//	mat4 ntm_t1 = tw * ntm;
-//	mat4 ntm_t2 = tp * tc;
-//	for (int i = 0; i < faces.size(); i++) {
-//		for (int j = 0; j < 3; j++) {
-//			vec4 start = tm_tot * (*faces[i].vertices[j]);
-//			start = start / start.w;
-//			vec4 direction = ntm_t1 * (*faces[i].normals[j]);
-//			direction.w = 0;
-//			direction = normalize(direction);
-//			direction.w = 1;
-//			direction = ntm_t2 * direction;
-//			direction = direction / direction.w;
-//			vec4 end = start + direction;
-//			end.w = 1;
-//			if ((start.z < -1 && end.z < -1) || (start.z > 1 && end.z > 1)) continue;
-//			Line l = Line(viewPort(start), viewPort(end));
-//			if (isLineLegal(l)) {
-//				lines.push_back(l);
-//			}
-//		}
-//	}
-//	return lines;
-//}
-//
-//vector<Line> Renderer::transformFaceNormals(vector<Face>& faces, mat4 tm, mat4 ntm) {
-//	vector<Line> lines;
-//	mat4 tm_tot = tp * tc * tw * tm;
-//	mat4 ntm_t1 = tw * ntm;
-//	mat4 ntm_t2 = tp * tc;
-//	for (int i = 0; i < faces.size(); i++) {
-//		vec4 start = tm_tot * (faces[i].center);
-//		start = start / start.w;
-//		vec4 direction = ntm_t1 * (faces[i].center_normal);
-//		direction.w = 0;
-//		direction = normalize(direction);
-//		direction.w = 1;
-//		direction = ntm_t2 * direction;
-//		direction = direction / direction.w;
-//		vec4 end = start + direction;
-//		end.w = 1;
-//		if ((start.z < -1 && end.z < -1) || (start.z > 1 && end.z > 1)) continue;
-//		Line l = Line(viewPort(start), viewPort(end));
-//		if (isLineLegal(l)) {
-//			lines.push_back(l);
-//		}
-//	}
-//	return lines;
-//}
-
 //==========
 
 
@@ -463,7 +275,7 @@ void Renderer::CreateOpenGLBuffer()
 /////////////////////////////////////////////////////
 
 
-//===C'tor\D'tor===
+//===C'tor/D'tor===
 Renderer::Renderer(int width, int height) :m_width(width), m_height(height),
 	f_anti_aliasing(false), fog({ {1,1,1}, 0.5 }), f_fog(false), f_axes(true)
 {
@@ -524,12 +336,6 @@ void Renderer::clearBuffer() {
 	}
 }
 
-//void Renderer::clearColorBuffer() {
-//	for (int i = 0; i < M_OUT_BUFFER_SIZE; i++) {
-//		m_outBuffer[i] = 0.2;
-//	}
-//}
-//
 void Renderer::colorBackground(Color color) {
 	for (int i = 0; i < M_OUT_BUFFER_SIZE; i+=3) {
 		m_outBuffer[i] = color.r;
@@ -552,71 +358,6 @@ void Renderer::setSize(int width, int height) {
 }
 //==========
 
-
-//===Drawing Interface===
-//void Renderer::drawVertices(vector<Vertex>& vertices, mat4 tm, Color c){
-//	vector<Pixel> pixels = transformVertices(vertices, tm);
-//	for (vector<Pixel>::iterator i = pixels.begin(); i != pixels.end(); i++) {
-//		rasterizePoint(*i, c);
-//	}
-//}
-//
-//void Renderer::drawEdges(vector<Edge>& edges, mat4 tm, Color c) {
-//	vector<Line> lines = transformEdges(edges, tm);
-//	for (vector<Line>::iterator i = lines.begin(); i != lines.end(); i++) {
-//		rasterizeLine(*i, c);
-//	}
-//}
-//
-//void Renderer::drawEdges(vector<Face>& faces, mat4 tm, Color c) {
-//	vector<Line> lines = transformFaces(faces, tm);
-//	for (vector<Line>::iterator i = lines.begin(); i != lines.end(); i++) {
-//		rasterizeLine(*i, c);
-//	}
-//}
-
-//void Renderer::drawTriangles(vector<Face>& faces, mat4 tm, Color c) {
-//	vector<Line> lines = transformFaces(faces, tm);
-//	for (vector<Line>::iterator i = lines.begin(); i != lines.end(); i++) {
-//		rasterizeLine(*i, c);
-//	}
-//}
-
-//void Renderer::drawVertexNormals(vector<Vertex>& points, mat4 tm, vector<vec4>& normals, mat4 ntm, vector<int>& vertex_normals_indexes, Color c) {
-	//vector<vec4> normals_to_draw;
-	/*for (vector<vec4>::iterator i = normals.begin(); i != normals.end(); i++) {
-		*i = normalize(*i);
-		*i *= 10;
-	}
-	vector<Pixel> vertices_pixels = transformVertices(points, tm);
-	vector<Pixel> normals_pixels = transformVertices(normals, ntm);
-	
-
-	for (int i = 0; i < vertex_normals_indexes.size(); i+=2) {
-		Pixel start = vertices_pixels[vertex_normals_indexes[i]];
-		Pixel end = Pixel(0, 0); 
-		end.x = vertices_pixels[vertex_normals_indexes[i]].x + normals[vertex_normals_indexes[i + 1]].x;
-		end.y = vertices_pixels[vertex_normals_indexes[i]].y + normals[vertex_normals_indexes[i + 1]].y;
-
-		Line l = Line(start, end);
-		rasterizeLine(l, c);
-	}
-}*/
-
-//void Renderer::drawVertexNormals(vector<Face>& faces, mat4 tm, mat4 ntm, Color c) {
-//	vector<Line> lines = transformVertexNormals(faces, tm, ntm);
-//	for (vector<Line>::iterator i = lines.begin(); i != lines.end(); i++) {
-//		rasterizeLine(*i, c);
-//	}
-//}
-//
-//void Renderer::drawFacesNormals(vector<Face>& faces, mat4 tm, mat4 ntm, Color c) {
-//	vector<Line> lines = transformFaceNormals(faces, tm, ntm);
-//	for (vector<Line>::iterator i = lines.begin(); i != lines.end(); i++) {
-//		rasterizeLine(*i, c);
-//	}
-//}
-//
 void Renderer::drawCamera(vec4 pos, Color c) {
 	mat4 t_tot = tp * tc * tw;
 	Pixel center = viewPort(t_tot * pos);
@@ -657,10 +398,6 @@ void Renderer::setWorldTransform(const mat4& tw) { this->tw = tw; }
 ////===Light Setters===
 void Renderer::setParallelSources(vector<ParallelSource*>* parallel_sources) { this->parallel_sources = parallel_sources; }
 void Renderer::setPointSources(vector<PointSource*>* point_sources) { this->point_sources = point_sources; }
-//void Renderer::setAmbientConstants(Color* color, GLfloat* intensity) {
-//	scene_ambient_light_color = color;
-//	//scene_ambient_light_intensity = intensity;
-//}
 void Renderer::setAmbientColor(Color* color) { scene_ambient_light_color = color; }
 ////==========
 
@@ -785,14 +522,8 @@ float* Renderer::createAntiAliasedBuffer() {
 						m_outBuffer[INDEX(m_width, (x * 2), ((y * 2) + 1), k)] +
 						m_outBuffer[INDEX(m_width, ((x * 2) + 1), ((y * 2) + 1), k)]) / 4;
 			}
-			//std::cout << "new_buff: (" << x << ", " << y << ")" << std::endl;
-			//std::cout << "m_buff: (" << x*2 << ", " << y*2 << ") (" << x * 2 +1<< ", " << y * 2 << ") (" << x * 2 << ", " << y * 2+1 << ") (" << x * 2 +1<< ", " << y * 2 +1<< ")" << std::endl;
-
 		}
 	}
-
-	//new_buff[INDEX(m_width / 2, 1, 1, 0)] = new_buff[INDEX(m_width / 2, 1, 1, 1)] = new_buff[INDEX(m_width / 2, 1, 1, 2)] = 1.0;
-
 	return new_buff;
 }
 

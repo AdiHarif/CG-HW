@@ -163,8 +163,6 @@ void Camera::rotateZWorld(float theta) {
 
 }
 
-
-
 void Camera::lookAt() {
     vec4 z_axis = normalize(position - at);
     vec4 x_axis = normalize(cross(up, z_axis));
@@ -266,16 +264,9 @@ void Camera::toggleProjection() {
 
 
 //===Getters===
-
 mat4 Camera::getTransform() { return tc; }
-
 mat4 Camera::getProjection() { return tp; }
-
 vec4 Camera::getPosition() { return position; }
 vec4 Camera::getAt() { return at; }
 vec4 Camera::getUp() { return up; }
-
-//bool Camera::getIsActive() { return is_active; }
-
-//void Camera::setIsActive(bool new_is_active) { is_active = new_is_active; }
 //==========

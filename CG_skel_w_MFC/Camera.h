@@ -72,7 +72,5 @@ public:
 	vec4 getPosition();
 	vec4 getAt();
 	vec4 getUp();
-	//bool getIsActive();
-	//void setIsActive(bool new_is_active);
 	//==========
 };
