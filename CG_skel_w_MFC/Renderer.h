@@ -65,6 +65,8 @@ class Renderer
 	mat4 tc;
 	mat4 tp;
 
+	vec4 active_camera_pos;
+
 	bool f_anti_aliasing;
 	bool f_fog;
 	bool f_axes;
@@ -127,10 +129,11 @@ public:
 	//==========
 
 
-	////===Transformation Setters===
+	////===Transformation/Camera Setters===
 	void setCameraTransform(const mat4& tc);
 	void setProjection(const mat4& tc);
 	void setWorldTransform(const mat4& tw);
+	void setActiveCameraPosition(vec4 pos);
 	////==========
 
 	////===Lights Setters===
@@ -151,6 +154,7 @@ public:
 	////===Lighting Calculations===
 	Color calculateAmbientColor(MeshModel& m);
 	Color calculateDiffuseColor(MeshModel& m, Vertex center, Normal noraml);
+	Color calculateSpecularColor(MeshModel& m, Vertex point, Normal noraml, vec4 dir_to_camera);
 	////==========
 
 	void toggleFog();

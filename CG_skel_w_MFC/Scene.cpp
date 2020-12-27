@@ -56,6 +56,7 @@ void Scene::draw()
 	m_renderer->setCameraTransform(getActiveCamera()->getTransform());
 	m_renderer->setProjection(getActiveCamera()->getProjection());
 	m_renderer->setWorldTransform(tw);
+	m_renderer->setActiveCameraPosition(getActiveCamera()->getPosition());
 
 	// 2. Tell all models to draw themselves
 	for (vector<Model*>::iterator i = models.begin(); i!=models.end(); i++){

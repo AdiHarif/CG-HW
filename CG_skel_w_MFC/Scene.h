@@ -23,7 +23,7 @@ protected:
 	//GLfloat specular_reflection;
 	//GLfloat diffuse_reflection;
 	//GLfloat ambient_reflection = 1;
-	GLfloat shininess;
+	GLfloat shininess = 0.1;
 
 	virtual ~Model() {}
 	//void virtual draw()=0;
