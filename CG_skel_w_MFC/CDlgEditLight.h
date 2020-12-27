@@ -52,8 +52,8 @@ public:
 	CEdit dir_x_editbox;
 	CEdit dir_y_editbox;
 	CEdit dir_z_editbox;
-	vector<ParallelSource*>* parallel_sources;
-	vector<PointSource*>* point_sources;
+	vector<ParallelSource>* parallel_sources;
+	vector<PointSource>* point_sources;
 
 	afx_msg void OnBnClickedRadioAmbient();
 	afx_msg void OnBnClickedRadioParallel();
@@ -61,8 +61,8 @@ public:
 	afx_msg void OnCbnSelchangeComboName();
 	afx_msg void OnBnClickedOk();
 
-	void setParallelSources(vector<ParallelSource*>* parallel_sources);
-	void setPointSources(vector<PointSource*>* point_sources);
+	void setParallelSources(vector<ParallelSource>* parallel_sources);
+	void setPointSources(vector<PointSource>* point_sources);
 	void updateComboParallel();
 	void updateComboPoint();
 	void clearAllEditBoxes();

@@ -83,8 +83,8 @@ class Renderer
 		//float curve;
 	} fog;
 
-	vector<ParallelSource*>* parallel_sources = NULL;
-	vector<PointSource*>* point_sources = NULL;
+	vector<ParallelSource> parallel_sources;
+	vector<PointSource> point_sources;
 	Color* scene_ambient_light_color;
 	//GLfloat* scene_ambient_light_intensity;
 
@@ -162,11 +162,13 @@ public:
 	void setCameraTransform(const mat4& tc);
 	void setProjection(const mat4& tc);
 	void setWorldTransform(const mat4& tw);
+
+	void setLightSources(vector<PointSource> points, vector<ParallelSource> parallels);
 	////==========
 
-	////===Lights Setters===
-	void setParallelSources(vector<ParallelSource*>* parallel_sources);
-	void setPointSources(vector<PointSource*>* point_sources);
+	//////===Lights Setters===
+	//void setParallelSources(vector<ParallelSource*>* parallel_sources);
+	//void setPointSources(vector<PointSource*>* point_sources);
 	//void setAmbientConstants(Color* color, GLfloat* intensity);
 	void setAmbientColor(Color* color);
 	////==========

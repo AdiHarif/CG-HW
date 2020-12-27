@@ -654,9 +654,9 @@ void Renderer::setProjection(const mat4& tp) { this->tp = tp; }
 void Renderer::setWorldTransform(const mat4& tw) { this->tw = tw; }
 ////==========
 
-////===Light Setters===
-void Renderer::setParallelSources(vector<ParallelSource*>* parallel_sources) { this->parallel_sources = parallel_sources; }
-void Renderer::setPointSources(vector<PointSource*>* point_sources) { this->point_sources = point_sources; }
+//////===Light Setters===
+//void Renderer::setParallelSources(vector<ParallelSource*>* parallel_sources) { this->parallel_sources = parallel_sources; }
+//void Renderer::setPointSources(vector<PointSource*>* point_sources) { this->point_sources = point_sources; }
 //void Renderer::setAmbientConstants(Color* color, GLfloat* intensity) {
 //	scene_ambient_light_color = color;
 //	//scene_ambient_light_intensity = intensity;
@@ -806,29 +806,27 @@ Color Renderer::calculateDiffuseColor(MeshModel& m, Vertex center, Normal normal
 	Color diffuse_color = { 0,0,0 };
 	float factor;
 	
-	for (vector<ParallelSource*>::iterator i = parallel_sources->begin(); i != parallel_sources->end(); i++) {
-		ParallelSource* parallel_s = dynamic_cast<ParallelSource*> ((*i));
-		vec4 dir = parallel_s->getDirection();
+	for (vector<ParallelSource>::iterator i = parallel_sources.begin(); i != parallel_sources.end(); i++) {
+		vec4 dir = i->getDirection();
 
 		vec3 v0 = normalize(vec3(normal.x, normal.y, normal.z));
 		vec3 v1 = -normalize(vec3(dir.x, dir.y, dir.z));
 
 		factor = v0 * v1;
 		if (factor > 0) {
-			diffuse_color += (m.diffuse_color * parallel_s->getColor()) * factor;
+			diffuse_color += (m.diffuse_color * i->getColor()) * factor;
 		}
 	}
 
-	for (vector<PointSource*>::iterator i = point_sources->begin(); i != point_sources->end(); i++) {
-		PointSource* point_s = dynamic_cast<PointSource*> ((*i));
-		vec4 dir =center - point_s->getPosition();
+	for (vector<PointSource>::iterator i = point_sources.begin(); i != point_sources.end(); i++) {
+		vec4 dir =center - i->getPosition();
 
 		vec3 v0 = normalize(vec3(normal.x, normal.y, normal.z));
 		vec3 v1 = -normalize(vec3(dir.x, dir.y, dir.z));
 
 		factor = v0 * v1;
 		if (factor > 0) {
-			diffuse_color += (m.diffuse_color * point_s->getColor()) * factor;
+			diffuse_color += (m.diffuse_color * i->getColor()) * factor;
 		}
 	}
 
@@ -933,4 +931,19 @@ void Renderer::applyBlur() {
 	}
 
 	delete tmp_buff;
+}
+
+void Renderer::setLightSources(vector<PointSource> points, vector<ParallelSource> parallels) {
+	parallel_sources.clear();
+	point_sources.clear();
+
+	mat4 t_tot = tp * tc;
+
+	for (vector<PointSource>::iterator i = points.begin(); i != points.end(); i++) {
+		point_sources.push_back(t_tot * (*i));
+	}
+
+	for (vector<ParallelSource>::iterator i = parallels.begin(); i != parallels.end(); i++) {
+		parallel_sources.push_back(t_tot * (*i));
+	}
 }

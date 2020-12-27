@@ -28,23 +28,13 @@ Scene::Scene(Renderer* renderer) : m_renderer(renderer) {
 	//ambient_light_intensity = 0.5;
 	Camera* def_cam = new Camera(vec4(0.0, 0.0, 10.0));
 	addCamera(def_cam);
-	ParallelSource* def_parallel_source = new ParallelSource("Parallel Light 0", vec3(0.0, 0.0, -1.0), { 0.3, 0.1, 0.1 });
-	addParallelSource(def_parallel_source);
-	m_renderer->setParallelSources(&parallel_sources);
-	m_renderer->setPointSources(&point_sources);
+	parallel_sources.push_back(ParallelSource("Parallel Light 0", vec3(0.0, 0.0, -1.0), { 0.3, 0.1, 0.1 }));
+	//addParallelSource(def_parallel_source);
 	//m_renderer->setAmbientConstants(&ambient_light_color, &ambient_light_intensity);
 	m_renderer->setAmbientColor(&ambient_light_color);
 }
 
 Scene::~Scene() {
-	for (vector<ParallelSource*>::iterator i = parallel_sources.begin(); i != parallel_sources.end(); i++) {
-		ParallelSource* ps = dynamic_cast<ParallelSource*> ((*i));
-		delete ps;
-	}
-	for (vector<PointSource*>::iterator i = point_sources.begin(); i != point_sources.end(); i++) {
-		PointSource* ps = dynamic_cast<PointSource*> ((*i));
-		delete ps;
-	}
 	for (vector<Camera*>::iterator i = cameras.begin(); i != cameras.end(); i++) {
 		Camera* c = dynamic_cast<Camera*> ((*i));
 		delete c;
@@ -74,6 +64,8 @@ void Scene::draw()
 	m_renderer->setCameraTransform(getActiveCamera()->getTransform());
 	m_renderer->setProjection(getActiveCamera()->getProjection());
 	m_renderer->setWorldTransform(tw);
+
+	m_renderer->setLightSources(point_sources, parallel_sources);
 
 	// 2. Tell all models to draw themselves
 	for (vector<Model*>::iterator i = models.begin(); i!=models.end(); i++){
@@ -466,14 +458,14 @@ void Scene::zoom(float amount) {
 
 //====
 //ParallelSource Interface
-void Scene::addParallelSource(ParallelSource* parallel_source) {
+void Scene::addParallelSource(ParallelSource parallel_source) {
 	parallel_sources.push_back(parallel_source);
 }
 
 //====
 
 //PointSource Interface
-void Scene::addPointSource(PointSource* point_source) {
+void Scene::addPointSource(PointSource point_source) {
 	point_sources.push_back(point_source);
 }
 

@@ -18,6 +18,14 @@ void ParallelSource::setDirection(vec3 dir) {
 
 //==========
 
+ParallelSource operator*(mat4 m, ParallelSource light) {
+
+	vec4 dir = m * light.direction;
+	dir /= dir.w;
+
+	return ParallelSource(light.name, normalize(vec3(dir.x,dir.y,dir.z)) , light.color);
+}
+
 
 //===PointSource===
 
@@ -40,3 +48,12 @@ vec3 PointSource::getDirectionToPoint(Vertex to) {
 }
 
 //==========
+
+
+PointSource operator*(mat4 m, PointSource light) {
+
+	vec4 dir = m * light.position;
+	dir /= dir.w;
+
+	return PointSource(light.name, vec3(dir.x, dir.y, dir.z), light.color);
+}

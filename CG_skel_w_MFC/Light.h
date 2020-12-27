@@ -27,6 +27,9 @@ public:
 	
 	vec3 getDirection();
 	void setDirection(vec3 dir);
+
+
+	friend ParallelSource operator*(mat4 m, ParallelSource light);
 };
 
 class PointSource : public Light {
@@ -38,4 +41,6 @@ public:
 	vec3 getPosition();
 	void setPosition(vec3 pos);
 	vec3 getDirectionToPoint(Vertex to);
+
+	friend PointSource operator*(mat4 m, PointSource light);
 };
