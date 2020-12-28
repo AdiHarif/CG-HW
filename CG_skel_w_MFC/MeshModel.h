@@ -10,6 +10,7 @@ using namespace std;
 
 typedef struct s_draw_pref {
 	enum PolyMode { VERTICES_ONLY = 0, EDGES_ONLY = 1, FILLED = 2} poly_mode = EDGES_ONLY;
+	enum Shading { FLAT = 0, GOURAUD = 1, PHONG =2} shading = FLAT;
 	bool f_draw_bb = false;
 	bool f_draw_vertex_normals = false;
 	bool f_draw_faces_normals = false;

@@ -457,7 +457,7 @@ void Renderer::drawModel(MeshModel& model) {
 		}
 
 		if (model.draw_pref.poly_mode == DrawPref::FILLED) {
-			if (1) { //TODO: change to if(flat_shading)
+			if (model.draw_pref.shading == DrawPref::FLAT) {
 				Triangle t = Triangle(px_vertices[i->vertices[0] - 1], px_vertices[i->vertices[1] - 1], px_vertices[i->vertices[2] - 1]);
 				Normal normal = tr_face_normals[i->normal];
 				Color face_diffuse_color = calculateDiffuseColor(model, center, normal);
@@ -467,6 +467,16 @@ void Renderer::drawModel(MeshModel& model) {
 				face_final_color.floorToOne();
 				drawTriangleSolid(t, face_final_color);
 			}
+			if (model.draw_pref.shading == DrawPref::GOURAUD) {
+
+			}
+
+			if (model.draw_pref.shading == DrawPref::PHONG) {
+
+
+			}
+
+
 		}
 
 		if (model.draw_pref.f_draw_vertex_normals) {
@@ -694,12 +704,12 @@ void Renderer::applyBloom(float bloom_threshold) {
 	}
 
 	for (int i = 0; i < buff_size; i += 3) {
-		if (m_outBuffer[i] > bloom_threshold 
+		if (m_outBuffer[i] > bloom_threshold
 			|| m_outBuffer[i + 1] > bloom_threshold
 			|| m_outBuffer[i + 2] > bloom_threshold) {
-				bloom_buff[i] = m_outBuffer[i];
-				bloom_buff[i + 1] = m_outBuffer[i + 1];
-				bloom_buff[i + 2] = m_outBuffer[i + 2];
+			bloom_buff[i] = m_outBuffer[i];
+			bloom_buff[i + 1] = m_outBuffer[i + 1];
+			bloom_buff[i + 2] = m_outBuffer[i + 2];
 		}
 	}
 
