@@ -22,10 +22,12 @@ Camera* Scene::getActiveCamera() {
 
 Scene::Scene(Renderer* renderer) : m_renderer(renderer) {
 	f_blur = false;
+	f_bloom = false;
 	active_model = NO_MODELS_ACTIVE;
 	active_camera = -1;
 	ambient_light_color = { 0.1, 0.1, 0.1 };
 	//ambient_light_intensity = 0.5;
+	light_bloom_threshold = 0.9;
 	Camera* def_cam = new Camera(vec4(0.0, 0.0, 10.0));
 	addCamera(def_cam);
 	parallel_sources.push_back(ParallelSource("Parallel Light 0", vec3(0.0, 0.0, -1.0), { 0.3, 0.1, 0.1 }));
@@ -85,6 +87,10 @@ void Scene::draw()
 
 	if (f_blur) {
 		m_renderer->applyBlur(m_renderer->m_outBuffer);
+	}
+
+	if (f_bloom) {
+		m_renderer->applyBloom(light_bloom_threshold);
 	}
 
 	m_renderer->drawAxes();
