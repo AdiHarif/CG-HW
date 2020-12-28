@@ -11,14 +11,6 @@
 #define RIGHT_PIXEL 1
 #define DRAW_BETWEEN_COLS 2
 
-//===Line Functions===
-
-//int Line::findX(int y) {
-//	return (int)( ((end.x - start.x) * (y - start.y))/(end.y - start.y) + start.x + 0.5);
-//}
-
-//==========
-
 //===Triangle Functions===
 
 Triangle::Triangle(Pixel p0, Pixel p1, Pixel p2) {
@@ -44,7 +36,7 @@ int Triangle::findMinY() {
 void Renderer::createBuffers()
 {
 	CreateOpenGLBuffer(); //Do not remove this line.
-	m_outBuffer = new float[3*m_width*m_height];
+	m_outBuffer = new float[3 * m_width * m_height];
 	m_zbuffer = new float[m_width * m_height];
 }
 //==========
@@ -53,7 +45,7 @@ void Renderer::createBuffers()
 //===Inner Drawing Functions===
 
 void Renderer::drawPixel(Pixel p, Color c) {
-	if ( (!isPixelLegal(p)) || p.z < m_zbuffer[Z_INDEX(m_width, p.x, p.y)]) {
+	if ((!isPixelLegal(p)) || p.z < m_zbuffer[Z_INDEX(m_width, p.x, p.y)]) {
 		return;
 	}
 	m_outBuffer[INDEX(m_width, p.x, p.y, 0)] = c.r;
@@ -67,7 +59,7 @@ void Renderer::drawLine(Line l, Color c, vector<Pixel>* pixels_drawn) {
 	Pixel p1 = l.end;
 	if (p0.x == p1.x) {
 		if (p0.y < p1.y) {
-			drawLineSteep(Line(p0,p1), c, pixels_drawn);
+			drawLineSteep(Line(p0, p1), c, pixels_drawn);
 		}
 		else {
 			drawLineSteep(Line(p1, p0), c, pixels_drawn);
@@ -102,7 +94,7 @@ void Renderer::drawLineModerate(Line l, Color c, vector<Pixel>* pixels_drawn) {
 		yi = -1;
 		dy = -dy;
 	}
-	int D = 2*dy - dx;
+	int D = 2 * dy - dx;
 	int y = p0.y;
 	for (int x = p0.x; x <= p1.x; x++) {
 		Pixel p = Pixel(x, y, z);
@@ -112,10 +104,10 @@ void Renderer::drawLineModerate(Line l, Color c, vector<Pixel>* pixels_drawn) {
 		this->drawPixel(p, c);
 		if (D > 0) {
 			y += yi;
-			D += 2*(dy-dx);
+			D += 2 * (dy - dx);
 		}
 		else {
-			D += 2*dy;
+			D += 2 * dy;
 		}
 		z += dz;
 	}
@@ -123,8 +115,8 @@ void Renderer::drawLineModerate(Line l, Color c, vector<Pixel>* pixels_drawn) {
 
 void Renderer::drawLineSteep(Line l, Color c, vector<Pixel>* pixels_drawn) {
 	//flip x<->y
-	Pixel p0 = { l.start.y, l.start.x, l.start.z};
-	Pixel p1 = { l.end.y, l.end.x, l.end.z};
+	Pixel p0 = { l.start.y, l.start.x, l.start.z };
+	Pixel p1 = { l.end.y, l.end.x, l.end.z };
 	//make sure p0 is left of p1
 	if (p0.x > p1.x) {
 		Pixel tmp = p0;
@@ -166,15 +158,6 @@ void Renderer::drawTriangleSolid(Triangle t, Color c) {
 	int max_y = t.findMaxY();
 	int min_y = t.findMinY();
 	int rows = max_y - min_y + 1;
-	//auto draw_between = new int[rows][DRAW_BETWEEN_COLS]; // creating a [rows][2] array
-
-	//// allocate 2d array
-	//int** draw_between = new int* [rows];
-	//int draw_between[rows][DRAW_BETWEEN_COLS];
-	//for (int i = 0; i < rows; i++) {
-	//	draw_between[i] = { INT_MAX, INT_MIN };
-	//}
-	//// ---
 
 	vector<Line> draw_between;
 	for (int i = 0; i < rows; i++) {
@@ -202,13 +185,6 @@ void Renderer::drawTriangleSolid(Triangle t, Color c) {
 		Line line_to_draw = Line(draw_between.at(i).start, draw_between.at(i).end);
 		drawLine(line_to_draw, c);
 	}
-
-	//// delete 2d array
-	//for (int i = 0; i < rows; ++i) {
-	//	delete[] draw_between[i];
-	//}
-	//delete[] draw_between;
-	//// ---
 }
 
 //==========
@@ -238,170 +214,6 @@ Pixel Renderer::viewPort(Vertex v) {
 	};
 	return p;
 }
-
-//vector<Pixel> Renderer::transformVertices(vector<Vertex>& vertices, mat4 tm){ //TODO: improve clipping
-//	vector<Pixel> pixels;
-//	mat4 t_tot = tp * tc * tw * tm;
-//	for (vector<vec4>::iterator i = vertices.begin(); i != vertices.end(); i++) {
-//		vec4 v = t_tot * (*i);
-//		v = v/v.w;
-//		if (v.z < -1 || v.z > 1) continue;
-//		Pixel p = viewPort(v);
-//		if (isPixelLegal(p)) {
-//			pixels.push_back(p);
-//		}
-//	}
-//	return pixels;
-//}
-
-
-//vector<Line> Renderer::transformEdges(vector<vec4>& edges, mat4 tm) { //TODO:delete
-//	vector<Line> lines;
-//	mat4 t_tot = tp * tc * tw * tm;
-//	for (vector<vec4>::iterator i = edges.begin(); i != edges.end(); i += 2) {
-//		vec4 v0 = t_tot * (*i);
-//		v0 = v0 / v0.w;
-//		vec4 v1 = t_tot * (*(i + 1));
-//		v1 = v1 / v1.w;
-//		if ((v0.z < -1 && v1.z < -1) || (v0.z > 1 && v1.z > 1)) continue;
-//		/*if (v0.z > v1.z) {
-//			vec4 tmp = v0;
-//			v0 = v1;
-//			v1 = tmp;
-//		}
-//		if (v0.z < -1) {
-//			vec4 correction = (v1 - v0) * ( (-1-v0.z)/(v1.z-v0.z));
-//			v0 = v0 + correction;
-//		}
-//		if (v1.z > 1) {
-//			vec4 correction = (v0-v1) * ((1 - v1.z) / (v0.z - v1.z));
-//			v0 = v0 + correction;
-//		}*/
-//
-//
-//		Line l = Line(viewPort(v0), viewPort(v1));
-//		if (isLineLegal(l)) {
-//			lines.push_back(l);
-//		}
-//	}
-//	return lines;
-//}
-
-//vector<Line> Renderer::transformEdges(vector<Edge>& edges, mat4 tm) { //TODO: improve clipping
-//	vector<Line> lines;
-//	mat4 t_tot = tp * tc * tw * tm;
-//	for (vector<Edge>::iterator i = edges.begin(); i != edges.end(); i++) {
-//		vec4 v0 = t_tot * (i->start);
-//		v0 = v0 / v0.w;
-//		vec4 v1 = t_tot * (i->end);
-//		v1 = v1 / v1.w;
-//		if ((v0.z < -1 && v1.z < -1) || (v0.z > 1 && v1.z > 1)) continue;
-//		/*if (v0.z > v1.z) {
-//			vec4 tmp = v0;
-//			v0 = v1;
-//			v1 = tmp;
-//		}
-//		if (v0.z < -1) {
-//			vec4 correction = (v1 - v0) * ((-1 - v0.z) / (v1.z - v0.z));
-//			v0 = v0 + correction;
-//		}
-//		if (v1.z > 1) {
-//			vec4 correction = (v0 - v1) * ((1 - v1.z) / (v0.z - v1.z));
-//			v0 = v0 + correction;
-//		}*/
-//		Line l = Line(viewPort(v0),viewPort(v1));
-//		if (isLineLegal(l)) {
-//			lines.push_back(l);
-//		}
-//	}
-//	return lines;
-//}
-//
-//vector<Line> Renderer::transformFaces(vector<Face>& faces, mat4 tm) {
-//	vector<Line> lines;
-//	mat4 t_tot = tp * tc * tw * tm;
-//	for (vector<Face>::iterator i = faces.begin(); i != faces.end(); i++) {
-//		Face f = (*i);
-//		for (int j = 0; j < 3; j++) {
-//			vec4 v0 = t_tot * (*f.vertices[j]);
-//			v0 = v0 / v0.w;
-//			vec4 v1 = t_tot * (*f.vertices[(j + 1) % 3]);
-//			v1 = v1 / v1.w;
-//			if ((v0.z < -1 && v1.z < -1) || (v0.z > 1 && v1.z > 1)) continue;
-//			/*if (v0.z > v1.z) {
-//				vec4 tmp = v0;
-//				v0 = v1;
-//				v1 = tmp;
-//			}
-//			if (v0.z < -1) {
-//				vec4 correction = (v1 - v0) * ((-1 - v0.z) / (v1.z - v0.z));
-//				v0 = v0 + correction;
-//			}
-//			if (v1.z > 1) {
-//				vec4 correction = (v0 - v1) * ((1 - v1.z) / (v0.z - v1.z));
-//				v0 = v0 + correction;
-//			}*/
-//			Line l = Line(viewPort(v0),viewPort(v1));
-//			if (isLineLegal(l)) {
-//				lines.push_back(l);
-//			}
-//		}
-//	}
-//	return lines;
-//}
-
-//vector<Line> Renderer::transformVertexNormals(vector<Face>& faces, mat4 tm, mat4 ntm) {
-//	vector<Line> lines;
-//	mat4 tm_tot = tp * tc * tw * tm;
-//	mat4 ntm_t1 = tw * ntm;
-//	mat4 ntm_t2 = tp * tc;
-//	for (int i = 0; i < faces.size(); i++) {
-//		for (int j = 0; j < 3; j++) {
-//			vec4 start = tm_tot * (*faces[i].vertices[j]);
-//			start = start / start.w;
-//			vec4 direction = ntm_t1 * (*faces[i].normals[j]);
-//			direction.w = 0;
-//			direction = normalize(direction);
-//			direction.w = 1;
-//			direction = ntm_t2 * direction;
-//			direction = direction / direction.w;
-//			vec4 end = start + direction;
-//			end.w = 1;
-//			if ((start.z < -1 && end.z < -1) || (start.z > 1 && end.z > 1)) continue;
-//			Line l = Line(viewPort(start), viewPort(end));
-//			if (isLineLegal(l)) {
-//				lines.push_back(l);
-//			}
-//		}
-//	}
-//	return lines;
-//}
-//
-//vector<Line> Renderer::transformFaceNormals(vector<Face>& faces, mat4 tm, mat4 ntm) {
-//	vector<Line> lines;
-//	mat4 tm_tot = tp * tc * tw * tm;
-//	mat4 ntm_t1 = tw * ntm;
-//	mat4 ntm_t2 = tp * tc;
-//	for (int i = 0; i < faces.size(); i++) {
-//		vec4 start = tm_tot * (faces[i].center);
-//		start = start / start.w;
-//		vec4 direction = ntm_t1 * (faces[i].center_normal);
-//		direction.w = 0;
-//		direction = normalize(direction);
-//		direction.w = 1;
-//		direction = ntm_t2 * direction;
-//		direction = direction / direction.w;
-//		vec4 end = start + direction;
-//		end.w = 1;
-//		if ((start.z < -1 && end.z < -1) || (start.z > 1 && end.z > 1)) continue;
-//		Line l = Line(viewPort(start), viewPort(end));
-//		if (isLineLegal(l)) {
-//			lines.push_back(l);
-//		}
-//	}
-//	return lines;
-//}
-
 //==========
 
 
@@ -417,7 +229,7 @@ void Renderer::InitOpenGLRendering()
 	GLuint buffer;
 	glBindVertexArray(gScreenVtc);
 	glGenBuffers(1, &buffer);
-	const GLfloat vtc[]={
+	const GLfloat vtc[] = {
 		-1, -1,
 		1, -1,
 		-1, 1,
@@ -425,31 +237,31 @@ void Renderer::InitOpenGLRendering()
 		1, -1,
 		1, 1
 	};
-	const GLfloat tex[]={
+	const GLfloat tex[] = {
 		0,0,
 		1,0,
 		0,1,
 		0,1,
 		1,0,
-		1,1};
+		1,1 };
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vtc)+sizeof(tex), NULL, GL_STATIC_DRAW);
-	glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(vtc), vtc);
-	glBufferSubData( GL_ARRAY_BUFFER, sizeof(vtc), sizeof(tex), tex);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vtc) + sizeof(tex), NULL, GL_STATIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vtc), vtc);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(vtc), sizeof(tex), tex);
 
-	GLuint program = InitShader( "vshader.glsl", "fshader.glsl" );
-	glUseProgram( program );
-	GLint  vPosition = glGetAttribLocation( program, "vPosition" );
+	GLuint program = InitShader("vshader.glsl", "fshader.glsl");
+	glUseProgram(program);
+	GLint  vPosition = glGetAttribLocation(program, "vPosition");
 
-	glEnableVertexAttribArray( vPosition );
-	glVertexAttribPointer( vPosition, 2, GL_FLOAT, GL_FALSE, 0,
-		0 );
+	glEnableVertexAttribArray(vPosition);
+	glVertexAttribPointer(vPosition, 2, GL_FLOAT, GL_FALSE, 0,
+		0);
 
-	GLint  vTexCoord = glGetAttribLocation( program, "vTexCoord" );
-	glEnableVertexAttribArray( vTexCoord );
-	glVertexAttribPointer( vTexCoord, 2, GL_FLOAT, GL_FALSE, 0,
-		(GLvoid *) sizeof(vtc) );
-	glProgramUniform1i( program, glGetUniformLocation(program, "texture"), 0 );
+	GLint  vTexCoord = glGetAttribLocation(program, "vTexCoord");
+	glEnableVertexAttribArray(vTexCoord);
+	glVertexAttribPointer(vTexCoord, 2, GL_FLOAT, GL_FALSE, 0,
+		(GLvoid*)sizeof(vtc));
+	glProgramUniform1i(program, glGetUniformLocation(program, "texture"), 0);
 	a = glGetError();
 }
 
@@ -463,9 +275,9 @@ void Renderer::CreateOpenGLBuffer()
 /////////////////////////////////////////////////////
 
 
-//===C'tor\D'tor===
+//===C'tor/D'tor===
 Renderer::Renderer(int width, int height) :m_width(width), m_height(height),
-	f_anti_aliasing(false), fog({ {1,1,1}, 0.5 }), f_fog(false), f_axes(true)
+f_anti_aliasing(false), fog({ {1,1,1}, 0.5 }), f_fog(false), f_axes(true)
 {
 	InitOpenGLRendering();
 	createBuffers();
@@ -494,7 +306,7 @@ void Renderer::swapBuffers()
 	float* anti_aliased_buffer;
 	if (f_anti_aliasing) {
 		anti_aliased_buffer = createAntiAliasedBuffer();
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width/2, m_height/2, GL_RGB, GL_FLOAT, anti_aliased_buffer);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width / 2, m_height / 2, GL_RGB, GL_FLOAT, anti_aliased_buffer);
 	}
 	else {
 		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GL_RGB, GL_FLOAT, m_outBuffer);
@@ -524,14 +336,8 @@ void Renderer::clearBuffer() {
 	}
 }
 
-//void Renderer::clearColorBuffer() {
-//	for (int i = 0; i < M_OUT_BUFFER_SIZE; i++) {
-//		m_outBuffer[i] = 0.2;
-//	}
-//}
-//
 void Renderer::colorBackground(Color color) {
-	for (int i = 0; i < M_OUT_BUFFER_SIZE; i+=3) {
+	for (int i = 0; i < M_OUT_BUFFER_SIZE; i += 3) {
 		m_outBuffer[i] = color.r;
 		m_outBuffer[i + 1] = color.g;
 		m_outBuffer[i + 2] = color.b;
@@ -550,99 +356,35 @@ void Renderer::setSize(int width, int height) {
 	}
 	createBuffers();
 }
+
 //==========
 
-
-//===Drawing Interface===
-//void Renderer::drawVertices(vector<Vertex>& vertices, mat4 tm, Color c){
-//	vector<Pixel> pixels = transformVertices(vertices, tm);
-//	for (vector<Pixel>::iterator i = pixels.begin(); i != pixels.end(); i++) {
-//		rasterizePoint(*i, c);
-//	}
-//}
-//
-//void Renderer::drawEdges(vector<Edge>& edges, mat4 tm, Color c) {
-//	vector<Line> lines = transformEdges(edges, tm);
-//	for (vector<Line>::iterator i = lines.begin(); i != lines.end(); i++) {
-//		rasterizeLine(*i, c);
-//	}
-//}
-//
-//void Renderer::drawEdges(vector<Face>& faces, mat4 tm, Color c) {
-//	vector<Line> lines = transformFaces(faces, tm);
-//	for (vector<Line>::iterator i = lines.begin(); i != lines.end(); i++) {
-//		rasterizeLine(*i, c);
-//	}
-//}
-
-//void Renderer::drawTriangles(vector<Face>& faces, mat4 tm, Color c) {
-//	vector<Line> lines = transformFaces(faces, tm);
-//	for (vector<Line>::iterator i = lines.begin(); i != lines.end(); i++) {
-//		rasterizeLine(*i, c);
-//	}
-//}
-
-//void Renderer::drawVertexNormals(vector<Vertex>& points, mat4 tm, vector<vec4>& normals, mat4 ntm, vector<int>& vertex_normals_indexes, Color c) {
-	//vector<vec4> normals_to_draw;
-	/*for (vector<vec4>::iterator i = normals.begin(); i != normals.end(); i++) {
-		*i = normalize(*i);
-		*i *= 10;
-	}
-	vector<Pixel> vertices_pixels = transformVertices(points, tm);
-	vector<Pixel> normals_pixels = transformVertices(normals, ntm);
-	
-
-	for (int i = 0; i < vertex_normals_indexes.size(); i+=2) {
-		Pixel start = vertices_pixels[vertex_normals_indexes[i]];
-		Pixel end = Pixel(0, 0); 
-		end.x = vertices_pixels[vertex_normals_indexes[i]].x + normals[vertex_normals_indexes[i + 1]].x;
-		end.y = vertices_pixels[vertex_normals_indexes[i]].y + normals[vertex_normals_indexes[i + 1]].y;
-
-		Line l = Line(start, end);
-		rasterizeLine(l, c);
-	}
-}*/
-
-//void Renderer::drawVertexNormals(vector<Face>& faces, mat4 tm, mat4 ntm, Color c) {
-//	vector<Line> lines = transformVertexNormals(faces, tm, ntm);
-//	for (vector<Line>::iterator i = lines.begin(); i != lines.end(); i++) {
-//		rasterizeLine(*i, c);
-//	}
-//}
-//
-//void Renderer::drawFacesNormals(vector<Face>& faces, mat4 tm, mat4 ntm, Color c) {
-//	vector<Line> lines = transformFaceNormals(faces, tm, ntm);
-//	for (vector<Line>::iterator i = lines.begin(); i != lines.end(); i++) {
-//		rasterizeLine(*i, c);
-//	}
-//}
-//
 void Renderer::drawCamera(vec4 pos, Color c) {
 	mat4 t_tot = tp * tc * tw;
 	Pixel center = viewPort(t_tot * pos);
 	for (int j = -2; j <= 2; j++) {
-		drawPixel(Pixel(center.x+j, center.y, center.z), c);
-		drawPixel(Pixel(center.x, center.y+j, center.z), c);
+		drawPixel(Pixel(center.x + j, center.y, center.z), c);
+		drawPixel(Pixel(center.x, center.y + j, center.z), c);
 	}
 }
 
 void Renderer::SetDemoBuffer()
 {
 	//vertical line
-	for(int i=0; i<m_width; i++)
+	for (int i = 0; i < m_width; i++)
 	{
-		m_outBuffer[INDEX(m_width,256,i,0)]=1;	m_outBuffer[INDEX(m_width,256,i,1)]=0;	m_outBuffer[INDEX(m_width,256,i,2)]=0;
+		m_outBuffer[INDEX(m_width, 256, i, 0)] = 1;	m_outBuffer[INDEX(m_width, 256, i, 1)] = 0;	m_outBuffer[INDEX(m_width, 256, i, 2)] = 0;
 	}
 	//horizontal line
-	for(int i=0; i<m_height; i++)
+	for (int i = 0; i < m_height; i++)
 	{
-		m_outBuffer[INDEX(m_width,i,256,0)]=1;	m_outBuffer[INDEX(m_width,i,256,1)]=0;	m_outBuffer[INDEX(m_width,i,256,2)]=1;
+		m_outBuffer[INDEX(m_width, i, 256, 0)] = 1;	m_outBuffer[INDEX(m_width, i, 256, 1)] = 0;	m_outBuffer[INDEX(m_width, i, 256, 2)] = 1;
 	}
 
 	//diagonal line
 	for (int i = 0; i < m_height; i++)
 	{
-		m_outBuffer[INDEX(m_width, m_height-i, i, 0)] = 1;	m_outBuffer[INDEX(m_width, m_height - i, i, 1)] = 0;	m_outBuffer[INDEX(m_width, m_height - i, i, 2)] = 1;
+		m_outBuffer[INDEX(m_width, m_height - i, i, 0)] = 1;	m_outBuffer[INDEX(m_width, m_height - i, i, 1)] = 0;	m_outBuffer[INDEX(m_width, m_height - i, i, 2)] = 1;
 	}
 }
 //==========
@@ -652,15 +394,10 @@ void Renderer::SetDemoBuffer()
 void Renderer::setCameraTransform(const mat4& tc) { this->tc = tc; }
 void Renderer::setProjection(const mat4& tp) { this->tp = tp; }
 void Renderer::setWorldTransform(const mat4& tw) { this->tw = tw; }
+void Renderer::setActiveCameraPosition(vec4 pos) { this->active_camera_pos = pos; }
 ////==========
 
-//////===Light Setters===
-//void Renderer::setParallelSources(vector<ParallelSource*>* parallel_sources) { this->parallel_sources = parallel_sources; }
-//void Renderer::setPointSources(vector<PointSource*>* point_sources) { this->point_sources = point_sources; }
-//void Renderer::setAmbientConstants(Color* color, GLfloat* intensity) {
-//	scene_ambient_light_color = color;
-//	//scene_ambient_light_intensity = intensity;
-//}
+
 void Renderer::setAmbientColor(Color* color) { scene_ambient_light_color = color; }
 ////==========
 
@@ -712,22 +449,27 @@ void Renderer::drawModel(MeshModel& model) {
 		if (model.draw_pref.poly_mode == DrawPref::EDGES_ONLY) {
 			int* indexes = i->vertices;
 			for (int j = 0; j < 3; j++) {
-				Line l = Line(px_vertices[indexes[j]-1], px_vertices[indexes[(j+1)%3]-1]);
+				Line l = Line(px_vertices[indexes[j] - 1], px_vertices[indexes[(j + 1) % 3] - 1]);
 				drawLine(l, model.mesh_color);
 			}
 		}
 
 		if (model.draw_pref.poly_mode == DrawPref::FILLED) {
-			Triangle t = Triangle(px_vertices[i->vertices[0] - 1], px_vertices[i->vertices[1] - 1], px_vertices[i->vertices[2] - 1]);
-			Normal normal = tr_face_normals[i->normal];
-			Color face_diffuse_color = calculateDiffuseColor(model, center, normal);
-			Color face_final_color = model_ambient_color + face_diffuse_color;
-			drawTriangleSolid(t, face_final_color);
+			if (1) { //TODO: change to if(flat_shading)
+				Triangle t = Triangle(px_vertices[i->vertices[0] - 1], px_vertices[i->vertices[1] - 1], px_vertices[i->vertices[2] - 1]);
+				Normal normal = tr_face_normals[i->normal];
+				Color face_diffuse_color = calculateDiffuseColor(model, center, normal);
+				vec4 dir_to_camera = active_camera_pos - center;
+				Color face_specular_color = calculateSpecularColor(model, center, normal, dir_to_camera);
+				Color face_final_color = model_ambient_color + face_diffuse_color + face_specular_color;
+				face_final_color.floorToOne();
+				drawTriangleSolid(t, face_final_color);
+			}
 		}
 
 		if (model.draw_pref.f_draw_vertex_normals) {
 			for (int j = 0; j < 3; j++) {
-				Pixel start = px_vertices[i->vertices[j]-1];
+				Pixel start = px_vertices[i->vertices[j] - 1];
 				Vertex end_v = tr_vertices[i->vertices[j] - 1] + tr_vertex_normals[i->vertex_normals[j] - 1];
 				end_v.w = 1;
 				Pixel end = viewPort(end_v);
@@ -736,7 +478,7 @@ void Renderer::drawModel(MeshModel& model) {
 		}
 
 		if (model.draw_pref.f_draw_faces_normals) {
-			Vertex center = (tr_vertices[i->vertices[0]-1] + tr_vertices[i->vertices[1]-1] + tr_vertices[i->vertices[2]-1]) / 3;
+			Vertex center = (tr_vertices[i->vertices[0] - 1] + tr_vertices[i->vertices[1] - 1] + tr_vertices[i->vertices[2] - 1]) / 3;
 			Pixel start = viewPort(center);
 			Vertex end_v = center + tr_face_normals[i->normal];
 			end_v.w = 1;
@@ -752,18 +494,18 @@ void Renderer::drawModel(MeshModel& model) {
 	}
 }
 
-void Renderer::drawOrigin(Color c){
-	vec4 v = vec4(0,0,0,1);
+void Renderer::drawOrigin(Color c) {
+	vec4 v = vec4(0, 0, 0, 1);
 	mat4 t_tot = tp * tc * tw;
 	drawPixel(viewPort(t_tot * v), c);
 }
 
 void Renderer::toggleAntiAliasing() {
-	
+
 	f_anti_aliasing = !f_anti_aliasing;
 	if (f_anti_aliasing) {
-		m_width *=2;
-		m_height *=2;
+		m_width *= 2;
+		m_height *= 2;
 	}
 	else {
 		m_width /= 2;
@@ -785,14 +527,8 @@ float* Renderer::createAntiAliasedBuffer() {
 						m_outBuffer[INDEX(m_width, (x * 2), ((y * 2) + 1), k)] +
 						m_outBuffer[INDEX(m_width, ((x * 2) + 1), ((y * 2) + 1), k)]) / 4;
 			}
-			//std::cout << "new_buff: (" << x << ", " << y << ")" << std::endl;
-			//std::cout << "m_buff: (" << x*2 << ", " << y*2 << ") (" << x * 2 +1<< ", " << y * 2 << ") (" << x * 2 << ", " << y * 2+1 << ") (" << x * 2 +1<< ", " << y * 2 +1<< ")" << std::endl;
-
 		}
 	}
-
-	//new_buff[INDEX(m_width / 2, 1, 1, 0)] = new_buff[INDEX(m_width / 2, 1, 1, 1)] = new_buff[INDEX(m_width / 2, 1, 1, 2)] = 1.0;
-
 	return new_buff;
 }
 
@@ -812,28 +548,41 @@ Color Renderer::calculateDiffuseColor(MeshModel& m, Vertex center, Normal normal
 		vec3 v0 = normalize(vec3(normal.x, normal.y, normal.z));
 		vec3 v1 = -normalize(vec3(dir.x, dir.y, dir.z));
 
-		factor = v0 * v1;
-		if (factor > 0) {
-			diffuse_color += (m.diffuse_color * i->getColor()) * factor;
-		}
+		factor = max(0, v0 * v1);
+		diffuse_color += (m.diffuse_color * i->getColor()) * factor;
 	}
 
+
 	for (vector<PointSource>::iterator i = point_sources.begin(); i != point_sources.end(); i++) {
-		vec4 dir =center - i->getPosition();
+		vec4 dir = center - i->getPosition();
 
 		vec3 v0 = normalize(vec3(normal.x, normal.y, normal.z));
 		vec3 v1 = -normalize(vec3(dir.x, dir.y, dir.z));
 
-		factor = v0 * v1;
-		if (factor > 0) {
-			diffuse_color += (m.diffuse_color * i->getColor()) * factor;
-		}
+		factor = max(0, v0 * v1);
+		diffuse_color += (m.diffuse_color * i->getColor()) * factor;
 	}
-
 
 	return diffuse_color;
 }
-////==========A
+
+Color Renderer::calculateSpecularColor(MeshModel& m, Vertex point, Normal normal, vec4 dir_to_camera) {
+	Color specular_color = { 0,0,0 };
+	float factor;
+
+	for (vector<PointSource>::iterator i = point_sources.begin(); i != point_sources.end(); i++) {
+		vec4 l = normalize(point - i->getPosition());
+		l.w = 1;
+		vec4 n = normalize(vec4(normal.x, normal.y, normal.z));
+		vec4 r = 2 * (l * n) * n - l;
+
+		factor = max(0, pow((r * dir_to_camera), m.shininess));
+		specular_color += (m.diffuse_color * i->getColor()) * factor;
+	}
+
+	return specular_color;
+}
+////==========
 
 
 void Renderer::toggleFog() {
@@ -872,40 +621,40 @@ void Renderer::drawAxes() {
 		axes[i] /= axes[i].w;
 		axes[i].w = 0;
 		axes[i] = normalize(axes[i]) / 10;
-		
+
 		drawLine(Line(viewPort(origin), viewPort(origin + axes[i])), colors[i]);
-	
+
 	}
-	
+
 }
 
-void Renderer::applyBlur() {
-	float weight[9] = {
-		0.016216,
-		0.054054,
-		0.1216216,
-		0.1945946,
-		0.227027,
-		0.1945946,
-		0.1216216,
-		0.054054,
-		0.016216,
+void Renderer::applyBlur(float* buffer) {
+	float weight[9] = { 0.016216,
+						0.054054,
+						0.1216216,
+						0.1945946,
+						0.227027,
+						0.1945946,
+						0.1216216,
+						0.054054,
+						0.016216,
 	};
+
 	int buff_size = m_width * m_height * 3;
 	float* tmp_buff = new float[buff_size];
 
 	for (int i = 0; i < buff_size; i++) {
-		tmp_buff[i] = m_outBuffer[i];
-		m_outBuffer[i] = 0;
+		tmp_buff[i] = buffer[i];
+		buffer[i] = 0;
 	}
 
 	//horizontal blur
 	for (int x = 0; x < m_width; x++) {
 		for (int y = 0; y < m_height; y++) {
 			for (int k = -4; k <= 4; k++) {
-				if (x+k>=0 && x+k<m_width) {
-					for (int c = 0; c < 3;c++) {
-						m_outBuffer[INDEX(m_width, (x + k), y, c)] += tmp_buff[INDEX(m_width, x, y, c)] * weight[4 + k];
+				if (x + k >= 0 && x + k < m_width) {
+					for (int c = 0; c < 3; c++) {
+						buffer[INDEX(m_width, (x + k), y, c)] += tmp_buff[INDEX(m_width, x, y, c)] * weight[4 + k];
 					}
 				}
 			}
@@ -913,8 +662,8 @@ void Renderer::applyBlur() {
 	}
 
 	for (int i = 0; i < buff_size; i++) {
-		tmp_buff[i] = m_outBuffer[i];
-		m_outBuffer[i] = 0;
+		tmp_buff[i] = buffer[i];
+		buffer[i] = 0;
 	}
 
 	//vertical blur
@@ -922,8 +671,8 @@ void Renderer::applyBlur() {
 		for (int y = 0; y < m_height; y++) {
 			for (int k = -4; k <= 4; k++) {
 				if (y + k >= 0 && y + k < m_height) {
-					for (int c = 0; c < 3;c++) {
-						m_outBuffer[INDEX(m_width, x, (y+k), c)] += tmp_buff[INDEX(m_width, x, y, c)] * weight[4 + k];
+					for (int c = 0; c < 3; c++) {
+						buffer[INDEX(m_width, x, (y + k), c)] += tmp_buff[INDEX(m_width, x, y, c)] * weight[4 + k];
 					}
 				}
 			}
@@ -947,3 +696,31 @@ void Renderer::setLightSources(vector<PointSource> points, vector<ParallelSource
 		parallel_sources.push_back(t_tot * (*i));
 	}
 }
+
+void Renderer::applyBloom(float bloom_threshold) {
+	int buff_size = m_width * m_height * 3;
+	float* bloom_buff = new float[buff_size];
+
+	for (int i = 0; i < buff_size; i++) {
+		bloom_buff[i] = 0;
+	}
+
+	for (int i = 0; i < buff_size; i += 3) {
+		if (m_outBuffer[i] > bloom_threshold 
+			|| m_outBuffer[i + 1] > bloom_threshold
+			|| m_outBuffer[i + 2] > bloom_threshold) {
+				bloom_buff[i] = m_outBuffer[i];
+				bloom_buff[i + 1] = m_outBuffer[i + 1];
+				bloom_buff[i + 2] = m_outBuffer[i + 2];
+		}
+	}
+
+	applyBlur(bloom_buff);
+
+	for (int i = 0; i < buff_size; i++) {
+		m_outBuffer[i] = max(0, m_outBuffer[i] + bloom_buff[i]);
+	}
+
+	delete bloom_buff;
+}
+

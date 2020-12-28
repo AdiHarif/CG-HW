@@ -60,7 +60,6 @@
 #define AMBIENT 2
 
 #define SCALE_UP_DEF 1.1
-//#define SCALE_DOWN_DEF (1/1.1)
 #define ROTATE_THETA_DEF 5
 #define TRANSLATE_DEF 0.3
 #define STEP_DOWN (1/1.1)
@@ -75,7 +74,6 @@ int last_x, last_y;
 bool lb_down, rb_down, mb_down;
 bool first_movement=true;
 float scale_step = SCALE_UP_DEF, rotation_step = ROTATE_THETA_DEF, translation_step = TRANSLATE_DEF;
-//int never_gonna = 0;
 
 //----------------------------------------------------------------------------
 
@@ -453,9 +451,6 @@ void special(int key, int x, int y) {
 	case GLUT_KEY_F1:
 		scene->togglePolyMode();
 		break;
-	/*case GLUT_KEY_F2:
-		scene->toggleEdges();
-		break;*/
 	case GLUT_KEY_F3:
 		scene->toggleBB();
 		break;
@@ -477,6 +472,8 @@ void special(int key, int x, int y) {
 	case GLUT_KEY_F9:
 		scene->toggleBlur();
 		break;
+	case GLUT_KEY_F10:
+		scene->toggleBloom();
 	}
 	scene->draw();
 }
@@ -518,7 +515,6 @@ void modelsMenuCB(int id){
 		break;
 	case MODEL_MENU_TRANSFORM_ACTIVE_MODEL:
 		transformActiveModel();
-		//std::cout << "MODEL_MENU_TRANSFORM_ACTIVE_MODEL" << std::endl;
 		break;
 	}
 	scene->draw();
@@ -528,11 +524,9 @@ void camerasMenuCB(int id){
 	switch (id){
 	case CAMERA_MENU_ADD_CAMERA:
 		addNewCamera();
-		//std::cout << "CAMERA_MENU_ADD_CAMERA" << std::endl;
 		break;
 	case CAMERA_MENU_EDIT_ACTIVE_CAMERA:
 		editActiveCamera();
-		//std::cout << "CAMERA_MENU_TRANSFORM_ACTIVE_CAMERA" << std::endl;
 		break;
 	}
 
@@ -551,26 +545,6 @@ void lightsMenuCB(int id) {
 	scene->draw();
 }
 
-
-
-//void cameraMenu(int id) {
-//	CFileDialog dlg(TRUE, _T(".obj"), NULL, NULL, _T("*.obj|*.*"));
-//	Camera* cam = NULL;
-//	switch (id)
-//	{
-//	case CAMERA_ADD:
-//		//TODO: change camera params
-//		//TODO: NOT WORKING
-//		cam = &Camera(vec4(5.0, 0.0, 0.0));
-//		scene->addCamera(cam);
-//		cout << "added camera";
-//		break;
-//	case CAMERA_SELECT:
-//		cout << "did not implement :/" << endl;
-//		break;
-//	}
-//}
-
 void mainMenuCB(int id){
 	switch(id){
 		case MAIN_MENU_TRANSFORM_WORLD:
@@ -584,11 +558,6 @@ void mainMenuCB(int id){
 			scene->party();
 			break;
 		case MAIN_MENU_ABOUT:
-			/*LPCTSTR s = "asdfasdf";
-			s =s+ "\n";
-			s = s+ "NO WAY";
-			AfxMessageBox(s);*/
-			//AfxMessageBox("I don't always write long manuals, but when I do:");
 			AfxMessageBox("I don't always write long manuals, but when I do:\r\n"
 						"HOW TO USE:\r\n"
 						"\r\nMouse:\r\n"
@@ -631,35 +600,7 @@ void mainMenuCB(int id){
 
 void mainMenu(int id)
 {
-	//Camera* cam = NULL;
-	//switch (id)
-	//{
-	//case MAIN_CAMERA:
-	//	//TODO: change camera params
-	//	//TODO: NOT WORKING
-	//	cam = new Camera(vec4(10.0, 0.0, 0.0));
-	//	scene->addCamera(cam);
-	//	cout << scene->getActiveCameraIndex() << endl;
-	//	scene->draw();
-	//	break;
-	//case MAIN_DEMO:
-	//	scene->drawDemo();
-	//	break;
-	//case MAIN_PARTY:
-	//	scene->party();
-	//	break;
-	//case MAIN_ABOUT:
-	//	/*string sentences[6] = { "give you up", "let you down", "run around and desert you",
-	//							"make you cry", "say goodbye", "tell a lie and hurt you" };
-	//	string selected_sentence = sentences[(never_gonna++)%sentences->size()];
-	//	CString strMsg;
-	//	_T("%s"), (LPCTSTR)strMsg;
-	//	AfxMessageBox(strMsg);*/
 
-	//	//TODO: write manual
-	//	AfxMessageBox("Never gonna give you up");
-	//	break;
-	//}
 }
 
 void initMenu()
@@ -676,11 +617,6 @@ void initMenu()
 	glutAddMenuEntry("Edit Lights", LIGHT_MENU_EDIT_LIGHT);
 
 	glutCreateMenu(mainMenuCB);
-
-	/*int menuCamera = glutCreateMenu(cameraMenu);
-	glutAddMenuEntry("Add Camera", CAMERA_ADD);
-	glutAddMenuEntry("Select Camera", CAMERA_SELECT);
-	glutCreateMenu(mainMenu);*/
 
 	glutAddSubMenu("Models", modelsMenu);
 	glutAddSubMenu("Cameras", camerasMenu);

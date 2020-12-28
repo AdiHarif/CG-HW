@@ -23,7 +23,7 @@ protected:
 	//GLfloat specular_reflection;
 	//GLfloat diffuse_reflection;
 	//GLfloat ambient_reflection = 1;
-	GLfloat shininess;
+	GLfloat shininess = 0.1;
 
 	virtual ~Model() {}
 	//void virtual draw()=0;
@@ -46,9 +46,10 @@ public:
 class Scene {
 
 	vector<Model*> models;
-	//vector<Light*> lights;
+
 	vector<ParallelSource> parallel_sources;
 	vector<PointSource> point_sources;
+
 	vector<Camera*> cameras;
 	Renderer *m_renderer;
 
@@ -61,9 +62,12 @@ class Scene {
 	bool f_draw_cameras = false;
 
 	bool f_blur;
+	bool f_bloom;
+	float light_bloom_threshold;
 
 	mat4 tw;
 
+	friend class Renderer;
 public:
 	//===C'tors / Destructors===
 	Scene() {}; //unimplemented
@@ -72,10 +76,7 @@ public:
 	//==========
 
 	//===Getters/Setters===
-	//vector<Model*> getModels();
-	//int getActiveModelIndex();
-	//Model* getActiveModel();
-	//int getActiveCameraIndex();
+	Model* getActiveModel();
 	Camera* getActiveCamera();
 	//==========
 
@@ -88,9 +89,7 @@ public:
 	//===Models Interface===
 	void loadOBJModel(string fileName);
 	void loadPrimModel();
-	//void removeModel(int model);
 	void removeSelection();
-	Model* getActiveModel();
 
 	void scaleSelection(double scale_factor);
 	void scaleSelection(vec3 scale_by);
@@ -105,8 +104,6 @@ public:
 	//==========
 
 	//===Display Toggles===
-	/*void toggleVertices();
-	void toggleEdges();*/
 	void togglePolyMode();
 	void toggleBB();
 	void toggleVertexNormals();
@@ -128,7 +125,6 @@ public:
 	void activeCameraToPerspective(const float fovy, const float aspect,
 			const float z_near, const float z_far);
 	void lookAtActiveModel();
-	//void deactivateAllCameras();
 
 	void toggleCameraProjection();
 
@@ -169,5 +165,5 @@ public:
 	void toggleAntiAliasing();
 	void toggleFog();
 	void toggleBlur();
-
+	void toggleBloom();
 };

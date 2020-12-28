@@ -80,9 +80,6 @@ struct vec2 {
     vec2& operator *= ( const GLfloat s )
 	{ x *= s;  y *= s;   return *this; }
 
-    //vec2& operator *= ( const vec2& v )
-	//{ x *= v.x;  y *= v.y; return *this; }
-
     vec2& operator /= ( const GLfloat s ) {
 
 	GLfloat r = GLfloat(1.0) / s;
@@ -118,10 +115,6 @@ struct vec2 {
 //  Non-class vec2 Methods
 //
 
-//inline
-//GLfloat dot( const vec2& u, const vec2& v ) {
-//    return 0; /*BUG*/
-//}
 
 inline
 GLfloat length( const vec2& v ) {
@@ -208,9 +201,6 @@ struct vec3 {
     vec3& operator *= ( const GLfloat s )
 	{ x *= s;  y *= s;  z *= s;  return *this; } /*BUG Fixed*/
 
-    /*vec3& operator *= ( const vec3& v )
-	{ x *= v.x;  y *= v.y;  z *= v.z;  return *this; }*/
-
     vec3& operator /= ( const GLfloat s ) {
 
 
@@ -252,11 +242,6 @@ struct vec3 {
 //
 //  Non-class vec3 Methods
 //
-
-//inline
-//GLfloat dot( const vec3& u, const vec3& v ) {
-//    return u.x*v.x + u.y*v.y + u.z*v.z ;
-//}
 
 inline
 GLfloat length( const vec3& v ) {
@@ -356,9 +341,6 @@ struct vec4 {
     vec4& operator *= ( const GLfloat s )
 	{ x *= s;  y *= s;  z *= s;  w *= s;  return *this; }
 
-    /*vec4& operator *= ( const vec4& v )
-	{ x *= v.x, y *= v.y, z *= v.z, w *= v.w;  return *this; }*/
-
     vec4& operator /= ( const GLfloat s ) {
 
 	GLfloat r = GLfloat(1.0) / s;
@@ -402,11 +384,6 @@ struct vec4 {
 //
 //  Non-class vec4 Methods
 //
-
-//inline
-//GLfloat dot( const vec4& u, const vec4& v ) {
-//    return u.x*v.x + u.y*v.y + u.z*v.z + u.w*v.w;
-//}
 
 inline
 GLfloat length( const vec4& v ) {

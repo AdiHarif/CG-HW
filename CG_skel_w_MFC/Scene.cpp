@@ -29,8 +29,6 @@ Scene::Scene(Renderer* renderer) : m_renderer(renderer) {
 	Camera* def_cam = new Camera(vec4(0.0, 0.0, 10.0));
 	addCamera(def_cam);
 	parallel_sources.push_back(ParallelSource("Parallel Light 0", vec3(0.0, 0.0, -1.0), { 0.3, 0.1, 0.1 }));
-	//addParallelSource(def_parallel_source);
-	//m_renderer->setAmbientConstants(&ambient_light_color, &ambient_light_intensity);
 	m_renderer->setAmbientColor(&ambient_light_color);
 }
 
@@ -86,7 +84,7 @@ void Scene::draw()
 	m_renderer->drawOrigin(Color(RED));
 
 	if (f_blur) {
-		m_renderer->applyBlur();
+		m_renderer->applyBlur(m_renderer->m_outBuffer);
 	}
 
 	m_renderer->drawAxes();
@@ -496,4 +494,8 @@ void Scene::toggleFog() {
 
 void Scene::toggleBlur() {
 	f_blur = !f_blur;
+}
+
+void Scene::toggleBloom() {
+	f_bloom = !f_bloom;
 }

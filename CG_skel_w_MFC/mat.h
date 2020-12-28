@@ -142,11 +142,6 @@ class mat2 {
 //  --- Non-class mat2 Methods ---
 //
 
-//inline
-//mat2 matrixCompMult( const mat2& A, const mat2& B ) {
-//    return mat2( A[0][0]*B[0][0], A[0][1]*B[0][1],
-//		 A[1][0]*B[1][0], A[1][1]*B[1][1] );
-//}
 
 inline
 mat2 transpose( const mat2& A ) {
