@@ -44,25 +44,25 @@ void Renderer::createBuffers()
 
 //===Inner Drawing Functions===
 
-void Renderer::drawPixel(Pixel p, Color c) {
+void Renderer::drawPixel(Pixel p) {
 	if ((!isPixelLegal(p)) || p.z < m_zbuffer[Z_INDEX(m_width, p.x, p.y)]) {
 		return;
 	}
-	m_outBuffer[INDEX(m_width, p.x, p.y, 0)] = c.r;
-	m_outBuffer[INDEX(m_width, p.x, p.y, 1)] = c.g;
-	m_outBuffer[INDEX(m_width, p.x, p.y, 2)] = c.b;
+	m_outBuffer[INDEX(m_width, p.x, p.y, 0)] = p.color.r;
+	m_outBuffer[INDEX(m_width, p.x, p.y, 1)] = p.color.g;
+	m_outBuffer[INDEX(m_width, p.x, p.y, 2)] = p.color.b;
 	m_zbuffer[Z_INDEX(m_width, p.x, p.y)] = p.z;
 }
 
-void Renderer::drawLine(Line l, Color c, vector<Pixel>* pixels_drawn) {
+void Renderer::drawLine(Line l, vector<Pixel>* pixels_drawn) {
 	Pixel p0 = l.start;
 	Pixel p1 = l.end;
 	if (p0.x == p1.x) {
 		if (p0.y < p1.y) {
-			drawLineSteep(Line(p0, p1), c, pixels_drawn);
+			drawLineSteep(Line(p0, p1), pixels_drawn);
 		}
 		else {
-			drawLineSteep(Line(p1, p0), c, pixels_drawn);
+			drawLineSteep(Line(p1, p0), pixels_drawn);
 		}
 	}
 	if (p0.x > p1.x) {// make sure that v0 is left of v1
@@ -71,15 +71,15 @@ void Renderer::drawLine(Line l, Color c, vector<Pixel>* pixels_drawn) {
 	}
 
 	if (std::abs(p1.y - p0.y) < std::abs(p1.x - p0.x)) {//-1 <= m <= 1
-		drawLineModerate(Line(p0, p1), c, pixels_drawn);
+		drawLineModerate(Line(p0, p1), pixels_drawn);
 	}
 	else { //|m|>1
-		drawLineSteep(Line(p0, p1), c, pixels_drawn);
+		drawLineSteep(Line(p0, p1), pixels_drawn);
 	}
 }
 
 
-void Renderer::drawLineModerate(Line l, Color c, vector<Pixel>* pixels_drawn) {
+void Renderer::drawLineModerate(Line l, vector<Pixel>* pixels_drawn) {
 	Pixel p0 = l.start;
 	Pixel p1 = l.end;
 	int dx = p1.x - p0.x;
@@ -88,6 +88,20 @@ void Renderer::drawLineModerate(Line l, Color c, vector<Pixel>* pixels_drawn) {
 	float dz = (p1.z - p0.z) / dx;
 	float z = p0.z;
 
+	// d_color:
+	float dr, dg, db;
+	if (dx == 0 || p0.color == p1.color) {
+		dr = 0;
+		dg = 0;
+		db = 0;
+	}
+	else {
+		dr = (p1.color.r - p0.color.r) / dx;
+		dg = (p1.color.g - p0.color.g) / dx;
+		db = (p1.color.b - p0.color.b) / dx;
+	}
+
+	Color cur_color = p0.color;
 
 	int yi = 1;
 	if (dy < 0) {
@@ -97,11 +111,11 @@ void Renderer::drawLineModerate(Line l, Color c, vector<Pixel>* pixels_drawn) {
 	int D = 2 * dy - dx;
 	int y = p0.y;
 	for (int x = p0.x; x <= p1.x; x++) {
-		Pixel p = Pixel(x, y, z);
+		Pixel p = Pixel(x, y, z, cur_color);
 		if (pixels_drawn != NULL) {
 			pixels_drawn->push_back(p);
 		}
-		this->drawPixel(p, c);
+		this->drawPixel(p);
 		if (D > 0) {
 			y += yi;
 			D += 2 * (dy - dx);
@@ -110,13 +124,16 @@ void Renderer::drawLineModerate(Line l, Color c, vector<Pixel>* pixels_drawn) {
 			D += 2 * dy;
 		}
 		z += dz;
+		cur_color.r += dr;
+		cur_color.g += dg;
+		cur_color.b += db;
 	}
 }
 
-void Renderer::drawLineSteep(Line l, Color c, vector<Pixel>* pixels_drawn) {
+void Renderer::drawLineSteep(Line l, vector<Pixel>* pixels_drawn) {
 	//flip x<->y
-	Pixel p0 = { l.start.y, l.start.x, l.start.z };
-	Pixel p1 = { l.end.y, l.end.x, l.end.z };
+	Pixel p0 = { l.start.y, l.start.x, l.start.z, l.start.color };
+	Pixel p1 = { l.end.y, l.end.x, l.end.z, l.end.color };
 	//make sure p0 is left of p1
 	if (p0.x > p1.x) {
 		Pixel tmp = p0;
@@ -129,6 +146,21 @@ void Renderer::drawLineSteep(Line l, Color c, vector<Pixel>* pixels_drawn) {
 	float dz = (p1.z - p0.z) / dx;
 	float z = p0.z;
 
+	// d_color:
+	float dr, dg, db;
+	if (dx == 0 || p0.color == p1.color) {
+		dr = 0;
+		dg = 0;
+		db = 0;
+	}
+	else {
+		dr = (p1.color.r - p0.color.r) / dx;
+		dg = (p1.color.g - p0.color.g) / dx;
+		db = (p1.color.b - p0.color.b) / dx;
+	}
+
+	Color cur_color = p0.color;
+
 	int yi = 1;
 	if (dy < 0) {
 		yi = -1;
@@ -137,11 +169,11 @@ void Renderer::drawLineSteep(Line l, Color c, vector<Pixel>* pixels_drawn) {
 	int D = 2 * dy - dx;
 	int y = p0.y;
 	for (int x = p0.x; x <= p1.x; x++) {
-		Pixel p = Pixel(y, x, z);
+		Pixel p = Pixel(y, x, z, cur_color);
 		if (pixels_drawn != NULL) {
 			pixels_drawn->push_back(p);
 		}
-		this->drawPixel(p, c);
+		this->drawPixel(p);
 		if (D > 0) {
 			y += yi;
 			D += 2 * (dy - dx);
@@ -149,26 +181,41 @@ void Renderer::drawLineSteep(Line l, Color c, vector<Pixel>* pixels_drawn) {
 		else {
 			D += 2 * dy;
 		}
-
 		z += dz;
+		cur_color.r += dr;
+		cur_color.g += dg;
+		cur_color.b += db;
 	}
 }
 
-void Renderer::drawTriangleSolid(Triangle t, Color c) {
+void Renderer::drawTriangle(Triangle t, Color c) {
 	int max_y = t.findMaxY();
 	int min_y = t.findMinY();
 	int rows = max_y - min_y + 1;
 
 	vector<Line> draw_between;
 	for (int i = 0; i < rows; i++) {
-		Pixel left = Pixel(INT_MIN, i + min_y, -1);// TODO: add z
-		Pixel right = Pixel(INT_MAX, i + min_y, -1);// TODO: add z
+		Pixel left = Pixel(INT_MIN, i + min_y, -1, c);// TODO: add z
+		Pixel right = Pixel(INT_MAX, i + min_y, -1, c);// TODO: add z
 		draw_between.push_back(Line(left, right));
 	}
 
 	for (Line l : t.lines) {
 		vector<Pixel> pixels_drawn;
-		drawLine(l, c, &pixels_drawn);
+		switch (shading_method) {
+		case FLAT:
+			l.start.color = c;
+			l.end.color = c;
+			break;
+		case GOURAUD:
+
+			break;
+		case PHONG:
+
+			break;
+		}
+
+		drawLine(l, &pixels_drawn);
 		for (Pixel p : pixels_drawn) {
 			if (p.x > draw_between.at(p.y - min_y).start.x) {
 				draw_between.at(p.y - min_y).start.x = p.x;
@@ -183,7 +230,9 @@ void Renderer::drawTriangleSolid(Triangle t, Color c) {
 
 	for (int i = 0; i < rows; i++) {
 		Line line_to_draw = Line(draw_between.at(i).start, draw_between.at(i).end);
-		drawLine(line_to_draw, c);
+		line_to_draw.start.color = c;
+		line_to_draw.end.color = c;
+		drawLine(line_to_draw);
 	}
 }
 
@@ -363,8 +412,8 @@ void Renderer::drawCamera(vec4 pos, Color c) {
 	mat4 t_tot = tp * tc * tw;
 	Pixel center = viewPort(t_tot * pos);
 	for (int j = -2; j <= 2; j++) {
-		drawPixel(Pixel(center.x + j, center.y, center.z), c);
-		drawPixel(Pixel(center.x, center.y + j, center.z), c);
+		drawPixel(Pixel(center.x + j, center.y, center.z, c));
+		drawPixel(Pixel(center.x, center.y + j, center.z, c));
 	}
 }
 
@@ -437,7 +486,8 @@ void Renderer::drawModel(MeshModel& model) {
 
 	if (model.draw_pref.poly_mode == DrawPref::VERTICES_ONLY) {
 		for (vector<Pixel>::iterator i = px_vertices.begin(); i != px_vertices.end(); i++) {
-			drawPixel(*i, model.mesh_color);
+			i->color = model.mesh_color;
+			drawPixel(*i);
 		}
 	}
 
@@ -450,12 +500,14 @@ void Renderer::drawModel(MeshModel& model) {
 			int* indexes = i->vertices;
 			for (int j = 0; j < 3; j++) {
 				Line l = Line(px_vertices[indexes[j] - 1], px_vertices[indexes[(j + 1) % 3] - 1]);
-				drawLine(l, model.mesh_color);
+				l.start.color = model.mesh_color;
+				l.end.color = model.mesh_color;
+				drawLine(l);
 			}
 		}
 
 		if (model.draw_pref.poly_mode == DrawPref::FILLED) {
-			if (model.draw_pref.shading == DrawPref::FLAT) {
+			if (shading_method == FLAT) {
 				Triangle t = Triangle(px_vertices[i->vertices[0] - 1], px_vertices[i->vertices[1] - 1], px_vertices[i->vertices[2] - 1]);
 				Normal normal = tr_face_normals[i->normal];
 				Color face_diffuse_color = calculateDiffuseColor(model, center, normal);
@@ -463,13 +515,13 @@ void Renderer::drawModel(MeshModel& model) {
 				Color face_specular_color = calculateSpecularColor(model, center, normal, dir_to_camera);
 				Color face_final_color = model_ambient_color + face_diffuse_color + face_specular_color;
 				face_final_color.floorToOne();
-				drawTriangleSolid(t, face_final_color);
+				drawTriangle(t, face_final_color);
 			}
-			if (model.draw_pref.shading == DrawPref::GOURAUD) {
+			if (shading_method == GOURAUD) {
 
 			}
 
-			if (model.draw_pref.shading == DrawPref::PHONG) {
+			if (shading_method == PHONG) {
 
 
 			}
@@ -480,26 +532,33 @@ void Renderer::drawModel(MeshModel& model) {
 		if (model.draw_pref.f_draw_vertex_normals) {
 			for (int j = 0; j < 3; j++) {
 				Pixel start = px_vertices[i->vertices[j] - 1];
+				start.color = model.vertex_normals_color;
 				Vertex end_v = tr_vertices[i->vertices[j] - 1] + tr_vertex_normals[i->vertex_normals[j] - 1];
 				end_v.w = 1;
 				Pixel end = viewPort(end_v);
-				drawLine(Line(start, end), model.vertex_normals_color);
+				end.color = model.vertex_normals_color;
+				drawLine(Line(start, end));
 			}
 		}
 
 		if (model.draw_pref.f_draw_faces_normals) {
 			Vertex center = (tr_vertices[i->vertices[0] - 1] + tr_vertices[i->vertices[1] - 1] + tr_vertices[i->vertices[2] - 1]) / 3;
 			Pixel start = viewPort(center);
+			start.color = model.face_normals_color;
 			Vertex end_v = center + tr_face_normals[i->normal];
 			end_v.w = 1;
 			Pixel end = viewPort(end_v);
-			drawLine(Line(start, end), model.face_normals_color);
+			end.color = model.face_normals_color;
+			drawLine(Line(start, end));
 		}
 	}
 
 	if (model.draw_pref.f_draw_bb) {
 		for (vector<Edge>::iterator i = model.bb_edges.begin(); i != model.bb_edges.end(); i++) {
-			drawLine(Line(viewPort(tm_tot * i->start), viewPort(tm_tot * i->end)), model.bb_color);
+			Line l = Line(viewPort(tm_tot * i->start), viewPort(tm_tot * i->end));
+			l.start.color = model.bb_color;
+			l.end.color = model.bb_color;
+			drawLine(l);
 		}
 	}
 }
@@ -507,7 +566,9 @@ void Renderer::drawModel(MeshModel& model) {
 void Renderer::drawOrigin(Color c) {
 	vec4 v = vec4(0, 0, 0, 1);
 	mat4 t_tot = tp * tc * tw;
-	drawPixel(viewPort(t_tot * v), c);
+	Pixel origin = viewPort(t_tot * v);
+	origin.color = c;
+	drawPixel(origin);
 }
 
 void Renderer::toggleAntiAliasing() {
@@ -551,7 +612,7 @@ Color Renderer::calculateAmbientColor(MeshModel& m) {
 Color Renderer::calculateDiffuseColor(MeshModel& m, Vertex center, Normal normal) {
 	Color diffuse_color = { 0,0,0 };
 	float factor;
-	
+
 	for (vector<ParallelSource>::iterator i = parallel_sources.begin(); i != parallel_sources.end(); i++) {
 		vec4 dir = i->getDirection();
 
@@ -632,7 +693,10 @@ void Renderer::drawAxes() {
 		axes[i].w = 0;
 		axes[i] = normalize(axes[i]) / 10;
 
-		drawLine(Line(viewPort(origin), viewPort(origin + axes[i])), colors[i]);
+		Line l = Line(viewPort(origin), viewPort(origin + axes[i]));
+		l.start.color = colors[i];
+		l.end.color = colors[i];
+		drawLine(l);
 
 	}
 

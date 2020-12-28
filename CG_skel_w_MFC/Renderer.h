@@ -21,12 +21,15 @@ struct Pixel {
 	int y;
 	float z;
 
-	Pixel(int x, int y, float z) : x(x), y(y), z(z) {}
+	Color color;
+
+	Pixel(int x, int y, float z, Color color = WHITE) : x(x), y(y), z(z), color(color){}
 
 	Pixel(const Pixel& p) {
 		x = p.x;
 		y = p.y;
 		z = p.z;
+		color = p.color;
 	}
 
 };
@@ -60,7 +63,8 @@ class Renderer
 	float *m_outBuffer; // 3*width*height
 	float *m_zbuffer; // width*height
 	int m_width, m_height;
-
+	enum Shading { FLAT = 0, GOURAUD = 1, PHONG = 2 } shading_method = FLAT;
+	
 	mat4 tw;
 	mat4 tc;
 	mat4 tp;
@@ -88,11 +92,11 @@ class Renderer
 
 
 	//===Inner Drawing Functions===
-	void drawPixel(Pixel p, Color c);
-	void drawLine(Line l, Color c, vector<Pixel>* pixels_drawn = NULL);
-	void drawLineModerate(Line l, Color c, vector<Pixel>* pixels_drawn = NULL);
-	void drawLineSteep(Line l, Color c, vector<Pixel>* pixels_drawn = NULL);
-	void drawTriangleSolid(Triangle t, Color c);
+	void drawPixel(Pixel p);
+	void drawLine(Line l, vector<Pixel>* pixels_drawn = NULL);
+	void drawLineModerate(Line l, vector<Pixel>* pixels_drawn = NULL);
+	void drawLineSteep(Line l, vector<Pixel>* pixels_drawn = NULL);
+	void drawTriangle(Triangle t, Color c = WHITE);
 	//==========
 
 
