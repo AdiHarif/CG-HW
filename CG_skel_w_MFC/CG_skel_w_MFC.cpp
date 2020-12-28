@@ -232,13 +232,11 @@ void addNewLight() {
 		switch (dlg.type_radio_index) {
 		case PARALLEL:
 			dir = vec3(dlg.dir_x, dlg.dir_y, dlg.dir_z);
-			parallel_s = new ParallelSource(dlg.name, dir, c);
-			scene->addParallelSource(parallel_s);
+			scene->addParallelSource(ParallelSource(dlg.name, dir, c));
 			break;
 		case POINT:
 			pos = vec3(dlg.pos_x, dlg.pos_y, dlg.pos_z);
-			point_s = new PointSource(dlg.name, pos, c);
-			scene->addPointSource(point_s);
+			scene->addPointSource(PointSource(dlg.name, pos, c));
 			break;
 		}
 	}
@@ -260,13 +258,13 @@ void editLight() {
 		switch (dlg.type_radio_index) {
 		case PARALLEL:
 			dir = vec3(dlg.dir_x, dlg.dir_y, dlg.dir_z);
-			parallel_s = scene->getParallelSources()->at(dlg.names_index);
+			parallel_s = &scene->getParallelSources()->at(dlg.names_index);
 			parallel_s->setColor(c);
 			parallel_s->setDirection(dir);
 			break;
 		case POINT:
 			pos = vec3(dlg.pos_x, dlg.pos_y, dlg.pos_z);
-			point_s = scene->getPointSources()->at(dlg.names_index);
+			point_s = &scene->getPointSources()->at(dlg.names_index);
 			point_s->setColor(c);
 			point_s->setPosition(pos);
 			break;

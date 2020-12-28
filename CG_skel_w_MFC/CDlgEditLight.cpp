@@ -182,26 +182,24 @@ void CDlgEditLight::OnBnClickedOk()
 	CDialog::OnOK();
 }
 
-void CDlgEditLight::setParallelSources(vector<ParallelSource*>* parallel_sources) {
+void CDlgEditLight::setParallelSources(vector<ParallelSource>* parallel_sources) {
 	this->parallel_sources = parallel_sources;
 }
 
-void CDlgEditLight::setPointSources(vector<PointSource*>* point_sources) {
+void CDlgEditLight::setPointSources(vector<PointSource>* point_sources) {
 	this->point_sources = point_sources;
 }
 
 
 void CDlgEditLight::updateComboParallel() {
-	for (vector<ParallelSource*>::iterator i = parallel_sources->begin(); i != parallel_sources->end(); i++) {
-		ParallelSource* parallel_s = dynamic_cast<ParallelSource*> ((*i));
-		names.AddString(_T(parallel_s->getName()));
+	for (vector<ParallelSource>::iterator i = parallel_sources->begin(); i != parallel_sources->end(); i++) {
+		names.AddString(_T(i->getName()));
 	}
 }
 
 void CDlgEditLight::updateComboPoint() {
-	for (vector<PointSource*>::iterator i = point_sources->begin(); i != point_sources->end(); i++) {
-		PointSource* point_s = dynamic_cast<PointSource*> ((*i));
-		names.AddString(_T(point_s->getName()));
+	for (vector<PointSource>::iterator i = point_sources->begin(); i != point_sources->end(); i++) {
+		names.AddString(_T(i->getName()));
 	}
 }
 
@@ -221,12 +219,12 @@ ParallelSource* CDlgEditLight::getSelectedParallelSource() {
 	if (names_index == -1) {
 		return NULL;
 	}
-	return parallel_sources->at(names_index);
+	return &parallel_sources->at(names_index);
 }
 
 PointSource* CDlgEditLight::getSelectedPointSource() {
 	if (names_index == -1) {
 		return NULL;
 	}
-	return point_sources->at(names_index);
+	return &point_sources->at(names_index);
 }

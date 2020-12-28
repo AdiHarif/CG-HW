@@ -76,8 +76,8 @@ class Renderer
 		float max_density;
 	} fog;
 
-	vector<ParallelSource*>* parallel_sources = NULL;
-	vector<PointSource*>* point_sources = NULL;
+	vector<ParallelSource> parallel_sources;
+	vector<PointSource> point_sources;
 	Color* scene_ambient_light_color;
 	//GLfloat* scene_ambient_light_intensity;
 
@@ -135,12 +135,10 @@ public:
 	void setCameraTransform(const mat4& tc);
 	void setProjection(const mat4& tc);
 	void setWorldTransform(const mat4& tw);
-	void setActiveCameraPosition(vec4 pos);
-	////==========
 
+	void setLightSources(vector<PointSource> points, vector<ParallelSource> parallels);
+	void setActiveCameraPosition(vec4 pos);
 	////===Lights Setters===
-	void setParallelSources(vector<ParallelSource*>* parallel_sources);
-	void setPointSources(vector<PointSource*>* point_sources);
 	void setAmbientColor(Color* color);
 	////==========
 

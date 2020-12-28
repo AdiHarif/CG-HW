@@ -46,8 +46,10 @@ public:
 class Scene {
 
 	vector<Model*> models;
-	vector<ParallelSource*> parallel_sources;
-	vector<PointSource*> point_sources;
+
+	vector<ParallelSource> parallel_sources;
+	vector<PointSource> point_sources;
+
 	vector<Camera*> cameras;
 	Renderer *m_renderer;
 
@@ -141,17 +143,17 @@ public:
 
 	//===Lights Interface===
 	//General
-	vector<ParallelSource*>* getParallelSources() { return &parallel_sources; }
-	vector<PointSource*>* getPointSources() { return &point_sources; }
+	vector<ParallelSource>* getParallelSources() { return &parallel_sources; }
+	vector<PointSource>* getPointSources() { return &point_sources; }
 	Color getAmbientColor() { return ambient_light_color; }
 	void setAmbientColor(Color c) { ambient_light_color = c; }
 	//====
 	//ParallelSource Interface
-	void addParallelSource(ParallelSource* parallel_source);
+	void addParallelSource(ParallelSource parallel_source);
 	//====
 	
 	//PointSource Interface
-	void addPointSource(PointSource* point_source);
+	void addPointSource(PointSource point_source);
 	//====
 	//==========
 

@@ -397,9 +397,7 @@ void Renderer::setWorldTransform(const mat4& tw) { this->tw = tw; }
 void Renderer::setActiveCameraPosition(vec4 pos) { this->active_camera_pos = pos; }
 ////==========
 
-////===Light Setters===
-void Renderer::setParallelSources(vector<ParallelSource*>* parallel_sources) { this->parallel_sources = parallel_sources; }
-void Renderer::setPointSources(vector<PointSource*>* point_sources) { this->point_sources = point_sources; }
+
 void Renderer::setAmbientColor(Color* color) { scene_ambient_light_color = color; }
 ////==========
 
@@ -553,27 +551,26 @@ Color Renderer::calculateAmbientColor(MeshModel& m) {
 Color Renderer::calculateDiffuseColor(MeshModel& m, Vertex center, Normal normal) {
 	Color diffuse_color = { 0,0,0 };
 	float factor;
-
-	for (vector<ParallelSource*>::iterator i = parallel_sources->begin(); i != parallel_sources->end(); i++) {
-		ParallelSource* parallel_s = dynamic_cast<ParallelSource*> ((*i));
-		vec4 dir = parallel_s->getDirection();
+	
+	for (vector<ParallelSource>::iterator i = parallel_sources.begin(); i != parallel_sources.end(); i++) {
+		vec4 dir = i->getDirection();
 
 		vec3 v0 = normalize(vec3(normal.x, normal.y, normal.z));
 		vec3 v1 = -normalize(vec3(dir.x, dir.y, dir.z));
 
 		factor = max(0, v0 * v1);
-		diffuse_color += (m.diffuse_color * parallel_s->getColor()) * factor;
+		diffuse_color += (m.diffuse_color * i->getColor()) * factor;
 	}
 
-	for (vector<PointSource*>::iterator i = point_sources->begin(); i != point_sources->end(); i++) {
-		PointSource* point_s = dynamic_cast<PointSource*> ((*i));
-		vec4 dir = center - point_s->getPosition();
+
+	for (vector<PointSource>::iterator i = point_sources.begin(); i != point_sources.end(); i++) {
+		vec4 dir = center - i->getPosition();
 
 		vec3 v0 = normalize(vec3(normal.x, normal.y, normal.z));
 		vec3 v1 = -normalize(vec3(dir.x, dir.y, dir.z));
 
 		factor = max(0, v0 * v1);
-		diffuse_color += (m.diffuse_color * point_s->getColor()) * factor;
+		diffuse_color += (m.diffuse_color * i->getColor()) * factor;
 	}
 
 	return diffuse_color;
@@ -583,15 +580,14 @@ Color Renderer::calculateSpecularColor(MeshModel& m, Vertex point, Normal normal
 	Color specular_color = { 0,0,0 };
 	float factor;
 
-	for (vector<PointSource*>::iterator i = point_sources->begin(); i != point_sources->end(); i++) {
-		PointSource* point_s = dynamic_cast<PointSource*> ((*i));
-		vec4 l = normalize(point - point_s->getPosition());
+	for (vector<PointSource>::iterator i = point_sources.begin(); i != point_sources.end(); i++) {
+		vec4 l = normalize(point - i->getPosition());
 		l.w = 1;
 		vec4 n = normalize(vec4(normal.x, normal.y, normal.z));
 		vec4 r = 2 * (l * n) * n - l;
 
 		factor = max(0, pow((r * dir_to_camera), m.shininess));
-		specular_color += (m.diffuse_color * point_s->getColor()) * factor;
+		specular_color += (m.diffuse_color * i->getColor()) * factor;
 	}
 
 	return specular_color;
@@ -619,9 +615,9 @@ void Renderer::applyFog() {
 void Renderer::drawAxes() {
 	mat4 t_tot = this->tp * this->tc;
 	vec4 axes[3];
-	axes[0] = t_tot * vec4(1, 0, 0, 0);
-	axes[1] = t_tot * vec4(0, 1, 0, 0);
-	axes[2] = t_tot * vec4(0, 0, 1, 0);
+	axes[0] = t_tot * vec4(1, 0, 0, 1);
+	axes[1] = t_tot * vec4(0, 1, 0, 1);
+	axes[2] = t_tot * vec4(0, 0, 1, 1);
 
 	Color colors[3];
 	colors[0] = { 1,0,0 };
@@ -632,6 +628,7 @@ void Renderer::drawAxes() {
 
 
 	for (int i = 0; i < 3; i++) {
+		axes[i] /= axes[i].w;
 		axes[i].w = 0;
 		axes[i] = normalize(axes[i]) / 10;
 
@@ -695,6 +692,21 @@ void Renderer::applyBlur(float* buffer) {
 	delete tmp_buff;
 }
 
+void Renderer::setLightSources(vector<PointSource> points, vector<ParallelSource> parallels) {
+	parallel_sources.clear();
+	point_sources.clear();
+
+	mat4 t_tot = tp * tc;
+
+	for (vector<PointSource>::iterator i = points.begin(); i != points.end(); i++) {
+		point_sources.push_back(t_tot * (*i));
+	}
+
+	for (vector<ParallelSource>::iterator i = parallels.begin(); i != parallels.end(); i++) {
+		parallel_sources.push_back(t_tot * (*i));
+	}
+}
+
 void Renderer::applyBloom(float bloom_threshold) {
 	int buff_size = m_width * m_height * 3;
 	float* bloom_buff = new float[buff_size];
@@ -721,3 +733,4 @@ void Renderer::applyBloom(float bloom_threshold) {
 
 	delete bloom_buff;
 }
+
