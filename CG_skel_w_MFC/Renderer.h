@@ -112,6 +112,8 @@ class Renderer
 	void InitOpenGLRendering();
 	//////////////////////////////
 
+	friend class Scene;
+
 public:
 	Renderer(int width=DEFAULT_WIDTH, int height=DEFAULT_HEIGHT);
 	~Renderer(void);
@@ -162,5 +164,7 @@ public:
 
 	void drawAxes();
 
-	void applyBlur();
+	void applyBlur(float* buffer);
+	
+	void applyBloom(float bloom_threshold);
 };

@@ -52,4 +52,9 @@ struct Color{
 	}
 	//==========
 
+	void floorToOne() {
+		r = min(1, r); 
+		g = min(1, g); 
+		b = min(1, b);
+	}
 };

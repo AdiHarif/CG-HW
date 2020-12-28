@@ -60,9 +60,12 @@ class Scene {
 	bool f_draw_cameras = false;
 
 	bool f_blur;
+	bool f_bloom;
+	float light_bloom_threshold;
 
 	mat4 tw;
 
+	friend class Renderer;
 public:
 	//===C'tors / Destructors===
 	Scene() {}; //unimplemented
@@ -160,5 +163,5 @@ public:
 	void toggleAntiAliasing();
 	void toggleFog();
 	void toggleBlur();
-
+	void toggleBloom();
 };

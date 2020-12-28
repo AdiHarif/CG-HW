@@ -356,6 +356,7 @@ void Renderer::setSize(int width, int height) {
 	}
 	createBuffers();
 }
+
 //==========
 
 void Renderer::drawCamera(vec4 pos, Color c) {
@@ -463,6 +464,7 @@ void Renderer::drawModel(MeshModel& model) {
 				vec4 dir_to_camera = active_camera_pos - center;
 				Color face_specular_color = calculateSpecularColor(model, center, normal, dir_to_camera);
 				Color face_final_color = model_ambient_color + face_diffuse_color + face_specular_color;
+				face_final_color.floorToOne();
 				drawTriangleSolid(t, face_final_color);
 			}
 		}
@@ -629,24 +631,24 @@ void Renderer::drawAxes() {
 
 }
 
-void Renderer::applyBlur() {
-	float weight[9] = {
-		0.016216,
-		0.054054,
-		0.1216216,
-		0.1945946,
-		0.227027,
-		0.1945946,
-		0.1216216,
-		0.054054,
-		0.016216,
+void Renderer::applyBlur(float* buffer) {
+	float weight[9] = { 0.016216,
+						0.054054,
+						0.1216216,
+						0.1945946,
+						0.227027,
+						0.1945946,
+						0.1216216,
+						0.054054,
+						0.016216,
 	};
+
 	int buff_size = m_width * m_height * 3;
 	float* tmp_buff = new float[buff_size];
 
 	for (int i = 0; i < buff_size; i++) {
-		tmp_buff[i] = m_outBuffer[i];
-		m_outBuffer[i] = 0;
+		tmp_buff[i] = buffer[i];
+		buffer[i] = 0;
 	}
 
 	//horizontal blur
@@ -655,7 +657,7 @@ void Renderer::applyBlur() {
 			for (int k = -4; k <= 4; k++) {
 				if (x + k >= 0 && x + k < m_width) {
 					for (int c = 0; c < 3; c++) {
-						m_outBuffer[INDEX(m_width, (x + k), y, c)] += tmp_buff[INDEX(m_width, x, y, c)] * weight[4 + k];
+						buffer[INDEX(m_width, (x + k), y, c)] += tmp_buff[INDEX(m_width, x, y, c)] * weight[4 + k];
 					}
 				}
 			}
@@ -663,8 +665,8 @@ void Renderer::applyBlur() {
 	}
 
 	for (int i = 0; i < buff_size; i++) {
-		tmp_buff[i] = m_outBuffer[i];
-		m_outBuffer[i] = 0;
+		tmp_buff[i] = buffer[i];
+		buffer[i] = 0;
 	}
 
 	//vertical blur
@@ -673,7 +675,7 @@ void Renderer::applyBlur() {
 			for (int k = -4; k <= 4; k++) {
 				if (y + k >= 0 && y + k < m_height) {
 					for (int c = 0; c < 3; c++) {
-						m_outBuffer[INDEX(m_width, x, (y + k), c)] += tmp_buff[INDEX(m_width, x, y, c)] * weight[4 + k];
+						buffer[INDEX(m_width, x, (y + k), c)] += tmp_buff[INDEX(m_width, x, y, c)] * weight[4 + k];
 					}
 				}
 			}
@@ -681,4 +683,31 @@ void Renderer::applyBlur() {
 	}
 
 	delete tmp_buff;
+}
+
+void Renderer::applyBloom(float bloom_threshold) {
+	int buff_size = m_width * m_height * 3;
+	float* bloom_buff = new float[buff_size];
+
+	for (int i = 0; i < buff_size; i++) {
+		bloom_buff[i] = 0;
+	}
+
+	for (int i = 0; i < buff_size; i += 3) {
+		if (m_outBuffer[i] > bloom_threshold 
+			|| m_outBuffer[i + 1] > bloom_threshold
+			|| m_outBuffer[i + 2] > bloom_threshold) {
+				bloom_buff[i] = m_outBuffer[i];
+				bloom_buff[i + 1] = m_outBuffer[i + 1];
+				bloom_buff[i + 2] = m_outBuffer[i + 2];
+		}
+	}
+
+	applyBlur(bloom_buff);
+
+	for (int i = 0; i < buff_size; i++) {
+		m_outBuffer[i] = max(0, m_outBuffer[i] + bloom_buff[i]);
+	}
+
+	delete bloom_buff;
 }
