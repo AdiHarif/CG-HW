@@ -7,6 +7,7 @@
 #include "Color.h"
 #include "Face.h"
 #include "Light.h"
+#include "Camera.h"
 
 #define M_OUT_BUFFER_SIZE 3*m_width*m_height
 #define M_ZBUFFER_SIZE m_width*m_height
@@ -63,10 +64,13 @@ class Renderer
 	float *m_outBuffer; // 3*width*height
 	float *m_zbuffer; // width*height
 	int m_width, m_height;
+
+	//mat4 tw;
+	/*mat4 tc;
+	mat4 tp;*/
+
+	Camera* camera;
 	enum Shading { FLAT = 0, GOURAUD = 1, PHONG = 2 } shading_method = FLAT;
-	
-	mat4 tc;
-	mat4 tp;
 
 	vec4 active_camera_pos;
 
@@ -136,9 +140,11 @@ public:
 
 
 	////===Transformation/Camera Setters===
-	void setCameraTransform(const mat4& tc);
-	void setProjection(const mat4& tc);
+	/*void setCameraTransform(const mat4& tc);
+	void setProjection(const mat4& tc);*/
 	//void setWorldTransform(const mat4& tw);
+
+	void setCamera(Camera* camera);
 
 	void setLightSources(vector<PointSource> points, vector<ParallelSource> parallels);
 	void setActiveCameraPosition(vec4 pos);

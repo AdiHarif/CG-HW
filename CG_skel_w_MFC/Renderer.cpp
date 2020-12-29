@@ -456,7 +456,7 @@ void Renderer::setSize(int width, int height) {
 //==========
 
 void Renderer::drawCamera(vec4 pos, Color c) {
-	mat4 t_tot = tp * tc;
+	mat4 t_tot = camera->tp * camera->tc;
 	Pixel center = viewPort(t_tot * pos);
 	for (int j = -2; j <= 2; j++) {
 		drawPixel(Pixel(center.x + j, center.y, center.z, c));
@@ -487,8 +487,8 @@ void Renderer::SetDemoBuffer()
 
 
 ////===Transformation Setters===
-void Renderer::setCameraTransform(const mat4& tc) { this->tc = tc; }
-void Renderer::setProjection(const mat4& tp) { this->tp = tp; }
+//void Renderer::setCameraTransform(const mat4& tc) { this->tc = tc; }
+//void Renderer::setProjection(const mat4& tp) { this->tp = tp; }
 //void Renderer::setWorldTransform(const mat4& tw) { this->tw = tw; }
 void Renderer::setActiveCameraPosition(vec4 pos) { this->active_camera_pos = pos; }
 ////==========
@@ -499,36 +499,57 @@ void Renderer::setAmbientColor(Color* color) { scene_ambient_light_color = color
 
 
 void Renderer::drawModel(MeshModel& model) {
-	mat4 tm_tot = tp * tc * model.tw * model.tm;
+
+
+	mat4 tm_tot = camera->tp * camera->tc * model.tw* model.tm;
 	vector<Vertex> tr_vertices;
 	vector<Pixel> px_vertices;
 	for (vector<Vertex>::iterator i = model.vertices.begin(); i != model.vertices.end(); i++) {
 		vec4 v = tm_tot * (*i);
+		v /= v.w;
 		tr_vertices.push_back(v);
 		px_vertices.push_back(viewPort(v));
 	}
 
-	mat4 ntm_t1 = model.ntw * model.ntm;
-	mat4 ntm_t2 = tp * tc;
+	mat4 ntm_t1 = model.ntw *model.ntm;
+	mat4 ntm_t2 = camera->tpn * camera->tcn;
 	vector<Normal> tr_vertex_normals;
 	for (vector<Normal>::iterator i = model.vertex_normals.begin(); i != model.vertex_normals.end(); i++) {
 		vec4 n = ntm_t1 * (*i);
+		n /= n.w;
 		n.w = 0;
-		n = normalize(n);
+		n = normalize(n)/100;
 		n.w = 1;
 		n = ntm_t2 * n;
+		n /= n.w;
 		tr_vertex_normals.push_back(n);
+		/*vec4 n = ntm_t2 * ntm_t1 * (*i);
+		n /= n.w;
+		n.w = 0;
+		n = normalize(n)/10;
+		n.w = 1;
+		tr_vertex_normals.push_back(n);*/
 	}
+
+	mat4 I = transpose(ntm_t2 * ntm_t1) * tm_tot;
 
 	Color model_ambient_color = calculateAmbientColor(model);
 	vector<Normal> tr_face_normals;
 	for (vector<Normal>::iterator i = model.face_normals.begin(); i != model.face_normals.end(); i++) {
 		vec4 n = ntm_t1 * (*i);
+		n /= n.w;
 		n.w = 0;
-		n = normalize(n);
+		n = normalize(n)/100;
 		n.w = 1;
 		n = ntm_t2 * n;
+		n /= n.w;
 		tr_face_normals.push_back(n);
+		/*vec4 n = ntm_t2 * ntm_t1 * (*i);
+		n /= n.w;
+		n.w = 0;
+		n = normalize(n)/10;
+		n.w = 1;
+		tr_face_normals.push_back(n);*/
 	}
 
 	if (model.draw_pref.poly_mode == DrawPref::VERTICES_ONLY) {
@@ -592,7 +613,7 @@ void Renderer::drawModel(MeshModel& model) {
 		}
 
 		if (model.draw_pref.f_draw_faces_normals) {
-			Vertex center = (tr_vertices[i->vertices[0] - 1] + tr_vertices[i->vertices[1] - 1] + tr_vertices[i->vertices[2] - 1]) / 3;
+			//Vertex center = (tr_vertices[i->vertices[0] - 1] + tr_vertices[i->vertices[1] - 1] + tr_vertices[i->vertices[2] - 1]) / 3;
 			Pixel start = viewPort(center);
 			start.color = model.face_normals_color;
 			Vertex end_v = center + tr_face_normals[i->normal];
@@ -615,7 +636,7 @@ void Renderer::drawModel(MeshModel& model) {
 
 void Renderer::drawOrigin(Color c) {
 	vec4 v = vec4(0, 0, 0, 1);
-	mat4 t_tot = tp * tc;
+	mat4 t_tot = camera->tp * camera->tc;
 	Pixel origin = viewPort(t_tot * v);
 	origin.color = c;
 	drawPixel(origin);
@@ -696,8 +717,11 @@ Color Renderer::calculateSpecularColor(MeshModel& m, Vertex point, Normal normal
 		l.w = 1;
 		vec4 n = normalize(vec4(normal.x, normal.y, normal.z));
 		vec4 r = 2 * (l * n) * n - l;
-
-		factor = max(0, pow((r * dir_to_camera), m.shininess));
+		r.w = 0;
+		r = normalize(r);
+		dir_to_camera.w = 0;
+		dir_to_camera = normalize(dir_to_camera);
+		factor = pow(max(0, (r * dir_to_camera)), m.shininess);
 		specular_color += (m.diffuse_color * i->getColor()) * factor;
 	}
 
@@ -724,7 +748,7 @@ void Renderer::applyFog() {
 }
 
 void Renderer::drawAxes() {
-	mat4 t_tot = this->tp * this->tc;
+	mat4 t_tot = camera->tp * camera->tc;
 	vec4 axes[3];
 	axes[0] = t_tot * vec4(1, 0, 0, 1);
 	axes[1] = t_tot * vec4(0, 1, 0, 1);
@@ -810,7 +834,7 @@ void Renderer::setLightSources(vector<PointSource> points, vector<ParallelSource
 	parallel_sources.clear();
 	point_sources.clear();
 
-	mat4 t_tot = tp * tc;
+	mat4 t_tot = camera->tp * camera->tc;
 
 	for (vector<PointSource>::iterator i = points.begin(); i != points.end(); i++) {
 		point_sources.push_back(t_tot * (*i));
@@ -847,6 +871,8 @@ void Renderer::applyBloom(float bloom_threshold) {
 
 	delete bloom_buff;
 }
+
+void Renderer::setCamera(Camera* camera) { this->camera = camera; }
 
 void Renderer::toggleShading() {
 	shading_method = Shading((shading_method + 1) % 3);

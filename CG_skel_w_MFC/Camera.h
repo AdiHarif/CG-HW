@@ -9,6 +9,9 @@ class Camera {
 	mat4 tc;
 	mat4 tp;
 
+	mat4 tcn;
+	mat4 tpn;
+
 	mat4 tci;
 
 	vec4 position;
@@ -73,4 +76,6 @@ public:
 	vec4 getAt();
 	vec4 getUp();
 	//==========
+
+	friend class Renderer;
 };
