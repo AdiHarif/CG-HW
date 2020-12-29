@@ -5,19 +5,20 @@
 #define RED { 1.0, 0.0, 0.0 }
 #define GREEN { 0.0, 1.0, 0.0 }
 #define BLUE { 0.0, 0.0, 1.0 }
+#define BLACK { 0.0, 0.0, 0.0 }
 #define WHITE { 1.0, 1.0, 1.0 }
 #define INACTIVE_GRAY { 0.4, 0.4, 0.4 }
 #define PURPLE { 1.0, 0.0, 1.0 }
 #define YELLOW { 1.0, 1.0, 0.0 }
 
 
-struct Color{
+struct Color {
 	float r = 0.0;
 	float g = 0.0;
 	float b = 0.0;
 
 	//===C'tors / Destructors===
-	Color() { r = 1.0; g = 1.0; b = 1.0; }
+	Color() { r = 0.0; g = 0.0; b = 0.0; }
 	Color(float r, float g, float b) : r(r), g(g), b(b) {}
 	Color(vec3 v) : r(v.x), g(v.x), b(v.x) {}
 	Color(const Color& c) { r = c.r; g = c.g; b = c.b; }
@@ -53,8 +54,8 @@ struct Color{
 	//==========
 
 	void floorToOne() {
-		r = min(1, r); 
-		g = min(1, g); 
+		r = min(1, r);
+		g = min(1, g);
 		b = min(1, b);
 	}
 };

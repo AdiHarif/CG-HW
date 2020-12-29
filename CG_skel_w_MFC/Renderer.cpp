@@ -188,50 +188,97 @@ void Renderer::drawLineSteep(Line l, vector<Pixel>* pixels_drawn) {
 	}
 }
 
-void Renderer::drawTriangle(Triangle t, Color c) {
+void Renderer::drawTriangleFlat(Triangle t, Color color) {
 	int max_y = t.findMaxY();
 	int min_y = t.findMinY();
 	int rows = max_y - min_y + 1;
 
 	vector<Line> draw_between;
-	for (int i = 0; i < rows; i++) {
-		Pixel left = Pixel(INT_MIN, i + min_y, -1, c);// TODO: add z
-		Pixel right = Pixel(INT_MAX, i + min_y, -1, c);// TODO: add z
+	for (int i = 0; i < rows; i++) { // init rows vector
+		Pixel left = Pixel(INT_MIN, i + min_y, -1, BLACK);// TODO: add z
+		Pixel right = Pixel(INT_MAX, i + min_y, -1, BLACK);// TODO: add z
 		draw_between.push_back(Line(left, right));
 	}
 
 	for (Line l : t.lines) {
 		vector<Pixel> pixels_drawn;
-		switch (shading_method) {
-		case FLAT:
-			l.start.color = c;
-			l.end.color = c;
-			break;
-		case GOURAUD:
-			
-			break;
-		case PHONG:
-
-			break;
-		}
+		l.start.color = color;
+		l.end.color = color;
 
 		drawLine(l, &pixels_drawn);
 		for (Pixel p : pixels_drawn) {
 			if (p.x > draw_between.at(p.y - min_y).start.x) {
 				draw_between.at(p.y - min_y).start.x = p.x;
 				draw_between.at(p.y - min_y).start.z = p.z;
+				draw_between.at(p.y - min_y).start.color = p.color;
 			}
 			if (p.x < draw_between.at(p.y - min_y).end.x) {
 				draw_between.at(p.y - min_y).end.x = p.x;
 				draw_between.at(p.y - min_y).end.z = p.z;
+				draw_between.at(p.y - min_y).end.color = p.color;
 			}
 		}
 	}
 
 	for (int i = 0; i < rows; i++) {
 		Line line_to_draw = Line(draw_between.at(i).start, draw_between.at(i).end);
-		line_to_draw.start.color = c;
-		line_to_draw.end.color = c;
+		drawLine(line_to_draw);
+	}
+}
+
+void Renderer::drawTriangleGouraud(Triangle t, Color ambient_color, MeshModel* m, vector<Normal> normals) {
+	int max_y = t.findMaxY();
+	int min_y = t.findMinY();
+	int rows = max_y - min_y + 1;
+
+	vector<Line> draw_between;
+	for (int i = 0; i < rows; i++) { // init rows vector
+		Pixel left = Pixel(INT_MIN, i + min_y, -1, BLACK);// TODO: add z
+		Pixel right = Pixel(INT_MAX, i + min_y, -1, BLACK);// TODO: add z
+		draw_between.push_back(Line(left, right));
+	}
+
+	for (int i = 0; i < t.lines.size(); i++) {
+		Line& l = t.lines.at(i);
+		vector<Pixel> pixels_drawn;
+
+		//set start color:
+		Vertex start_vertex = Vertex(l.start.x, l.start.y, l.start.z, 1.0);
+		Normal start_vertex_normal = normals[&l - &(t.lines[0])];
+		Color start_diffuse_color = calculateDiffuseColor(*m, start_vertex, start_vertex_normal);
+		vec4 start_dir_to_camera = active_camera_pos - start_vertex;
+		Color start_specular_color = calculateSpecularColor(*m, start_vertex, start_vertex_normal, start_dir_to_camera);
+		l.start.color = ambient_color + start_diffuse_color + start_specular_color;
+		l.start.color.floorToOne();
+
+		//set start color of line l to be end color of line l-1:
+		//Line& prev_l = t.lines.at((i + 2) % 3);
+		//prev_l.end.color = l.start.color;
+		Vertex end_vertex = Vertex(l.end.x, l.end.y, l.end.z, 1.0);
+		Normal end_vertex_normal = normals[&l - &(t.lines[0])];
+		Color end_diffuse_color = calculateDiffuseColor(*m, end_vertex, end_vertex_normal);
+		vec4 end_dir_to_camera = active_camera_pos - end_vertex;
+		Color end_specular_color = calculateSpecularColor(*m, end_vertex, end_vertex_normal, end_dir_to_camera);
+		l.end.color = ambient_color + end_diffuse_color + end_specular_color;
+		l.end.color.floorToOne();
+
+		drawLine(l, &pixels_drawn);
+		for (Pixel p : pixels_drawn) {
+			if (p.x > draw_between.at(p.y - min_y).start.x) {
+				draw_between.at(p.y - min_y).start.x = p.x;
+				draw_between.at(p.y - min_y).start.z = p.z;
+				draw_between.at(p.y - min_y).start.color = p.color;
+			}
+			if (p.x < draw_between.at(p.y - min_y).end.x) {
+				draw_between.at(p.y - min_y).end.x = p.x;
+				draw_between.at(p.y - min_y).end.z = p.z;
+				draw_between.at(p.y - min_y).end.color = p.color;
+			}
+		}
+	}
+
+	for (int i = 0; i < rows; i++) {
+		Line line_to_draw = Line(draw_between.at(i).start, draw_between.at(i).end);
 		drawLine(line_to_draw);
 	}
 }
@@ -409,7 +456,7 @@ void Renderer::setSize(int width, int height) {
 //==========
 
 void Renderer::drawCamera(vec4 pos, Color c) {
-	mat4 t_tot = tp * tc * tw;
+	mat4 t_tot = tp * tc;
 	Pixel center = viewPort(t_tot * pos);
 	for (int j = -2; j <= 2; j++) {
 		drawPixel(Pixel(center.x + j, center.y, center.z, c));
@@ -442,7 +489,7 @@ void Renderer::SetDemoBuffer()
 ////===Transformation Setters===
 void Renderer::setCameraTransform(const mat4& tc) { this->tc = tc; }
 void Renderer::setProjection(const mat4& tp) { this->tp = tp; }
-void Renderer::setWorldTransform(const mat4& tw) { this->tw = tw; }
+//void Renderer::setWorldTransform(const mat4& tw) { this->tw = tw; }
 void Renderer::setActiveCameraPosition(vec4 pos) { this->active_camera_pos = pos; }
 ////==========
 
@@ -452,7 +499,7 @@ void Renderer::setAmbientColor(Color* color) { scene_ambient_light_color = color
 
 
 void Renderer::drawModel(MeshModel& model) {
-	mat4 tm_tot = tp * tc * tw * model.tm;
+	mat4 tm_tot = tp * tc * model.tw * model.tm;
 	vector<Vertex> tr_vertices;
 	vector<Pixel> px_vertices;
 	for (vector<Vertex>::iterator i = model.vertices.begin(); i != model.vertices.end(); i++) {
@@ -461,7 +508,7 @@ void Renderer::drawModel(MeshModel& model) {
 		px_vertices.push_back(viewPort(v));
 	}
 
-	mat4 ntm_t1 = tw * model.ntm;
+	mat4 ntm_t1 = model.ntw * model.ntm;
 	mat4 ntm_t2 = tp * tc;
 	vector<Normal> tr_vertex_normals;
 	for (vector<Normal>::iterator i = model.vertex_normals.begin(); i != model.vertex_normals.end(); i++) {
@@ -507,18 +554,24 @@ void Renderer::drawModel(MeshModel& model) {
 		}
 
 		if (model.draw_pref.poly_mode == DrawPref::FILLED) {
+			Triangle t = Triangle(px_vertices[i->vertices[0] - 1], px_vertices[i->vertices[1] - 1], px_vertices[i->vertices[2] - 1]);
 			if (shading_method == FLAT) {
-				Triangle t = Triangle(px_vertices[i->vertices[0] - 1], px_vertices[i->vertices[1] - 1], px_vertices[i->vertices[2] - 1]);
 				vec4 dir_to_camera = active_camera_pos - center;
 				Normal face_normal = tr_face_normals[i->normal];
 				Color face_diffuse_color = calculateDiffuseColor(model, center, face_normal);
 				Color face_specular_color = calculateSpecularColor(model, center, face_normal, dir_to_camera);
 				Color face_final_color = model_ambient_color + face_diffuse_color + face_specular_color;
 				face_final_color.floorToOne();
-				drawTriangle(t, face_final_color);
+				drawTriangleFlat(t, face_final_color);
 			}
 			if (shading_method == GOURAUD) {
-
+				if (i->vertex_normals[0] >= 0) { // means there are vertex normals
+					vector<Normal> triangle_normals;
+					triangle_normals.push_back(tr_vertex_normals.at(i->vertex_normals[0] - 1));
+					triangle_normals.push_back(tr_vertex_normals.at(i->vertex_normals[1] - 1));
+					triangle_normals.push_back(tr_vertex_normals.at(i->vertex_normals[2] - 1));
+					drawTriangleGouraud(t, model_ambient_color, &model, triangle_normals);
+				}
 			}
 
 			if (shading_method == PHONG) {
@@ -526,7 +579,7 @@ void Renderer::drawModel(MeshModel& model) {
 			}
 		}
 
-		if (model.draw_pref.f_draw_vertex_normals) {
+		if (model.draw_pref.f_draw_vertex_normals && i->vertex_normals[0] >= 0) {// means there are vertex normals
 			for (int j = 0; j < 3; j++) {
 				Pixel start = px_vertices[i->vertices[j] - 1];
 				start.color = model.vertex_normals_color;
@@ -562,7 +615,7 @@ void Renderer::drawModel(MeshModel& model) {
 
 void Renderer::drawOrigin(Color c) {
 	vec4 v = vec4(0, 0, 0, 1);
-	mat4 t_tot = tp * tc * tw;
+	mat4 t_tot = tp * tc;
 	Pixel origin = viewPort(t_tot * v);
 	origin.color = c;
 	drawPixel(origin);
@@ -606,7 +659,7 @@ Color Renderer::calculateAmbientColor(MeshModel& m) {
 	return *scene_ambient_light_color * m.ambient_color;
 }
 
-Color Renderer::calculateDiffuseColor(MeshModel& m, Vertex center, Normal normal) {
+Color Renderer::calculateDiffuseColor(MeshModel& m, Vertex point, Normal normal) {
 	Color diffuse_color = { 0,0,0 };
 	float factor;
 
@@ -622,7 +675,7 @@ Color Renderer::calculateDiffuseColor(MeshModel& m, Vertex center, Normal normal
 
 
 	for (vector<PointSource>::iterator i = point_sources.begin(); i != point_sources.end(); i++) {
-		vec4 dir = center - i->getPosition();
+		vec4 dir = i->getPosition() - point;
 
 		vec3 v0 = normalize(vec3(normal.x, normal.y, normal.z));
 		vec3 v1 = -normalize(vec3(dir.x, dir.y, dir.z));
@@ -795,3 +848,6 @@ void Renderer::applyBloom(float bloom_threshold) {
 	delete bloom_buff;
 }
 
+void Renderer::toggleShading() {
+	shading_method = Shading((shading_method + 1) % 3);
+}

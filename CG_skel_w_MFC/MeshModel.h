@@ -28,7 +28,7 @@ protected :
 
 	vector<Edge> bb_edges;
 
-	vec4 position;
+	//vec4 position;
 	mat4 tm;
 	mat4 tw;
 	mat4 ntm;
@@ -48,13 +48,13 @@ public:
 	void loadFile(string fileName);
 	void initBoundingBox(vec4 min, vec4 max);
 
-	void translate(vec4);
-	void scale(vec3);
-	void rotateX(GLfloat);
-	void rotateY(GLfloat);
-	void rotateZ(GLfloat);
+	void translate(vec4, bool f_world_frame = true);
+	void scale(vec3, bool f_world_frame = false);
+	void rotateX(GLfloat, bool f_world_frame = false);
+	void rotateY(GLfloat, bool f_world_frame = false);
+	void rotateZ(GLfloat, bool f_world_frame = false);
 
-	mat4 getWorldTransform();
+	//mat4 getWorldTransform();
 	vec4 getPosition();
 	
 	void togglePolyMode();

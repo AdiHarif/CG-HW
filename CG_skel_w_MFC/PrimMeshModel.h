@@ -43,7 +43,7 @@ public:
 		initBoundingBox(min, max);
 
 		//setting model position:
-		position = vec4(0.0);
+		//position = vec4(0.0);
 
 		//centering the model to (0,0,0):
 		vec4 middle_offset = vec4((min.x + max.x) / 2, (min.y + max.y) / 2, (min.z + max.z) / 2);
@@ -55,6 +55,6 @@ public:
 			(*i) = t * (*i);
 		}
 
-		position = vec4(0.0, 0.0, 0.0, 1.0);
+		//position = vec4(0.0, 0.0, 0.0, 1.0);
 	}
 };

@@ -451,6 +451,9 @@ void special(int key, int x, int y) {
 	case GLUT_KEY_F1:
 		scene->togglePolyMode();
 		break;
+	case GLUT_KEY_F2:
+		renderer->toggleShading();
+		break;
 	case GLUT_KEY_F3:
 		scene->toggleBB();
 		break;

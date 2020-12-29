@@ -65,7 +65,6 @@ class Renderer
 	int m_width, m_height;
 	enum Shading { FLAT = 0, GOURAUD = 1, PHONG = 2 } shading_method = FLAT;
 	
-	mat4 tw;
 	mat4 tc;
 	mat4 tp;
 
@@ -96,7 +95,8 @@ class Renderer
 	void drawLine(Line l, vector<Pixel>* pixels_drawn = NULL);
 	void drawLineModerate(Line l, vector<Pixel>* pixels_drawn = NULL);
 	void drawLineSteep(Line l, vector<Pixel>* pixels_drawn = NULL);
-	void drawTriangle(Triangle t, Color c = WHITE);
+	void drawTriangleFlat(Triangle t, Color color);
+	void drawTriangleGouraud(Triangle t, Color ambient_color, MeshModel* m, vector<Normal> normals);
 	//==========
 
 
@@ -138,7 +138,7 @@ public:
 	////===Transformation/Camera Setters===
 	void setCameraTransform(const mat4& tc);
 	void setProjection(const mat4& tc);
-	void setWorldTransform(const mat4& tw);
+	//void setWorldTransform(const mat4& tw);
 
 	void setLightSources(vector<PointSource> points, vector<ParallelSource> parallels);
 	void setActiveCameraPosition(vec4 pos);
@@ -157,7 +157,7 @@ public:
 
 	////===Lighting Calculations===
 	Color calculateAmbientColor(MeshModel& m);
-	Color calculateDiffuseColor(MeshModel& m, Vertex center, Normal noraml);
+	Color calculateDiffuseColor(MeshModel& m, Vertex point, Normal noraml);
 	Color calculateSpecularColor(MeshModel& m, Vertex point, Normal noraml, vec4 dir_to_camera);
 	////==========
 
@@ -167,6 +167,7 @@ public:
 	void drawAxes();
 
 	void applyBlur(float* buffer);
-	
 	void applyBloom(float bloom_threshold);
+
+	void toggleShading();
 };
