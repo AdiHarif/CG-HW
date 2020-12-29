@@ -65,7 +65,7 @@ class Scene {
 	bool f_bloom;
 	float light_bloom_threshold;
 
-	mat4 tw;
+	//mat4 tw;
 
 	friend class Renderer;
 public:

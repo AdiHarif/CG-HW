@@ -34,7 +34,7 @@ vec4 vec4fFromStream(std::istream& aStream) {
 MeshModel::MeshModel(string fileName)
 {
 	loadFile(fileName);
-	position = vec4(0.0, 0.0, 0.0, 1.0);
+	//position = vec4(0.0, 0.0, 0.0, 1.0);
 }
 
 MeshModel::~MeshModel(void)
@@ -119,58 +119,110 @@ void MeshModel::loadFile(string fileName)
 	}
 }
 
-void MeshModel::translate(vec4 v) {
+void MeshModel::translate(vec4 v, bool f_world_frame) {
 	mat4 t = translateMat(v);
-	this->position = t * this->position;
-	this->tm = t * this->tm;
+	mat4 nt = transpose(translateMat(-v));
+	if (!f_world_frame) {
+		tm = t * tm;
+		ntm = nt * ntm;
+	}
+	else {
+		tw = t * tw;
+		ntw = nt * ntw;
+	}
+	//this->position = t * this->position;
+	//this->tm = t * this->tm;
 }
 
-void MeshModel::scale(vec3 v) {
-	mat4 s = scaleMat(v);
-	mat4 t1 = translateMat(this->position);
-	mat4 t2 = translateMat(-this->position);
-	this->tm = t1 * s * t2 * this->tm;
+void MeshModel::scale(vec3 v, bool f_world_frame) {
+	mat4 t = scaleMat(v);
+	mat4 nt = scaleMat(vec3(1/v.x, 1/v.y, 1/v.z)); //bo beed for a transpose here
+	if (!f_world_frame) {
+		tm = t * tm;
+		ntm = nt * ntm;
+	}
+	else {
+		tw = t * tw;
+		ntw = nt * ntw;
+	}
+	//mat4 s = scaleMat(v);
+	//mat4 t1 = translateMat(this->position);
+	//mat4 t2 = translateMat(-this->position);
+	//this->tm = t1 * s * t2 * this->tm;
 
 	// normals transformations: //TODO: fix
 	/*mat4 sn1 = scaleMat(1 / v.x, 1 / v.y, 1 / v.z);
 	ntm = sn1 * ntm;*/
 }
 
-void MeshModel::rotateX(GLfloat theta) {
-	mat4 r = rotateXMat(theta);
-	mat4 t1 = translateMat(this->position);
-	mat4 t2 = translateMat(-this->position);
-	this->tm = t1 * r * t2 * this->tm;
+void MeshModel::rotateX(GLfloat theta, bool f_world_frame) {
+	mat4 t = rotateXMat(theta);
+	mat4 nt = transpose(rotateXMat(-theta));
+	if (!f_world_frame) {
+		tm = t * tm;
+		ntm = nt * ntm;
+	}
+	else {
+		tw = t * tw;
+		ntw = nt * ntw;
+	}
+	//mat4 r = rotateXMat(theta);
+	//mat4 t1 = translateMat(this->position);
+	//mat4 t2 = translateMat(-this->position);
+	//this->tm = t1 * r * t2 * this->tm;
 
-	// normals transformations:
-	ntm =  r * ntm;
+	//// normals transformations:
+	//ntm =  r * ntm;
 }
 
-void MeshModel::rotateY(GLfloat theta) {
-	mat4 r = rotateYMat(theta);
-	mat4 t1 = translateMat(this->position);
-	mat4 t2 = translateMat(-this->position);
-	this->tm = t1 * r * t2 * this->tm;
+void MeshModel::rotateY(GLfloat theta, bool f_world_frame) {
+	mat4 t = rotateYMat(theta);
+	mat4 nt = transpose(rotateYMat(-theta));
+	if (!f_world_frame) {
+		tm = t * tm;
+		ntm = nt * ntm;
+	}
+	else {
+		tw = t * tw;
+		ntw = nt * ntw;
+	}
+	//mat4 r = rotateYMat(theta);
+	//mat4 t1 = translateMat(this->position);
+	//mat4 t2 = translateMat(-this->position);
+	//this->tm = t1 * r * t2 * this->tm;
 
-	// normals transformations:
-	ntm =  r * ntm;
+	//// normals transformations:
+	//ntm =  r * ntm;
 }
 
-void MeshModel::rotateZ(GLfloat theta) {
-	mat4 r = rotateZMat(theta);
-	mat4 t1 = translateMat(this->position);
-	mat4 t2 = translateMat(-this->position);
-	this->tm = t1 * r * t2 * this->tm;
+void MeshModel::rotateZ(GLfloat theta, bool f_world_frame) {
+	mat4 t = rotateZMat(theta);
+	mat4 nt = transpose(rotateZMat(-theta));
+	if (!f_world_frame) {
+		tm = t * tm;
+		ntm = nt * ntm;
+	}
+	else {
+		tw = t * tw;
+		ntw = nt * ntw;
+	}
+	//mat4 r = rotateZMat(theta);
+	//mat4 t1 = translateMat(this->position);
+	//mat4 t2 = translateMat(-this->position);
+	//this->tm = t1 * r * t2 * this->tm;
 
-	// normals transformations:
-	ntm =  r * ntm;
+	//// normals transformations:
+	//ntm =  r * ntm;
 }
 
-mat4 MeshModel::getWorldTransform() {
-	return this->tm;
-}
+//mat4 MeshModel::getWorldTransform() {
+//	return this->tm;
+//}
 
-vec4 MeshModel::getPosition(){ return position; }
+vec4 MeshModel::getPosition(){ 
+	//return position; 
+	return tw * tm * vec4(0, 0, 0, 1);
+}
 
 void MeshModel::initBoundingBox(vec4 min, vec4 max) {
 	vector<Vertex> bb_vertices;

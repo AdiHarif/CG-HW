@@ -360,7 +360,7 @@ void Renderer::setSize(int width, int height) {
 //==========
 
 void Renderer::drawCamera(vec4 pos, Color c) {
-	mat4 t_tot = tp * tc * tw;
+	mat4 t_tot = tp * tc;
 	Pixel center = viewPort(t_tot * pos);
 	for (int j = -2; j <= 2; j++) {
 		drawPixel(Pixel(center.x + j, center.y, center.z), c);
@@ -393,7 +393,7 @@ void Renderer::SetDemoBuffer()
 ////===Transformation Setters===
 void Renderer::setCameraTransform(const mat4& tc) { this->tc = tc; }
 void Renderer::setProjection(const mat4& tp) { this->tp = tp; }
-void Renderer::setWorldTransform(const mat4& tw) { this->tw = tw; }
+//void Renderer::setWorldTransform(const mat4& tw) { this->tw = tw; }
 void Renderer::setActiveCameraPosition(vec4 pos) { this->active_camera_pos = pos; }
 ////==========
 
@@ -403,7 +403,7 @@ void Renderer::setAmbientColor(Color* color) { scene_ambient_light_color = color
 
 
 void Renderer::drawModel(MeshModel& model) {
-	mat4 tm_tot = tp * tc * tw * model.tm;
+	mat4 tm_tot = tp * tc * model.tw* model.tm;
 	vector<Vertex> tr_vertices;
 	vector<Pixel> px_vertices;
 	for (vector<Vertex>::iterator i = model.vertices.begin(); i != model.vertices.end(); i++) {
@@ -412,7 +412,7 @@ void Renderer::drawModel(MeshModel& model) {
 		px_vertices.push_back(viewPort(v));
 	}
 
-	mat4 ntm_t1 = tw * model.ntm;
+	mat4 ntm_t1 = model.ntw *model.ntm;
 	mat4 ntm_t2 = tp * tc;
 	vector<Normal> tr_vertex_normals;
 	for (vector<Normal>::iterator i = model.vertex_normals.begin(); i != model.vertex_normals.end(); i++) {
@@ -506,7 +506,7 @@ void Renderer::drawModel(MeshModel& model) {
 
 void Renderer::drawOrigin(Color c) {
 	vec4 v = vec4(0, 0, 0, 1);
-	mat4 t_tot = tp * tc * tw;
+	mat4 t_tot = tp * tc;
 	drawPixel(viewPort(t_tot * v), c);
 }
 

@@ -61,7 +61,7 @@ class Renderer
 	float *m_zbuffer; // width*height
 	int m_width, m_height;
 
-	mat4 tw;
+	//mat4 tw;
 	mat4 tc;
 	mat4 tp;
 
@@ -134,7 +134,7 @@ public:
 	////===Transformation/Camera Setters===
 	void setCameraTransform(const mat4& tc);
 	void setProjection(const mat4& tc);
-	void setWorldTransform(const mat4& tw);
+	//void setWorldTransform(const mat4& tw);
 
 	void setLightSources(vector<PointSource> points, vector<ParallelSource> parallels);
 	void setActiveCameraPosition(vec4 pos);
