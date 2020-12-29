@@ -208,7 +208,7 @@ void Renderer::drawTriangle(Triangle t, Color c) {
 			l.end.color = c;
 			break;
 		case GOURAUD:
-
+			
 			break;
 		case PHONG:
 
@@ -500,8 +500,8 @@ void Renderer::drawModel(MeshModel& model) {
 			int* indexes = i->vertices;
 			for (int j = 0; j < 3; j++) {
 				Line l = Line(px_vertices[indexes[j] - 1], px_vertices[indexes[(j + 1) % 3] - 1]);
-				l.start.color = model.mesh_color;
-				l.end.color = model.mesh_color;
+				l.start.color = RED;// model.mesh_color;
+				l.end.color = BLUE;// model.mesh_color;
 				drawLine(l);
 			}
 		}
@@ -509,10 +509,10 @@ void Renderer::drawModel(MeshModel& model) {
 		if (model.draw_pref.poly_mode == DrawPref::FILLED) {
 			if (shading_method == FLAT) {
 				Triangle t = Triangle(px_vertices[i->vertices[0] - 1], px_vertices[i->vertices[1] - 1], px_vertices[i->vertices[2] - 1]);
-				Normal normal = tr_face_normals[i->normal];
-				Color face_diffuse_color = calculateDiffuseColor(model, center, normal);
 				vec4 dir_to_camera = active_camera_pos - center;
-				Color face_specular_color = calculateSpecularColor(model, center, normal, dir_to_camera);
+				Normal face_normal = tr_face_normals[i->normal];
+				Color face_diffuse_color = calculateDiffuseColor(model, center, face_normal);
+				Color face_specular_color = calculateSpecularColor(model, center, face_normal, dir_to_camera);
 				Color face_final_color = model_ambient_color + face_diffuse_color + face_specular_color;
 				face_final_color.floorToOne();
 				drawTriangle(t, face_final_color);
@@ -523,10 +523,7 @@ void Renderer::drawModel(MeshModel& model) {
 
 			if (shading_method == PHONG) {
 
-
 			}
-
-
 		}
 
 		if (model.draw_pref.f_draw_vertex_normals) {
