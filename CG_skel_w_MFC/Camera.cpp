@@ -48,7 +48,7 @@ void Camera::setTransformation(vec4 x_axis, vec4 y_axis, vec4 z_axis, vec4 posit
 
     tci = translateMat(position)* tci;
     tc = tc * translateMat(-position);
-
+    tcn = transpose(tci);
 
 }
 
@@ -62,7 +62,7 @@ void Camera::rotateXAroundAt(float theta) {
 
     mat4 ri = rotateXMat(-theta);
     tci = tci * t1 * ri * t2;
-
+    tcn = transpose(tci);
     position = tci * vec4(0, 0, 0, 1);//updating new position in world coordinates
 }
 
@@ -75,6 +75,7 @@ void Camera::rotateYAroundAt(float theta) {
 
     mat4 ri = rotateYMat(-theta);
     tci = tci * t1 * ri * t2;
+    tcn = transpose(tci);
 
     position = tci * vec4(0, 0, 0, 1);//updating new position in world coordinates
 }
@@ -88,6 +89,7 @@ void Camera::rotateZAroundAt(float theta) {
 
     mat4 ri = rotateYMat(-theta);
     tci = tci * t1 * ri * t2;
+    tcn = transpose(tci);
 
     position = tci * vec4(0, 0, 0, 1);//updating new position in world coordinates
 }
@@ -100,6 +102,7 @@ void Camera::translateC(vec4 v) {
 
     tc = t * tc;
     tci = tci * ti;
+    tcn = transpose(tci);
 
     at = tci* atc;
     position = vec4(tci[0][3], tci[1][3], tci[2][3], 1); //tci* (0,0,0,1)
@@ -167,7 +170,7 @@ void Camera::lookAt() {
     vec4 z_axis = normalize(position - at);
     vec4 x_axis = normalize(cross(up, z_axis));
     vec4 y_axis = normalize(cross(z_axis, x_axis));
-    vec4 t = vec4(0.0, 0.0, 0.0, 1.0);
+    //vec4 t = vec4(0.0, 0.0, 0.0, 1.0);
     setTransformation(x_axis, y_axis, z_axis, position);
 }
 
@@ -188,6 +191,7 @@ void Camera::zoom(float aspect) {
 
     tc = t * tc;
     tci = tci * ti;
+    tcn = transpose(tci);
 
     position = vec4(tci[0][3], tci[1][3], tci[2][3], 1); //tci* (0,0,0,1)
 
@@ -214,6 +218,10 @@ void Camera::ortho(const float left, const float right,
     mat4 t = translateMat(-(right + left) / 2, -(bottom + top) / 2, -(z_near + z_far) / 2);
     mat4 s = scaleMat(2 / (right - left), 2 / (top - bottom), 2 / (z_near - z_far));
     tp = s * t;
+
+    mat4 ti = translateMat((right + left) / 2, (bottom + top) / 2, (z_near + z_far) / 2);
+    mat4 si = scaleMat((right - left)/2, (top - bottom)/2, (z_near - z_far)/2);
+    tpn = transpose(ti * si);
 }
 
 
@@ -240,6 +248,17 @@ void Camera::frustum(const float left, const float right,
     n[3][2] = 1;
     n[3][3] = 0;
     tp = n * s * h;
+
+    mat4 hi;
+    hi[0][2] = -(left + right) / 2;
+    hi[1][2] = -(top + bottom) / 2;
+    mat4 si = scaleMat((right - left)/(2 * z_near),  (top - bottom)/ (2 * z_near) , 1.0);
+    mat4 ni;
+    ni[2][2] = 0;
+    ni[2][3] = 1;
+    ni[3][2] = (z_far - z_near)/(2 * z_near * z_far);
+    ni[3][3] = (z_near + z_far) / (2 * z_near * z_far);
+    tpn = transpose(hi * si * ni);
 }
 
 void Camera::perspective(const float fovy, const float aspect,
@@ -264,8 +283,8 @@ void Camera::toggleProjection() {
 
 
 //===Getters===
-mat4 Camera::getTransform() { return tc; }
-mat4 Camera::getProjection() { return tp; }
+//mat4 Camera::getTransform() { return tc; }
+//mat4 Camera::getProjection() { return tp; }
 vec4 Camera::getPosition() { return position; }
 vec4 Camera::getAt() { return at; }
 vec4 Camera::getUp() { return up; }

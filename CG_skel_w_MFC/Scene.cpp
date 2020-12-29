@@ -61,9 +61,11 @@ void Scene::draw()
 	//m_renderer->clearColorBuffer();
 	m_renderer->clearBuffer();
 	// 1. Send the renderer the current camera transform and the projection
-	m_renderer->setCameraTransform(getActiveCamera()->getTransform());
-	m_renderer->setProjection(getActiveCamera()->getProjection());
+	/*m_renderer->setCameraTransform(getActiveCamera()->getTransform());
+	m_renderer->setProjection(getActiveCamera()->getProjection());*/
 	//m_renderer->setWorldTransform(tw);
+
+	m_renderer->setCamera(cameras[active_camera]);
 
 	m_renderer->setLightSources(point_sources, parallel_sources);
 

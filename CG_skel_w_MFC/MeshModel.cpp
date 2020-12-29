@@ -124,11 +124,11 @@ void MeshModel::translate(vec4 v, bool f_world_frame) {
 	mat4 nt = transpose(translateMat(-v));
 	if (!f_world_frame) {
 		tm = t * tm;
-		ntm = nt * ntm;
+		//ntm = nt * ntm;
 	}
 	else {
 		tw = t * tw;
-		ntw = nt * ntw;
+		//ntw = nt * ntw;
 	}
 	//this->position = t * this->position;
 	//this->tm = t * this->tm;
