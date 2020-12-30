@@ -83,8 +83,8 @@ class Renderer
 		float max_density;
 	} fog;
 
-	vector<ParallelSource> parallel_sources;
-	vector<PointSource> point_sources;
+	vector<ParallelSource>* parallel_sources;
+	vector<PointSource>* point_sources;
 	Color* scene_ambient_light_color;
 	//GLfloat* scene_ambient_light_intensity;
 
@@ -145,7 +145,7 @@ public:
 
 	void setCamera(Camera* camera);
 
-	void setLightSources(vector<PointSource> points, vector<ParallelSource> parallels);
+	//void setLightSources(vector<PointSource> points, vector<ParallelSource> parallels);
 	void setActiveCameraPosition(vec4 pos);
 	////===Lights Setters===
 	void setAmbientColor(Color* color);

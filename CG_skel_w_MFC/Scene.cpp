@@ -30,7 +30,8 @@ Scene::Scene(Renderer* renderer) : m_renderer(renderer) {
 	light_bloom_threshold = 0.9;
 	Camera* def_cam = new Camera(vec4(0.0, 0.0, 10.0));
 	addCamera(def_cam);
-	parallel_sources.push_back(ParallelSource("Parallel Light 0", vec3(0.0, 0.0, -1.0), { 0.3, 0.1, 0.1 }));
+	parallel_sources.push_back(ParallelSource("Point Light 0", vec3(0.0, 0.0, -1.0), { 0.3, 0.1, 0.1 }));
+	point_sources.push_back(PointSource("Point Light 0", vec3(1.5, 1.5, 1.5), { 1, 1, 1 }));
 	m_renderer->setAmbientColor(&ambient_light_color);
 }
 
@@ -67,7 +68,9 @@ void Scene::draw()
 
 	m_renderer->setCamera(cameras[active_camera]);
 
-	m_renderer->setLightSources(point_sources, parallel_sources);
+	//m_renderer->setLightSources(point_sources, parallel_sources);
+	m_renderer->point_sources = &this->point_sources;
+	m_renderer->parallel_sources = &this->parallel_sources;
 
 	// 2. Tell all models to draw themselves
 	for (vector<Model*>::iterator i = models.begin(); i!=models.end(); i++){
