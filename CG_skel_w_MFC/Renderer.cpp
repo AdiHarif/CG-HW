@@ -714,7 +714,7 @@ Color Renderer::calculateSpecularColor(MeshModel& m, Vertex point, Normal normal
 	float factor;
 
 	for (vector<PointSource>::iterator i = point_sources->begin(); i != point_sources->end(); i++) {
-		vec4 l = normalize(point - vec4(i->getPosition()));
+		vec4 l = -normalize(point - vec4(i->getPosition()));
 		l.w = 0;
 		vec4 n = normalize(vec4(normal.x, normal.y, normal.z, 0));
 		vec4 r = 2 * (l * n) * n - l;
@@ -722,7 +722,8 @@ Color Renderer::calculateSpecularColor(MeshModel& m, Vertex point, Normal normal
 		r = normalize(r);
 		dir_to_camera.w = 0;
 		dir_to_camera = normalize(dir_to_camera);
-		factor = pow(max(0, (r * dir_to_camera)), m.shininess);
+		float tmp = (r * dir_to_camera);
+		factor = pow(max(0, tmp),1/ m.shininess);
 		specular_color += (m.diffuse_color * i->getColor()) * factor;
 	}
 
