@@ -495,11 +495,13 @@ void Renderer::setAmbientColor(Color* color) { scene_ambient_light_color = color
 void Renderer::drawModel(MeshModel& model) {
 
 
-	mat4 tm_tot = camera->tp * camera->tc * model.tw* model.tm;
+	mat4 tm_tot1 = model.tw* model.tm;
+	mat4 tm_tot2 = camera->tp * camera->tc;
+	mat4 tm_tot = tm_tot2 * tm_tot1;
 	vector<Vertex> tr_vertices;
 	vector<Pixel> px_vertices;
 	for (vector<Vertex>::iterator i = model.vertices.begin(); i != model.vertices.end(); i++) {
-		vec4 v = tm_tot * (*i);
+		vec4 v = tm_tot2*tm_tot1 * (*i);
 		v /= v.w;
 		tr_vertices.push_back(v);
 		px_vertices.push_back(viewPort(v));
@@ -525,9 +527,10 @@ void Renderer::drawModel(MeshModel& model) {
 		tr_vertex_normals.push_back(n);*/
 	}
 
-	mat4 I = transpose(ntm_t2 * ntm_t1) * tm_tot;
+	//mat4 I = transpose(ntm_t2 * ntm_t1) * tm_tot;
 
 	Color model_ambient_color = calculateAmbientColor(model);
+	vector<Normal> wr_face_normals;
 	vector<Normal> tr_face_normals;
 	for (vector<Normal>::iterator i = model.face_normals.begin(); i != model.face_normals.end(); i++) {
 		vec4 n = ntm_t1 * (*i);
@@ -535,6 +538,7 @@ void Renderer::drawModel(MeshModel& model) {
 		n.w = 0;
 		n = normalize(n)/100;
 		n.w = 1;
+		wr_face_normals.push_back(n);
 		n = ntm_t2 * n;
 		n /= n.w;
 		tr_face_normals.push_back(n);
@@ -555,8 +559,10 @@ void Renderer::drawModel(MeshModel& model) {
 
 	for (vector<Face>::iterator i = model.faces.begin(); i != model.faces.end(); i++) {
 
-		Vertex center = tm_tot * i->center;
-		center = center / center.w;
+		Vertex wr_center = tm_tot1 * i->center;
+		wr_center = wr_center / wr_center.w;
+
+		Vertex center = tm_tot2 * wr_center;
 
 		if (model.draw_pref.poly_mode == DrawPref::EDGES_ONLY) {
 			int* indexes = i->vertices;
@@ -571,11 +577,12 @@ void Renderer::drawModel(MeshModel& model) {
 		if (model.draw_pref.poly_mode == DrawPref::FILLED) {
 			Triangle t = Triangle(px_vertices[i->vertices[0] - 1], px_vertices[i->vertices[1] - 1], px_vertices[i->vertices[2] - 1]);
 			if (shading_method == FLAT) {
-				vec4 dir_to_camera = active_camera_pos - center;
-				Normal face_normal = tr_face_normals[i->normal];
-				Color face_diffuse_color = calculateDiffuseColor(model, center, face_normal);
-				Color face_specular_color = calculateSpecularColor(model, center, face_normal, dir_to_camera);
-				Color face_final_color = model.emit_color + model_ambient_color + face_diffuse_color + face_specular_color;
+				vec4 wr_dir_to_camera = normalize(camera->getPosition() - wr_center);
+
+				Normal wr_face_normal = wr_face_normals[i->normal];
+				Color face_diffuse_color = calculateDiffuseColor(model, wr_center, wr_face_normal);
+				Color face_specular_color = calculateSpecularColor(model, wr_center, wr_face_normal, wr_dir_to_camera);
+				Color face_final_color = model.emit_color + model_ambient_color + face_diffuse_color /*+ face_specular_color*/;
 				face_final_color.floorToOne();
 				drawTriangleFlat(t, face_final_color);
 			}
@@ -678,7 +685,7 @@ Color Renderer::calculateDiffuseColor(MeshModel& m, Vertex point, Normal normal)
 	Color diffuse_color = { 0,0,0 };
 	float factor;
 
-	for (vector<ParallelSource>::iterator i = parallel_sources.begin(); i != parallel_sources.end(); i++) {
+	for (vector<ParallelSource>::iterator i = parallel_sources->begin(); i != parallel_sources->end(); i++) {
 		vec4 dir = i->getDirection();
 
 		vec3 v0 = normalize(vec3(normal.x, normal.y, normal.z));
@@ -689,11 +696,11 @@ Color Renderer::calculateDiffuseColor(MeshModel& m, Vertex point, Normal normal)
 	}
 
 
-	for (vector<PointSource>::iterator i = point_sources.begin(); i != point_sources.end(); i++) {
-		vec4 dir = i->getPosition() - point;
+	for (vector<PointSource>::iterator i = point_sources->begin(); i != point_sources->end(); i++) {
+		vec4 dir = vec4(i->getPosition().x - point.x, i->getPosition().y - point.y, i->getPosition().z - point.z, 1);
 
 		vec3 v0 = normalize(vec3(normal.x, normal.y, normal.z));
-		vec3 v1 = -normalize(vec3(dir.x, dir.y, dir.z));
+		vec3 v1 = normalize(vec3(dir.x, dir.y, dir.z));
 
 		factor = max(0, v0 * v1);
 		diffuse_color += (m.diffuse_color * i->getColor()) * factor;
@@ -706,8 +713,8 @@ Color Renderer::calculateSpecularColor(MeshModel& m, Vertex point, Normal normal
 	Color specular_color = { 0,0,0 };
 	float factor;
 
-	for (vector<PointSource>::iterator i = point_sources.begin(); i != point_sources.end(); i++) {
-		vec4 l = normalize(point - i->getPosition());
+	for (vector<PointSource>::iterator i = point_sources->begin(); i != point_sources->end(); i++) {
+		vec4 l = normalize(point - vec4(i->getPosition()));
 		l.w = 0;
 		vec4 n = normalize(vec4(normal.x, normal.y, normal.z, 0));
 		vec4 r = 2 * (l * n) * n - l;
@@ -824,20 +831,20 @@ void Renderer::applyBlur(float* buffer) {
 	delete tmp_buff;
 }
 
-void Renderer::setLightSources(vector<PointSource> points, vector<ParallelSource> parallels) {
-	parallel_sources.clear();
-	point_sources.clear();
-
-	mat4 t_tot = camera->tp * camera->tc;
-
-	for (vector<PointSource>::iterator i = points.begin(); i != points.end(); i++) {
-		point_sources.push_back(t_tot * (*i));
-	}
-
-	for (vector<ParallelSource>::iterator i = parallels.begin(); i != parallels.end(); i++) {
-		parallel_sources.push_back(t_tot * (*i));
-	}
-}
+//void Renderer::setLightSources(vector<PointSource> points, vector<ParallelSource> parallels) {
+//	parallel_sources.clear();
+//	point_sources.clear();
+//
+//	mat4 t_tot = camera->tp * camera->tc;
+//
+//	for (vector<PointSource>::iterator i = points.begin(); i != points.end(); i++) {
+//		point_sources.push_back(t_tot * (*i));
+//	}
+//
+//	for (vector<ParallelSource>::iterator i = parallels.begin(); i != parallels.end(); i++) {
+//		parallel_sources.push_back(t_tot * (*i));
+//	}
+//}
 
 void Renderer::applyBloom(float bloom_threshold) {
 	int buff_size = m_width * m_height * 3;
