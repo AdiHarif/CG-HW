@@ -116,6 +116,11 @@ void MeshModel::loadFile(string fileName)
 		Normal n = cross(e0, e1);
 		face_normals.push_back(n);
 		faces[i].normal = i;
+
+		faces[i].ambient_color = ambient_color;
+		faces[i].diffuse_color = diffuse_color;
+		faces[i].specular_color = specular_color;
+		faces[i].emit_color = emit_color;
 	}
 }
 

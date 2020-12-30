@@ -4,6 +4,7 @@
 #include "InitShader.h"
 #include "GL\freeglut.h"
 #include "MeshModel.h"
+#include "NonUniformMeshModel.h"
 
 #define INDEX(width,x,y,c) (x+y*width)*3+c
 #define Z_INDEX(width,x,y) (x+y*width)
@@ -226,7 +227,7 @@ void Renderer::drawTriangleFlat(Triangle t, Color color) {
 	}
 }
 
-void Renderer::drawTriangleGouraud(Triangle t, Color ambient_color, MeshModel* m, vector<Normal> normals) {
+void Renderer::drawTriangleGouraud(Triangle t, Color ambient_color, MeshModel* m, Face& f, vector<Normal> normals) {
 	int max_y = t.findMaxY();
 	int min_y = t.findMinY();
 	int rows = max_y - min_y + 1;
@@ -245,8 +246,8 @@ void Renderer::drawTriangleGouraud(Triangle t, Color ambient_color, MeshModel* m
 		Vertex p_v = Vertex(p.x, p.y, p.z);
 		Normal p_normal = normals[i];
 		vec4 dir_to_camera = active_camera_pos - p_v;
-		Color diffuse_color = calculateDiffuseColor(*m, p_v, p_normal);
-		Color specular_color = calculateSpecularColor(*m, p_v, p_normal, dir_to_camera);
+		Color diffuse_color = calculateDiffuseColor(f, p_v, p_normal);
+		Color specular_color = calculateSpecularColor(*m, f, p_v, p_normal, dir_to_camera);
 		p.color = m->emit_color + ambient_color + diffuse_color + specular_color;
 		p.color = p.color;
 	}
@@ -529,7 +530,7 @@ void Renderer::drawModel(MeshModel& model) {
 
 	//mat4 I = transpose(ntm_t2 * ntm_t1) * tm_tot;
 
-	Color model_ambient_color = calculateAmbientColor(model);
+	Color model_ambient_color = calculateAmbientColor(model.faces[0]);
 	vector<Normal> wr_face_normals;
 	vector<Normal> tr_face_normals;
 	for (vector<Normal>::iterator i = model.face_normals.begin(); i != model.face_normals.end(); i++) {
@@ -578,11 +579,20 @@ void Renderer::drawModel(MeshModel& model) {
 			Triangle t = Triangle(px_vertices[i->vertices[0] - 1], px_vertices[i->vertices[1] - 1], px_vertices[i->vertices[2] - 1]);
 			if (shading_method == FLAT) {
 				vec4 wr_dir_to_camera = normalize(camera->getPosition() - wr_center);
-
 				Normal wr_face_normal = wr_face_normals[i->normal];
-				Color face_diffuse_color = calculateDiffuseColor(model, wr_center, wr_face_normal);
-				Color face_specular_color = calculateSpecularColor(model, wr_center, wr_face_normal, wr_dir_to_camera);
-				Color face_final_color = model.emit_color + model_ambient_color + face_diffuse_color + face_specular_color;
+				Color face_diffuse_color = calculateDiffuseColor(*i, wr_center, wr_face_normal);
+				Color face_specular_color = calculateSpecularColor(model, *i, wr_center, wr_face_normal, wr_dir_to_camera);
+				Color face_ambient_color;
+				Color face_emit_color;
+				if (NonUniformMeshModel* non_uni_model = dynamic_cast<NonUniformMeshModel*>(&model)) { // this is a non uniform model
+					face_ambient_color = non_uni_model->faces.at(i - model.faces.begin()).ambient_color;
+					face_emit_color = non_uni_model->faces.at(i - model.faces.begin()).emit_color;
+				}
+				else { // this is a uniform model
+					face_ambient_color = model_ambient_color;
+					face_emit_color = model.emit_color;
+				}
+				Color face_final_color = face_emit_color + face_ambient_color + face_diffuse_color + face_specular_color;
 				face_final_color.floorToOne();
 				drawTriangleFlat(t, face_final_color);
 			}
@@ -592,7 +602,14 @@ void Renderer::drawModel(MeshModel& model) {
 					triangle_normals.push_back(tr_vertex_normals.at(i->vertex_normals[0] - 1));
 					triangle_normals.push_back(tr_vertex_normals.at(i->vertex_normals[1] - 1));
 					triangle_normals.push_back(tr_vertex_normals.at(i->vertex_normals[2] - 1));
-					drawTriangleGouraud(t, model_ambient_color, &model, triangle_normals);
+					Color face_ambient_color;
+					if (NonUniformMeshModel* non_uni_model = dynamic_cast<NonUniformMeshModel*>(&model)) { // this is a non uniform model
+						face_ambient_color = non_uni_model->faces.at(i - model.faces.begin()).ambient_color;
+					}
+					else { // this is a uniform model
+						face_ambient_color = model_ambient_color;
+					}
+					drawTriangleGouraud(t, face_ambient_color, &model, *i, triangle_normals);
 				}
 			}
 
@@ -677,11 +694,15 @@ float* Renderer::createAntiAliasedBuffer() {
 
 
 ////===Lighting Calculations===
-Color Renderer::calculateAmbientColor(MeshModel& m) {
-	return *scene_ambient_light_color * m.ambient_color;
+//Color Renderer::calculateAmbientColor(MeshModel& m) {
+//	return *scene_ambient_light_color * m.ambient_color;
+//}
+
+Color Renderer::calculateAmbientColor(Face& f) {
+	return *scene_ambient_light_color * f.ambient_color;
 }
 
-Color Renderer::calculateDiffuseColor(MeshModel& m, Vertex point, Normal normal) {
+Color Renderer::calculateDiffuseColor(Face& f, Vertex point, Normal normal) {
 	Color diffuse_color = { 0,0,0 };
 	float factor;
 
@@ -692,7 +713,7 @@ Color Renderer::calculateDiffuseColor(MeshModel& m, Vertex point, Normal normal)
 		vec3 v1 = -normalize(vec3(dir.x, dir.y, dir.z));
 
 		factor = max(0, v0 * v1);
-		diffuse_color += (m.diffuse_color * i->getColor()) * factor;
+		diffuse_color += (f.diffuse_color * i->getColor()) * factor;
 	}
 
 
@@ -703,13 +724,13 @@ Color Renderer::calculateDiffuseColor(MeshModel& m, Vertex point, Normal normal)
 		vec3 v1 = normalize(vec3(dir.x, dir.y, dir.z));
 
 		factor = max(0, v0 * v1);
-		diffuse_color += (m.diffuse_color * i->getColor()) * factor;
+		diffuse_color += (f.diffuse_color * i->getColor()) * factor;
 	}
 
 	return diffuse_color;
 }
 
-Color Renderer::calculateSpecularColor(MeshModel& m, Vertex point, Normal normal, vec4 dir_to_camera) {
+Color Renderer::calculateSpecularColor(MeshModel& m, Face& f, Vertex point, Normal normal, vec4 dir_to_camera) {
 	Color specular_color = { 0,0,0 };
 	float factor;
 
@@ -723,8 +744,8 @@ Color Renderer::calculateSpecularColor(MeshModel& m, Vertex point, Normal normal
 		dir_to_camera.w = 0;
 		dir_to_camera = normalize(dir_to_camera);
 		float tmp = (r * dir_to_camera);
-		factor = pow(max(0, tmp),1/ m.shininess);
-		specular_color += (m.diffuse_color * i->getColor()) * factor;
+		factor = pow(max(0, tmp),1/ m.getShininess());
+		specular_color += (f.diffuse_color * i->getColor()) * factor;
 	}
 
 	return specular_color;

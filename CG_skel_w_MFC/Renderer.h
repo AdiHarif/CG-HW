@@ -100,7 +100,7 @@ class Renderer
 	void drawLineModerate(Line l, vector<Pixel>* pixels_drawn = NULL);
 	void drawLineSteep(Line l, vector<Pixel>* pixels_drawn = NULL);
 	void drawTriangleFlat(Triangle t, Color color);
-	void drawTriangleGouraud(Triangle t, Color ambient_color, MeshModel* m, vector<Normal> normals);
+	void drawTriangleGouraud(Triangle t, Color ambient_color, MeshModel* m, Face& f, vector<Normal> normals);
 	//==========
 
 
@@ -161,9 +161,10 @@ public:
 	float* createAntiAliasedBuffer();
 
 	////===Lighting Calculations===
-	Color calculateAmbientColor(MeshModel& m);
-	Color calculateDiffuseColor(MeshModel& m, Vertex point, Normal noraml);
-	Color calculateSpecularColor(MeshModel& m, Vertex point, Normal noraml, vec4 dir_to_camera);
+	//Color calculateAmbientColor(MeshModel& m);
+	Color calculateAmbientColor(Face& f);
+	Color calculateDiffuseColor(Face& f, Vertex point, Normal noraml);
+	Color calculateSpecularColor(MeshModel& m, Face& f, Vertex point, Normal normal, vec4 dir_to_camera);
 	////==========
 
 	void toggleFog();

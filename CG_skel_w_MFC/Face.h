@@ -25,6 +25,11 @@ private:
 	int normal;
 	Vertex center;
 
+	Color ambient_color;
+	Color diffuse_color;
+	Color specular_color;
+	Color emit_color;
+
 public:
 	Face();
 	Face(vec3 v, int normal_index = 0);

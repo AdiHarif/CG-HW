@@ -40,6 +40,9 @@ public:
 
 	Color getEmitColor() { return emit_color; }
 	void setEmitColor(Color c) { emit_color = c; }
+
+	GLfloat getShininess() { return shininess; }
+	void setShininess(GLfloat s) { shininess = s; }
 };
 
 

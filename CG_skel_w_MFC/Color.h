@@ -58,4 +58,11 @@ struct Color {
 		g = min(1, g);
 		b = min(1, b);
 	}
+
+	static Color getRandomColor() {
+		float r = ((double)rand() / (RAND_MAX));
+		float g = ((double)rand() / (RAND_MAX));
+		float b = ((double)rand() / (RAND_MAX));
+		return { r, g, b };
+	}
 };
