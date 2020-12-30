@@ -874,11 +874,11 @@ void Renderer::toggleShading() {
 
 void Renderer::drawLight(PointSource point_s) {
 	// TODO: fix transformations
-	/*mat4 t_tot = camera->tp * camera->tc;
+	mat4 t_tot = camera->tp * camera->tc;
 	Pixel center = viewPort(t_tot * point_s.getPosition());
 	center.color = point_s.getColor();
 	for (int j = -2; j <= 2; j++) {
 		drawPixel(Pixel(center.x + j, center.y, center.z, center.color));
 		drawPixel(Pixel(center.x, center.y + j, center.z, center.color));
-	}*/
+	}
 }
