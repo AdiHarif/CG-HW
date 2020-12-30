@@ -582,7 +582,7 @@ void Renderer::drawModel(MeshModel& model) {
 				Normal wr_face_normal = wr_face_normals[i->normal];
 				Color face_diffuse_color = calculateDiffuseColor(model, wr_center, wr_face_normal);
 				Color face_specular_color = calculateSpecularColor(model, wr_center, wr_face_normal, wr_dir_to_camera);
-				Color face_final_color = model.emit_color + model_ambient_color + face_diffuse_color /*+ face_specular_color*/;
+				Color face_final_color = model.emit_color + model_ambient_color + face_diffuse_color + face_specular_color;
 				face_final_color.floorToOne();
 				drawTriangleFlat(t, face_final_color);
 			}
