@@ -528,3 +528,7 @@ void Scene::toggleBlur() {
 void Scene::toggleBloom() {
 	f_bloom = !f_bloom;
 }
+
+void Scene::updateActiveModelFacesColors() {
+
+}

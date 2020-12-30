@@ -122,5 +122,14 @@ public:
 		}
 
 		//position = vec4(0.0, 0.0, 0.0, 1.0);
+
+		for (Face& f : faces) {
+			f.ambient_color = Color::getRandomColor();
+			f.diffuse_color = Color::getRandomColor();
+			f.specular_color = Color::getRandomColor();
+			f.emit_color = Color::getRandomColor();
+		}
 	}
+
+	friend class Renderer;
 };

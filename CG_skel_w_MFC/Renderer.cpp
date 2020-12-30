@@ -4,6 +4,7 @@
 #include "InitShader.h"
 #include "GL\freeglut.h"
 #include "MeshModel.h"
+#include "NonUniformMeshModel.h"
 
 #define INDEX(width,x,y,c) (x+y*width)*3+c
 #define Z_INDEX(width,x,y) (x+y*width)
@@ -226,7 +227,7 @@ void Renderer::drawTriangleFlat(Triangle t, Color color) {
 	}
 }
 
-void Renderer::drawTriangleGouraud(Triangle t, Color ambient_color, MeshModel* m, vector<Vertex> wr_vertices, vector<Normal> wr_normals) {
+void Renderer::drawTriangleGouraud(Triangle t, Color ambient_color, MeshModel* m, Face& f, vector<Vertex> wr_vertices, vector<Normal> wr_normals) {
 	int max_y = t.findMaxY();
 	int min_y = t.findMinY();
 	int rows = max_y - min_y + 1;
@@ -245,8 +246,8 @@ void Renderer::drawTriangleGouraud(Triangle t, Color ambient_color, MeshModel* m
 		Vertex p_v = wr_vertices[i];
 		Normal p_normal = wr_normals[i];
 		vec4 dir_to_camera = camera->position - p_v;
-		Color diffuse_color = calculateDiffuseColor(*m, p_v, p_normal);
-		Color specular_color = calculateSpecularColor(*m, p_v, p_normal, dir_to_camera);
+		Color diffuse_color = calculateDiffuseColor(f, p_v, p_normal);
+		Color specular_color = calculateSpecularColor(*m, f, p_v, p_normal, dir_to_camera);
 		p.color = m->emit_color + ambient_color + diffuse_color + specular_color;
 		p.color = p.color;
 	}
@@ -536,7 +537,7 @@ void Renderer::drawModel(MeshModel& model) {
 
 	//mat4 I = transpose(ntm_t2 * ntm_t1) * tm_tot;
 
-	Color model_ambient_color = calculateAmbientColor(model);
+	Color model_ambient_color = calculateAmbientColor(model.faces[0]);
 	vector<Normal> wr_face_normals;
 	vector<Normal> tr_face_normals;
 	for (vector<Normal>::iterator i = model.face_normals.begin(); i != model.face_normals.end(); i++) {
@@ -585,11 +586,20 @@ void Renderer::drawModel(MeshModel& model) {
 			Triangle t = Triangle(px_vertices[i->vertices[0] - 1], px_vertices[i->vertices[1] - 1], px_vertices[i->vertices[2] - 1]);
 			if (shading_method == FLAT) {
 				vec4 wr_dir_to_camera = normalize(camera->getPosition() - wr_center);
-
 				Normal wr_face_normal = wr_face_normals[i->normal];
-				Color face_diffuse_color = calculateDiffuseColor(model, wr_center, wr_face_normal);
-				Color face_specular_color = calculateSpecularColor(model, wr_center, wr_face_normal, wr_dir_to_camera);
-				Color face_final_color = model.emit_color + model_ambient_color + face_diffuse_color + face_specular_color;
+				Color face_diffuse_color = calculateDiffuseColor(*i, wr_center, wr_face_normal);
+				Color face_specular_color = calculateSpecularColor(model, *i, wr_center, wr_face_normal, wr_dir_to_camera);
+				Color face_ambient_color;
+				Color face_emit_color;
+				if (NonUniformMeshModel* non_uni_model = dynamic_cast<NonUniformMeshModel*>(&model)) { // this is a non uniform model
+					face_ambient_color = non_uni_model->faces.at(i - model.faces.begin()).ambient_color;
+					face_emit_color = non_uni_model->faces.at(i - model.faces.begin()).emit_color;
+				}
+				else { // this is a uniform model
+					face_ambient_color = model_ambient_color;
+					face_emit_color = model.emit_color;
+				}
+				Color face_final_color = face_emit_color + face_ambient_color + face_diffuse_color + face_specular_color;
 				face_final_color.floorToOne();
 				drawTriangleFlat(t, face_final_color);
 			}
@@ -603,7 +613,14 @@ void Renderer::drawModel(MeshModel& model) {
 					triangle_normals.push_back(wr_vertex_normals.at(i->vertex_normals[0] - 1));
 					triangle_normals.push_back(wr_vertex_normals.at(i->vertex_normals[1] - 1));
 					triangle_normals.push_back(wr_vertex_normals.at(i->vertex_normals[2] - 1));
-					drawTriangleGouraud(t, model_ambient_color, &model, triangle_vertices, triangle_normals);
+					Color face_ambient_color;
+					if (NonUniformMeshModel* non_uni_model = dynamic_cast<NonUniformMeshModel*>(&model)) { // this is a non uniform model
+						face_ambient_color = non_uni_model->faces.at(i - model.faces.begin()).ambient_color;
+					}
+					else { // this is a uniform model
+						face_ambient_color = model_ambient_color;
+					}
+					drawTriangleGouraud(t, face_ambient_color, &model, *i, triangle_vertices, triangle_normals);
 				}
 			}
 
@@ -617,7 +634,7 @@ void Renderer::drawModel(MeshModel& model) {
 					triangle_normals.push_back(wr_vertex_normals.at(i->vertex_normals[0] - 1));
 					triangle_normals.push_back(wr_vertex_normals.at(i->vertex_normals[1] - 1));
 					triangle_normals.push_back(wr_vertex_normals.at(i->vertex_normals[2] - 1));
-					drawTrianglePhong(t, model_ambient_color, &model, triangle_vertices, triangle_normals);
+					drawTrianglePhong(t, model_ambient_color, &model, *i,triangle_vertices, triangle_normals);
 				}
 			}
 		}
@@ -698,11 +715,15 @@ float* Renderer::createAntiAliasedBuffer() {
 
 
 ////===Lighting Calculations===
-Color Renderer::calculateAmbientColor(MeshModel& m) {
-	return *scene_ambient_light_color * m.ambient_color;
+//Color Renderer::calculateAmbientColor(MeshModel& m) {
+//	return *scene_ambient_light_color * m.ambient_color;
+//}
+
+Color Renderer::calculateAmbientColor(Face& f) {
+	return *scene_ambient_light_color * f.ambient_color;
 }
 
-Color Renderer::calculateDiffuseColor(MeshModel& m, Vertex point, Normal normal) {
+Color Renderer::calculateDiffuseColor(Face& f, Vertex point, Normal normal) {
 	Color diffuse_color = { 0,0,0 };
 	float factor;
 
@@ -713,7 +734,7 @@ Color Renderer::calculateDiffuseColor(MeshModel& m, Vertex point, Normal normal)
 		vec3 v1 = -normalize(vec3(dir.x, dir.y, dir.z));
 
 		factor = max(0, v0 * v1);
-		diffuse_color += (m.diffuse_color * i->getColor()) * factor;
+		diffuse_color += (f.diffuse_color * i->getColor()) * factor;
 	}
 
 
@@ -724,13 +745,13 @@ Color Renderer::calculateDiffuseColor(MeshModel& m, Vertex point, Normal normal)
 		vec3 v1 = normalize(vec3(dir.x, dir.y, dir.z));
 
 		factor = max(0, v0 * v1);
-		diffuse_color += (m.diffuse_color * i->getColor()) * factor;
+		diffuse_color += (f.diffuse_color * i->getColor()) * factor;
 	}
 
 	return diffuse_color;
 }
 
-Color Renderer::calculateSpecularColor(MeshModel& m, Vertex point, Normal normal, vec4 dir_to_camera) {
+Color Renderer::calculateSpecularColor(MeshModel& m, Face& f, Vertex point, Normal normal, vec4 dir_to_camera) {
 	Color specular_color = { 0,0,0 };
 	float factor;
 
@@ -744,8 +765,8 @@ Color Renderer::calculateSpecularColor(MeshModel& m, Vertex point, Normal normal
 		dir_to_camera.w = 0;
 		dir_to_camera = normalize(dir_to_camera);
 		float tmp = (r * dir_to_camera);
-		factor = pow(max(0, tmp),1/ m.shininess);
-		specular_color += (m.diffuse_color * i->getColor()) * factor;
+		factor = pow(max(0, tmp),1/ m.getShininess());
+		specular_color += (f.diffuse_color * i->getColor()) * factor;
 	}
 
 	return specular_color;
@@ -898,7 +919,7 @@ void Renderer::applyBloom(float bloom_threshold) {
 void Renderer::setCamera(Camera* camera) { this->camera = camera; }
 
 void Renderer::toggleShading() {
-	shading_method = Shading((shading_method + 1) % 3);
+	shading_method = Shading((shading_method + 1) % 2);
 }
 
 void Renderer::drawLight(PointSource point_s) {
@@ -913,7 +934,7 @@ void Renderer::drawLight(PointSource point_s) {
 }
 
 
-void Renderer::drawTrianglePhong(Triangle t, Color ambient_color, MeshModel* m, vector<Vertex> wr_vertices, vector<Normal> wr_normals) {
+void Renderer::drawTrianglePhong(Triangle t, Color ambient_color, MeshModel* m, Face& f, vector<Vertex> wr_vertices, vector<Normal> wr_normals) {
 	int max_y = t.findMaxY();
 	int min_y = t.findMinY();
 	int rows = max_y - min_y + 1;
@@ -948,7 +969,7 @@ void Renderer::drawTrianglePhong(Triangle t, Color ambient_color, MeshModel* m, 
 		vector<Normal> pixel_normals;
 		vector<Vertex> pixel_vertices;
 		Line l = t.lines[i];
-		drawLinePhong(l, wr_vertices[i], wr_vertices[(i + 1) % 3], wr_normals[i], wr_normals[(i+1)%3],m, ambient_color, m->emit_color, &pixels_drawn,&pixel_vertices, &pixel_normals);
+		drawLinePhong(l, wr_vertices[i], wr_vertices[(i + 1) % 3], wr_normals[i], wr_normals[(i+1)%3],m, f, ambient_color, m->emit_color, &pixels_drawn,&pixel_vertices, &pixel_normals);
 		for (int j = 0; j < pixels_drawn.size(); j++) {
 			Pixel p = pixels_drawn[j];
 			if (p.x > draw_between.at(p.y - min_y).start.x) {
@@ -966,19 +987,19 @@ void Renderer::drawTrianglePhong(Triangle t, Color ambient_color, MeshModel* m, 
 
 	for (int i = 0; i < rows; i++) {
 		Line line_to_draw = Line(draw_between.at(i).start, draw_between.at(i).end);
-		drawLinePhong(line_to_draw, start_vertices[i], end_vertices[i], start_normals[i], end_normals[i],m, ambient_color, m->emit_color);
+		drawLinePhong(line_to_draw, start_vertices[i], end_vertices[i], start_normals[i], end_normals[i],m, f,ambient_color, m->emit_color);
 	}
 }
 
-void Renderer::drawLinePhong(Line l, Vertex v1, Vertex v2, Normal n1, Normal n2,  MeshModel* m, Color emb, Color emit, vector<Pixel>* pixels_drawn, vector<Vertex>* pixel_vertices, vector<Normal>* pixel_normals) {
+void Renderer::drawLinePhong(Line l, Vertex v1, Vertex v2, Normal n1, Normal n2,  MeshModel* m, Face& f, Color emb, Color emit, vector<Pixel>* pixels_drawn, vector<Vertex>* pixel_vertices, vector<Normal>* pixel_normals) {
 	Pixel p0 = l.start;
 	Pixel p1 = l.end;
 	if (p0.x == p1.x) {
 		if (p0.y < p1.y) {
-			drawLineSteepPhong(Line(p0, p1),v1, v2, n1, n2,  m,emb,emit,  pixels_drawn, pixel_vertices, pixel_normals);
+			drawLineSteepPhong(Line(p0, p1),v1, v2, n1, n2,  m,f,emb,emit,  pixels_drawn, pixel_vertices, pixel_normals);
 		}
 		else {
-			drawLineSteepPhong(Line(p1, p0), v2, v1, n2, n1,  m, emb, emit, pixels_drawn,pixel_vertices, pixel_normals);
+			drawLineSteepPhong(Line(p1, p0), v2, v1, n2, n1,  m, f,emb, emit, pixels_drawn,pixel_vertices, pixel_normals);
 		}
 	}
 	if (p0.x > p1.x) {// make sure that v0 is left of v1
@@ -987,15 +1008,15 @@ void Renderer::drawLinePhong(Line l, Vertex v1, Vertex v2, Normal n1, Normal n2,
 	}
 
 	if (std::abs(p1.y - p0.y) < std::abs(p1.x - p0.x)) {//-1 <= m <= 1
-		drawLineModeratePhong(Line(p0, p1), v1, v2, n1, n2,  m, emb, emit, pixels_drawn, pixel_vertices, pixel_normals);
+		drawLineModeratePhong(Line(p0, p1), v1, v2, n1, n2,  m,f, emb, emit, pixels_drawn, pixel_vertices, pixel_normals);
 	}
 	else { //|m|>1
-		drawLineSteepPhong(Line(p0, p1), v1, v2, n1, n2,  m, emb, emit, pixels_drawn, pixel_vertices, pixel_normals);
+		drawLineSteepPhong(Line(p0, p1), v1, v2, n1, n2,  m, f,emb, emit, pixels_drawn, pixel_vertices, pixel_normals);
 	}
 }
 
 
-void Renderer::drawLineModeratePhong(Line l, Vertex v1, Vertex v2, Normal n1, Normal n2, MeshModel* m, Color emb, Color emit, vector<Pixel>* pixels_drawn, vector<Vertex>* pixel_vertices, vector<Normal>* pixel_normals) {
+void Renderer::drawLineModeratePhong(Line l, Vertex v1, Vertex v2, Normal n1, Normal n2, MeshModel* m, Face& f, Color emb, Color emit, vector<Pixel>* pixels_drawn, vector<Vertex>* pixel_vertices, vector<Normal>* pixel_normals) {
 	Pixel p0 = l.start;
 	Pixel p1 = l.end;
 	int dx = p1.x - p0.x;
@@ -1033,8 +1054,9 @@ void Renderer::drawLineModeratePhong(Line l, Vertex v1, Vertex v2, Normal n1, No
 
 		vec4 dir_to_camera = camera->position - v;
 
-		Color difuse = calculateDiffuseColor(*m, v, n);
-		Color spec = calculateSpecularColor(*m, v, n, dir_to_camera);
+		Face f;
+		Color difuse = calculateDiffuseColor( f, v, n);
+		Color spec = calculateSpecularColor(*m, f, v, n, dir_to_camera);
 		Color total = emb + difuse + spec + emit;
 		Pixel p = Pixel(x, y, z, total);
 		if (pixels_drawn != NULL) {
@@ -1058,7 +1080,7 @@ void Renderer::drawLineModeratePhong(Line l, Vertex v1, Vertex v2, Normal n1, No
 	}
 }
 
-void Renderer::drawLineSteepPhong(Line l, Vertex v1, Vertex v2, Normal n1, Normal n2, MeshModel* m, Color emb, Color emit, vector<Pixel>* pixels_drawn, vector<Vertex>* pixel_vertices, vector<Normal>* pixel_normals) {
+void Renderer::drawLineSteepPhong(Line l, Vertex v1, Vertex v2, Normal n1, Normal n2, MeshModel* m, Face& f, Color emb, Color emit, vector<Pixel>* pixels_drawn, vector<Vertex>* pixel_vertices, vector<Normal>* pixel_normals) {
 	//flip x<->y
 	Pixel p0 = { l.start.y, l.start.x, l.start.z, l.start.color };
 	Pixel p1 = { l.end.y, l.end.x, l.end.z, l.end.color };
@@ -1101,9 +1123,8 @@ void Renderer::drawLineSteepPhong(Line l, Vertex v1, Vertex v2, Normal n1, Norma
 
 	for (int x = p0.x; x <= p1.x; x++) {
 		vec4 dir_to_camera = camera->position - v;
-
-		Color difuse = calculateDiffuseColor(*m, v, n);
-		Color spec = calculateSpecularColor(*m, v, n, dir_to_camera);
+		Color difuse = calculateDiffuseColor(f, v, n);
+		Color spec = calculateSpecularColor(*m, f, v, n, dir_to_camera);
 		Color total = emb + difuse + spec + emit;
 		Pixel p = Pixel(y, x, z, total);
 		if (pixels_drawn != NULL) {

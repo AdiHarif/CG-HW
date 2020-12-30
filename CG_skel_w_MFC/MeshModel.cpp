@@ -116,6 +116,11 @@ void MeshModel::loadFile(string fileName)
 		Normal n = cross(e0, e1);
 		face_normals.push_back(n);
 		faces[i].normal = i;
+
+		faces[i].ambient_color = ambient_color;
+		faces[i].diffuse_color = diffuse_color;
+		faces[i].specular_color = specular_color;
+		faces[i].emit_color = emit_color;
 	}
 }
 
@@ -222,6 +227,10 @@ void MeshModel::rotateZ(GLfloat theta, bool f_world_frame) {
 vec4 MeshModel::getPosition(){ 
 	//return position; 
 	return tw * tm * vec4(0, 0, 0, 1);
+}
+
+vector<Face>* MeshModel::getFaces() {
+	return &faces;
 }
 
 void MeshModel::initBoundingBox(vec4 min, vec4 max) {

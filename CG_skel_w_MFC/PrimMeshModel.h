@@ -67,5 +67,12 @@ public:
 		}
 
 		//position = vec4(0.0, 0.0, 0.0, 1.0);
+
+		for (Face& f : faces) {
+			f.ambient_color = PURPLE;
+			f.diffuse_color = WHITE;
+			f.specular_color = YELLOW;
+			f.emit_color = { 0.0, 0.0, 0.1 };
+		}
 	}
 };

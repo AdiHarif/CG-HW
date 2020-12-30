@@ -100,13 +100,14 @@ class Renderer
 	void drawLineModerate(Line l, vector<Pixel>* pixels_drawn = NULL);
 	void drawLineSteep(Line l, vector<Pixel>* pixels_drawn = NULL);
 	void drawTriangleFlat(Triangle t, Color color);
-	void drawTriangleGouraud(Triangle t, Color ambient_color, MeshModel* m, vector<Vertex> wr_vertices, vector<Normal> normals);
-	void drawTrianglePhong(Triangle t, Color ambient_color, MeshModel* m, vector<Vertex> wr_vertices, vector<Normal> wr_normals);
+	void drawTriangleGouraud(Triangle t, Color ambient_color, MeshModel* m, Face & f, vector<Vertex> wr_vertices, vector<Normal> normals);
+	void drawTrianglePhong(Triangle t, Color ambient_color, MeshModel* m,Face& f, vector<Vertex> wr_vertices, vector<Normal> wr_normals);
 
 
-	void drawLinePhong(Line l, Vertex v1, Vertex v2, Normal n1, Normal n2, MeshModel* m, Color emb, Color emit, vector<Pixel>* pixels_drawn = NULL, vector<Vertex>* pixel_vertices=NULL, vector<Normal>* pixel_normals = NULL);
-	void drawLineModeratePhong(Line l, Vertex v1, Vertex v2, Normal n1, Normal n2, MeshModel* m, Color emb, Color emit, vector<Pixel>* pixels_drawn = NULL, vector<Vertex>* pixel_vertices=NULL, vector<Normal>* pixel_normals=NULL);
-	void drawLineSteepPhong(Line l, Vertex v1, Vertex v2, Normal n1, Normal n2, MeshModel* m, Color emb, Color emit, vector<Pixel>* pixels_drawn = NULL, vector<Vertex>* pixel_vertices=NULL, vector<Normal>* pixel_normals = NULL);
+	void drawLinePhong(Line l, Vertex v1, Vertex v2, Normal n1, Normal n2, MeshModel* m, Face& f, Color emb, Color emit, vector<Pixel>* pixels_drawn = NULL, vector<Vertex>* pixel_vertices=NULL, vector<Normal>* pixel_normals = NULL);
+	void drawLineModeratePhong(Line l, Vertex v1, Vertex v2, Normal n1, Normal n2, MeshModel* m, Face& f, Color emb, Color emit, vector<Pixel>* pixels_drawn = NULL, vector<Vertex>* pixel_vertices=NULL, vector<Normal>* pixel_normals=NULL);
+	void drawLineSteepPhong(Line l, Vertex v1, Vertex v2, Normal n1, Normal n2, MeshModel* m,Face& f, Color emb, Color emit, vector<Pixel>* pixels_drawn = NULL, vector<Vertex>* pixel_vertices=NULL, vector<Normal>* pixel_normals = NULL);
+
 
 	//==========
 
@@ -168,9 +169,10 @@ public:
 	float* createAntiAliasedBuffer();
 
 	////===Lighting Calculations===
-	Color calculateAmbientColor(MeshModel& m);
-	Color calculateDiffuseColor(MeshModel& m, Vertex point, Normal noraml);
-	Color calculateSpecularColor(MeshModel& m, Vertex point, Normal noraml, vec4 dir_to_camera);
+	//Color calculateAmbientColor(MeshModel& m);
+	Color calculateAmbientColor(Face& f);
+	Color calculateDiffuseColor(Face& f, Vertex point, Normal noraml);
+	Color calculateSpecularColor(MeshModel& m, Face& f, Vertex point, Normal normal, vec4 dir_to_camera);
 	////==========
 
 	void toggleFog();
