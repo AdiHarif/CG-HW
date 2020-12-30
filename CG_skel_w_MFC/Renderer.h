@@ -134,7 +134,6 @@ public:
 	void setSize(int width, int height);
 	//==========
 
-	void drawCamera(vec4 pos, Color c);
 	void SetDemoBuffer();
 	//==========
 
@@ -154,9 +153,9 @@ public:
 
 
 	void drawModel(MeshModel& model);
+	void drawCamera(vec4 pos, Color c);
 	void drawOrigin(Color c);
-
-	//void drawTriangle();
+	void drawLight(PointSource point_s, Color c);
 
 	void toggleAntiAliasing();
 	float* createAntiAliasedBuffer();
