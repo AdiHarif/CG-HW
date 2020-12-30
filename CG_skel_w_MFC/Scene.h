@@ -172,4 +172,6 @@ public:
 	void toggleFog();
 	void toggleBlur();
 	void toggleBloom();
+
+	void updateActiveModelFacesColors();
 };

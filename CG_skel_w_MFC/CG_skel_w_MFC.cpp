@@ -25,6 +25,8 @@
 #include "CDlgNewLight.h"
 #include "CDlgEditLight.h"
 #include "CDlgEditModelColor.h"
+#include "NonUniformMeshModel.h"
+#include "Face.h"
 
 #define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
 
@@ -291,10 +293,23 @@ void editActiveModelColor() {
 		Color diffuse_color = Color(dlg.diffuse_r, dlg.diffuse_g, dlg.diffuse_b);
 		Color specular_color = Color(dlg.specular_r, dlg.specular_g, dlg.specular_b);
 		Color emit_color = Color(dlg.emit_r, dlg.emit_g, dlg.emit_b);
+		m->setEmitColor(emit_color);
 		m->setAmbientColor(ambient_color);
 		m->setDiffuseColor(diffuse_color);
 		m->setSpecularColor(specular_color);
-		m->setEmitColor(emit_color);
+
+		if (NonUniformMeshModel* non_uni_model = dynamic_cast<NonUniformMeshModel*>(m)) { // this is a non uniform model
+			//do nothing
+		}
+		else {
+			MeshModel* model = dynamic_cast<MeshModel*>(m);
+			for (vector<Face>::iterator i = (*model->getFaces()).begin(); i != (*model->getFaces()).end(); i++) {
+				i->setEmitColor(emit_color);
+				i->setAmbientColor(ambient_color);
+				i->setDiffuseColor(diffuse_color);
+				i->setSpecularColor(specular_color);
+			}
+		}
 	}
 }
 

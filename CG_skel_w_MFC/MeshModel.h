@@ -56,6 +56,7 @@ public:
 
 	//mat4 getWorldTransform();
 	vec4 getPosition();
+	vector<Face>* getFaces();
 	
 	void togglePolyMode();
 	void toggleBB();

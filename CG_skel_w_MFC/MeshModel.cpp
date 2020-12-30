@@ -229,6 +229,10 @@ vec4 MeshModel::getPosition(){
 	return tw * tm * vec4(0, 0, 0, 1);
 }
 
+vector<Face>* MeshModel::getFaces() {
+	return &faces;
+}
+
 void MeshModel::initBoundingBox(vec4 min, vec4 max) {
 	vector<Vertex> bb_vertices;
 	//bottom face:
