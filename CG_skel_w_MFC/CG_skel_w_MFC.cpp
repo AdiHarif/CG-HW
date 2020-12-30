@@ -30,7 +30,8 @@
 
 #define MODEL_MENU_OPEN_FILE 1
 #define MODEL_MENU_ADD_PRIMITIVE 2
-#define MODEL_MENU_TRANSFORM_ACTIVE_MODEL 3
+#define MODEL_MENU_ADD_NON_UNIFORM 3
+#define MODEL_MENU_TRANSFORM_ACTIVE_MODEL 4
 #define CAMERA_MENU_ADD_CAMERA 1
 #define CAMERA_MENU_EDIT_ACTIVE_CAMERA 2
 #define LIGHT_MENU_ADD_LIGHT 1
@@ -519,6 +520,9 @@ void modelsMenuCB(int id){
 	case MODEL_MENU_ADD_PRIMITIVE:
 		scene->loadPrimModel();
 		break;
+	case MODEL_MENU_ADD_NON_UNIFORM:
+		scene->loadNonUniform();
+		break;
 	case MODEL_MENU_TRANSFORM_ACTIVE_MODEL:
 		transformActiveModel();
 		break;
@@ -614,6 +618,7 @@ void initMenu()
 	int modelsMenu = glutCreateMenu(modelsMenuCB);
 	glutAddMenuEntry("Load Model From a File",MODEL_MENU_OPEN_FILE);
 	glutAddMenuEntry("Add Primitive: Cube", MODEL_MENU_ADD_PRIMITIVE);
+	glutAddMenuEntry("Add Primitive: Non-Uniform Weird Dice", MODEL_MENU_ADD_NON_UNIFORM);
 	glutAddMenuEntry("Transform Active Model", MODEL_MENU_TRANSFORM_ACTIVE_MODEL);
 	int camerasMenu = glutCreateMenu(camerasMenuCB);
 	glutAddMenuEntry("Add New Camera",CAMERA_MENU_ADD_CAMERA);

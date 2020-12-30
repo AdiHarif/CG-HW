@@ -20,6 +20,15 @@ Face::Face(vec3 v, int normal_index) {
 	normal = normal_index;
 }
 
+Face::Face(vec3 v, vec3 vn) {
+	for (int i = 0; i < 3; i++) {
+		vertices[i] = v[i];
+	}
+	for (int i = 0; i < 3; i++) {
+		vertex_normals[i] = vn[i];
+	}
+}
+
 
 Face::Face(std::istream& s, int normal_index) {
 	for (int i = 0; i < 3; i++) {

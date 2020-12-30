@@ -2,6 +2,7 @@
 #include "Scene.h"
 #include "MeshModel.h"
 #include "PrimMeshModel.h"
+#include "NonUniformMeshModel.h"
 #include <string>
 
 using namespace std;
@@ -132,6 +133,12 @@ void Scene::loadOBJModel(string fileName)
 void Scene::loadPrimModel() {
 	//PrimMeshModel* model = new PrimMeshModel(file_name);
 	PrimMeshModel* model = new PrimMeshModel();
+	models.push_back(model);
+	activateLastModel();
+}
+
+void Scene::loadNonUniform() {
+	NonUniformMeshModel* model = new NonUniformMeshModel();
 	models.push_back(model);
 	activateLastModel();
 }
