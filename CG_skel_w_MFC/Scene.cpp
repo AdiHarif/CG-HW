@@ -85,6 +85,10 @@ void Scene::draw()
 		}
 	}
 
+	for (vector<PointSource>::iterator i = point_sources.begin(); i != point_sources.end(); i++) {
+		m_renderer->drawLight(*i, i->getColor());
+	}
+
 	m_renderer->drawOrigin(Color(RED));
 
 	if (f_blur) {
