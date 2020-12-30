@@ -227,7 +227,7 @@ void Renderer::drawTriangleFlat(Triangle t, Color color) {
 	}
 }
 
-void Renderer::drawTriangleGouraud(Triangle t, Color ambient_color, MeshModel* m, Face& f, vector<Normal> normals) {
+void Renderer::drawTriangleGouraud(Triangle t, Color ambient_color, MeshModel* m, Face& f, vector<Vertex> wr_vertices, vector<Normal> wr_normals) {
 	int max_y = t.findMaxY();
 	int min_y = t.findMinY();
 	int rows = max_y - min_y + 1;
@@ -243,9 +243,9 @@ void Renderer::drawTriangleGouraud(Triangle t, Color ambient_color, MeshModel* m
 	// calculate colors in corners:
 	for (int i = 0; i < t.lines.size(); i++) {
 		Pixel& p = t.lines.at(i).start;
-		Vertex p_v = Vertex(p.x, p.y, p.z);
-		Normal p_normal = normals[i];
-		vec4 dir_to_camera = active_camera_pos - p_v;
+		Vertex p_v = wr_vertices[i];
+		Normal p_normal = wr_normals[i];
+		vec4 dir_to_camera = camera->position - p_v;
 		Color diffuse_color = calculateDiffuseColor(f, p_v, p_normal);
 		Color specular_color = calculateSpecularColor(*m, f, p_v, p_normal, dir_to_camera);
 		p.color = m->emit_color + ambient_color + diffuse_color + specular_color;
@@ -500,9 +500,14 @@ void Renderer::drawModel(MeshModel& model) {
 	mat4 tm_tot2 = camera->tp * camera->tc;
 	mat4 tm_tot = tm_tot2 * tm_tot1;
 	vector<Vertex> tr_vertices;
+	vector<Vertex> wr_vertices;
 	vector<Pixel> px_vertices;
 	for (vector<Vertex>::iterator i = model.vertices.begin(); i != model.vertices.end(); i++) {
-		vec4 v = tm_tot2*tm_tot1 * (*i);
+
+		vec4 v = tm_tot1 * (*i);
+		v /= v.w;
+		wr_vertices.push_back(v);
+		v = tm_tot2*v;
 		v /= v.w;
 		tr_vertices.push_back(v);
 		px_vertices.push_back(viewPort(v));
@@ -511,12 +516,14 @@ void Renderer::drawModel(MeshModel& model) {
 	mat4 ntm_t1 = model.ntw * model.ntm;
 	mat4 ntm_t2 = camera->tpn * camera->tcn;
 	vector<Normal> tr_vertex_normals;
+	vector<Normal> wr_vertex_normals;
 	for (vector<Normal>::iterator i = model.vertex_normals.begin(); i != model.vertex_normals.end(); i++) {
 		vec4 n = ntm_t1 * (*i);
 		n /= n.w;
 		n.w = 0;
 		n = normalize(n) / 100;
 		n.w = 1;
+		wr_vertex_normals.push_back(n);
 		n = ntm_t2 * n;
 		n /= n.w;
 		tr_vertex_normals.push_back(n);
@@ -598,10 +605,14 @@ void Renderer::drawModel(MeshModel& model) {
 			}
 			if (shading_method == GOURAUD) {
 				if (i->vertex_normals[0] >= 0) { // means there are vertex normals
+					vector<Vertex> triangle_vertices;
+					triangle_vertices.push_back(wr_vertices.at(i->vertices[0] - 1));
+					triangle_vertices.push_back(wr_vertices.at(i->vertices[1] - 1));
+					triangle_vertices.push_back(wr_vertices.at(i->vertices[2] - 1));
 					vector<Normal> triangle_normals;
-					triangle_normals.push_back(tr_vertex_normals.at(i->vertex_normals[0] - 1));
-					triangle_normals.push_back(tr_vertex_normals.at(i->vertex_normals[1] - 1));
-					triangle_normals.push_back(tr_vertex_normals.at(i->vertex_normals[2] - 1));
+					triangle_normals.push_back(wr_vertex_normals.at(i->vertex_normals[0] - 1));
+					triangle_normals.push_back(wr_vertex_normals.at(i->vertex_normals[1] - 1));
+					triangle_normals.push_back(wr_vertex_normals.at(i->vertex_normals[2] - 1));
 					Color face_ambient_color;
 					if (NonUniformMeshModel* non_uni_model = dynamic_cast<NonUniformMeshModel*>(&model)) { // this is a non uniform model
 						face_ambient_color = non_uni_model->faces.at(i - model.faces.begin()).ambient_color;
@@ -609,7 +620,7 @@ void Renderer::drawModel(MeshModel& model) {
 					else { // this is a uniform model
 						face_ambient_color = model_ambient_color;
 					}
-					drawTriangleGouraud(t, face_ambient_color, &model, *i, triangle_normals);
+					drawTriangleGouraud(t, face_ambient_color, &model, *i, triangle_vertices, triangle_normals);
 				}
 			}
 
