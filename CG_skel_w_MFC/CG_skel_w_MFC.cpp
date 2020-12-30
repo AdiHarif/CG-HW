@@ -70,12 +70,12 @@
 #define MIN_SCALE_UP 1.01
 #define MAX_SCALE_DOWN 0.99
 
-Scene *scene;
-Renderer *renderer;
+Scene* scene;
+Renderer* renderer;
 
 int last_x, last_y;
 bool lb_down, rb_down, mb_down;
-bool first_movement=true;
+bool first_movement = true;
 float scale_step = SCALE_UP_DEF, rotation_step = ROTATE_THETA_DEF, translation_step = TRANSLATE_DEF;
 
 //----------------------------------------------------------------------------
@@ -152,7 +152,7 @@ void addNewCamera() {
 				new_cam = new Camera(pos, lookat, up);
 			}
 			scene->addCamera(new_cam);
-		}		
+		}
 	}
 }
 
@@ -250,7 +250,7 @@ void editLight() {
 	dlg.setParallelSources(scene->getParallelSources());
 	dlg.setPointSources(scene->getPointSources());
 	if (dlg.DoModal() == IDOK) {
-		if (dlg.names_index < 0) {
+		if (dlg.names_index < 0 && dlg.type_radio_index != 2) {
 			return;
 		}
 		Color c = Color(dlg.color_r, dlg.color_g, dlg.color_b);
@@ -276,6 +276,8 @@ void editLight() {
 			break;
 		}
 	}
+
+
 }
 
 
@@ -325,12 +327,12 @@ void changeAllSteps(float step_change) {
 
 // Callbacks
 
-void display( void )
+void display(void)
 {
-	
+
 }
 
-void reshape( int width, int height )
+void reshape(int width, int height)
 {
 	renderer->setSize(width, height);
 	scene->draw();
@@ -343,7 +345,7 @@ void keyboard(unsigned char key, int x, int y)
 		exit(EXIT_SUCCESS);
 		break;
 
-	//rotate:
+		//rotate:
 	case 'A':
 	case 'a':
 		scene->translateSelection(vec4(-translation_step, 0, 0));
@@ -378,7 +380,7 @@ void keyboard(unsigned char key, int x, int y)
 		break;
 	case 'f':
 	case 'F':
-		scene->translateCameraC(vec4(-translation_step, 0,0));
+		scene->translateCameraC(vec4(-translation_step, 0, 0));
 		break;
 	case 'h':
 	case 'H':
@@ -398,7 +400,7 @@ void keyboard(unsigned char key, int x, int y)
 		break;
 	case 'j':
 	case 'J':
-		scene->scaleSelection(1/(scale_step));
+		scene->scaleSelection(1 / (scale_step));
 		break;
 	case SPACEBAR:
 		scene->lookAtActiveModel();
@@ -419,29 +421,29 @@ void mouse(int button, int state, int x, int y)
 {
 	//button = {GLUT_LEFT_BUTTON, GLUT_MIDDLE_BUTTON, GLUT_RIGHT_BUTTON}
 	//state = {GLUT_DOWN,GLUT_UP}
-	
+
 	//set down flags
-	switch(button) {
-		case GLUT_LEFT_BUTTON:
-			lb_down = (state==GLUT_UP)?0:1;
-			if (!lb_down) {
-				first_movement = true;
-			}
-			break;
-		case GLUT_RIGHT_BUTTON:
-			rb_down = (state==GLUT_UP)?0:1;
-			break;
-		case GLUT_MIDDLE_BUTTON:
-			mb_down = (state==GLUT_UP)?0:1;	
-			break;
-		case SCROLL_UP:
-			//cout << "scroll up" << endl;
-			scene->zoom(scale_step);
-			break;
-		case SCROLL_DOWN:
-			//cout << "scroll down" << endl;
-			scene->zoom(1/scale_step);
-			break;
+	switch (button) {
+	case GLUT_LEFT_BUTTON:
+		lb_down = (state == GLUT_UP) ? 0 : 1;
+		if (!lb_down) {
+			first_movement = true;
+		}
+		break;
+	case GLUT_RIGHT_BUTTON:
+		rb_down = (state == GLUT_UP) ? 0 : 1;
+		break;
+	case GLUT_MIDDLE_BUTTON:
+		mb_down = (state == GLUT_UP) ? 0 : 1;
+		break;
+	case SCROLL_UP:
+		//cout << "scroll up" << endl;
+		scene->zoom(scale_step);
+		break;
+	case SCROLL_DOWN:
+		//cout << "scroll down" << endl;
+		scene->zoom(1 / scale_step);
+		break;
 	}
 
 	scene->draw();
@@ -449,7 +451,7 @@ void mouse(int button, int state, int x, int y)
 
 void special(int key, int x, int y) {
 	switch (key) {
-	//translate:
+		//translate:
 	case GLUT_KEY_RIGHT:
 		scene->rotateSelectionY(-rotation_step);
 		break;
@@ -462,8 +464,8 @@ void special(int key, int x, int y) {
 	case GLUT_KEY_DOWN:
 		scene->rotateSelectionX(rotation_step);
 		break;
-	
-	//toggles:
+
+		//toggles:
 	case GLUT_KEY_F1:
 		scene->togglePolyMode();
 		break;
@@ -503,12 +505,12 @@ void special(int key, int x, int y) {
 void motion(int x, int y)
 {
 	// calc difference in mouse movement
-	int dx=x-last_x;
-	int dy=y-last_y;
+	int dx = x - last_x;
+	int dy = y - last_y;
 	// update last x,y
-	last_x=x;
-	last_y=y;
-	
+	last_x = x;
+	last_y = y;
+
 	if (first_movement) {
 		first_movement = false;
 	}
@@ -522,11 +524,11 @@ void motion(int x, int y)
 
 
 
-void modelsMenuCB(int id){
+void modelsMenuCB(int id) {
 	CFileDialog dlg(TRUE, _T(".obj"), NULL, NULL, _T("*.obj|*.*"));
-	switch (id){
+	switch (id) {
 	case MODEL_MENU_OPEN_FILE:
-		if(dlg.DoModal()==IDOK)
+		if (dlg.DoModal() == IDOK)
 		{
 			std::string s((LPCTSTR)dlg.GetPathName());
 			scene->loadOBJModel((LPCTSTR)dlg.GetPathName());
@@ -545,8 +547,8 @@ void modelsMenuCB(int id){
 	scene->draw();
 }
 
-void camerasMenuCB(int id){
-	switch (id){
+void camerasMenuCB(int id) {
+	switch (id) {
 	case CAMERA_MENU_ADD_CAMERA:
 		addNewCamera();
 		break;
@@ -570,55 +572,55 @@ void lightsMenuCB(int id) {
 	scene->draw();
 }
 
-void mainMenuCB(int id){
-	switch(id){
-		case MAIN_MENU_TRANSFORM_WORLD:
-			transformWorld();
-			//std::cout << "MAIN_MENU_TRANSFORM_WORLD" << std::endl;
-			break;
-		case MAIN_MENU_EDIT_ACTIVE_MODEL_COLOR:
-			editActiveModelColor();
-			break;
-		case MAIN_MENU_PARTY:
-			scene->party();
-			break;
-		case MAIN_MENU_ABOUT:
-			AfxMessageBox("I don't always write long manuals, but when I do:\r\n"
-						"HOW TO USE:\r\n"
-						"\r\nMouse:\r\n"
-						"LEFT_BUTTON(hold): Move camera around lookAt point\r\n"
-						"RIGHT_BUTTON: Open menu\r\n"
-						"SCROLL_UP: Zoom in\r\n"
-						"SCROLL_DOWN: Zoom out\r\n"
+void mainMenuCB(int id) {
+	switch (id) {
+	case MAIN_MENU_TRANSFORM_WORLD:
+		transformWorld();
+		//std::cout << "MAIN_MENU_TRANSFORM_WORLD" << std::endl;
+		break;
+	case MAIN_MENU_EDIT_ACTIVE_MODEL_COLOR:
+		editActiveModelColor();
+		break;
+	case MAIN_MENU_PARTY:
+		scene->party();
+		break;
+	case MAIN_MENU_ABOUT:
+		AfxMessageBox("I don't always write long manuals, but when I do:\r\n"
+			"HOW TO USE:\r\n"
+			"\r\nMouse:\r\n"
+			"LEFT_BUTTON(hold): Move camera around lookAt point\r\n"
+			"RIGHT_BUTTON: Open menu\r\n"
+			"SCROLL_UP: Zoom in\r\n"
+			"SCROLL_DOWN: Zoom out\r\n"
 
-						"\r\nKeyboard:\r\n"
-						"ESC: Exit program\r\n"
-						"TAB: Switch between selected models\r\n"
-						"W-A-S-D: Move selected models in world view\r\n"
-						"]: Activate next camera(cyclic)\r\n"
-						"[: Activate previous camera(cyclic)\r\n"
-						"P: Toggle camera projection(Ortho-Frustum)\r\n"
-						"DEL: Remove selected model\r\n"
-						"F-H-T-G: Strafe selected camera\r\n"
-						"U-J: Scale selected model(s)\r\n"
-						"Z-X: Change step size\r\n"
-						"ARROW_KEYS: Rotate selected model(s) (X, Y)\r\n"
-						"F1: Toggle drawing vertices\r\n"
-						"F2: Toggle drawing edges\r\n"
-						"F3: Toggle drawing bounding box(es)\r\n"
-						"F4: Toggle drawing vertex normals\r\n"
-						"F5: Toggle drawing face normals\r\n"
-						"F6: Toggle drawing cameras\r\n"
+			"\r\nKeyboard:\r\n"
+			"ESC: Exit program\r\n"
+			"TAB: Switch between selected models\r\n"
+			"W-A-S-D: Move selected models in world view\r\n"
+			"]: Activate next camera(cyclic)\r\n"
+			"[: Activate previous camera(cyclic)\r\n"
+			"P: Toggle camera projection(Ortho-Frustum)\r\n"
+			"DEL: Remove selected model\r\n"
+			"F-H-T-G: Strafe selected camera\r\n"
+			"U-J: Scale selected model(s)\r\n"
+			"Z-X: Change step size\r\n"
+			"ARROW_KEYS: Rotate selected model(s) (X, Y)\r\n"
+			"F1: Toggle drawing vertices\r\n"
+			"F2: Toggle drawing edges\r\n"
+			"F3: Toggle drawing bounding box(es)\r\n"
+			"F4: Toggle drawing vertex normals\r\n"
+			"F5: Toggle drawing face normals\r\n"
+			"F6: Toggle drawing cameras\r\n"
 
-						"\r\nLegend:\r\n"
-						"Green: Selected model(s)\r\n"
-						"Grey: Unselected model(s)\r\n"
-						"Red dot: (0, 0, 0)\r\n"
-						"Yellow +: Cameras\r\n"
-						"Purple: Vertex normals(of selected model(s))\r\n"
-						"Red: Face normals(of selected model(s))\r\n"
-						"White: Bounding box\r\n");
-			break;
+			"\r\nLegend:\r\n"
+			"Green: Selected model(s)\r\n"
+			"Grey: Unselected model(s)\r\n"
+			"Red dot: (0, 0, 0)\r\n"
+			"Yellow +: Cameras\r\n"
+			"Purple: Vertex normals(of selected model(s))\r\n"
+			"Red: Face normals(of selected model(s))\r\n"
+			"White: Bounding box\r\n");
+		break;
 	}
 	scene->draw();
 }
@@ -631,12 +633,12 @@ void mainMenu(int id)
 void initMenu()
 {
 	int modelsMenu = glutCreateMenu(modelsMenuCB);
-	glutAddMenuEntry("Load Model From a File",MODEL_MENU_OPEN_FILE);
+	glutAddMenuEntry("Load Model From a File", MODEL_MENU_OPEN_FILE);
 	glutAddMenuEntry("Add Primitive: Cube", MODEL_MENU_ADD_PRIMITIVE);
 	glutAddMenuEntry("Add Primitive: Non-Uniform Weird Dice", MODEL_MENU_ADD_NON_UNIFORM);
 	glutAddMenuEntry("Transform Active Model", MODEL_MENU_TRANSFORM_ACTIVE_MODEL);
 	int camerasMenu = glutCreateMenu(camerasMenuCB);
-	glutAddMenuEntry("Add New Camera",CAMERA_MENU_ADD_CAMERA);
+	glutAddMenuEntry("Add New Camera", CAMERA_MENU_ADD_CAMERA);
 	glutAddMenuEntry("Edit Active Camera ", CAMERA_MENU_EDIT_ACTIVE_CAMERA);
 	int lightsMenu = glutCreateMenu(lightsMenuCB);
 	glutAddMenuEntry("Add New Light", LIGHT_MENU_ADD_LIGHT);
@@ -657,16 +659,16 @@ void initMenu()
 
 
 
-int my_main( int argc, char **argv )
+int my_main(int argc, char** argv)
 {
 	//----------------------------------------------------------------------------
 	// Initialize window
-	glutInit( &argc, argv );
-	glutInitDisplayMode( GLUT_RGBA| GLUT_DOUBLE);
-	glutInitWindowSize( 512, 512 );
-	glutInitContextVersion( 3, 2 );
-	glutInitContextProfile( GLUT_CORE_PROFILE );
-	glutCreateWindow( "I AM GLUT" );
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
+	glutInitWindowSize(512, 512);
+	glutInitContextVersion(3, 2);
+	glutInitContextProfile(GLUT_CORE_PROFILE);
+	glutCreateWindow("I AM GLUT");
 	glewExperimental = GL_TRUE;
 	glewInit();
 	GLenum err = glewInit();
@@ -678,21 +680,21 @@ int my_main( int argc, char **argv )
 	}
 	fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
 
-	
-	
-	renderer = new Renderer(512,512);
+
+
+	renderer = new Renderer(512, 512);
 	scene = new Scene(renderer);
 	//----------------------------------------------------------------------------
 	// Initialize Callbacks
 
-	glutDisplayFunc( display );
-	glutKeyboardFunc( keyboard );
-	glutMouseFunc( mouse );
-	glutSpecialFunc( special );
-	glutMotionFunc ( motion );
-	glutReshapeFunc( reshape );
+	glutDisplayFunc(display);
+	glutKeyboardFunc(keyboard);
+	glutMouseFunc(mouse);
+	glutSpecialFunc(special);
+	glutMotionFunc(motion);
+	glutReshapeFunc(reshape);
 	initMenu();
-	
+
 
 	glutMainLoop();
 	delete scene;
@@ -704,10 +706,10 @@ CWinApp theApp;
 
 using namespace std;
 
-int main( int argc, char **argv )
+int main(int argc, char** argv)
 {
 	int nRetCode = 0;
-	
+
 	// initialize MFC and print and error on failure
 	if (!AfxWinInit(::GetModuleHandle(NULL), NULL, ::GetCommandLine(), 0))
 	{
@@ -717,9 +719,9 @@ int main( int argc, char **argv )
 	}
 	else
 	{
-		my_main(argc, argv );
+		my_main(argc, argv);
 	}
-	
+
 	return nRetCode;
 }
 
