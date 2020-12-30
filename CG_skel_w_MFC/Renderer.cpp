@@ -634,7 +634,14 @@ void Renderer::drawModel(MeshModel& model) {
 					triangle_normals.push_back(wr_vertex_normals.at(i->vertex_normals[0] - 1));
 					triangle_normals.push_back(wr_vertex_normals.at(i->vertex_normals[1] - 1));
 					triangle_normals.push_back(wr_vertex_normals.at(i->vertex_normals[2] - 1));
-					drawTrianglePhong(t, model_ambient_color, &model, *i,triangle_vertices, triangle_normals);
+					Color face_ambient_color;
+					if (NonUniformMeshModel* non_uni_model = dynamic_cast<NonUniformMeshModel*>(&model)) { // this is a non uniform model
+						face_ambient_color = non_uni_model->faces.at(i - model.faces.begin()).ambient_color;
+					}
+					else { // this is a uniform model
+						face_ambient_color = model_ambient_color;
+					}
+					drawTrianglePhong(t, face_ambient_color, &model, *i,triangle_vertices, triangle_normals);
 				}
 			}
 		}
@@ -919,7 +926,7 @@ void Renderer::applyBloom(float bloom_threshold) {
 void Renderer::setCamera(Camera* camera) { this->camera = camera; }
 
 void Renderer::toggleShading() {
-	shading_method = Shading((shading_method + 1) % 2);
+	shading_method = Shading((shading_method + 1) % 3);
 }
 
 void Renderer::drawLight(PointSource point_s) {
@@ -1123,9 +1130,9 @@ void Renderer::drawLineSteepPhong(Line l, Vertex v1, Vertex v2, Normal n1, Norma
 
 	for (int x = p0.x; x <= p1.x; x++) {
 		vec4 dir_to_camera = camera->position - v;
-		Color difuse = calculateDiffuseColor(f, v, n);
+		Color diffuse = calculateDiffuseColor(f, v, n);
 		Color spec = calculateSpecularColor(*m, f, v, n, dir_to_camera);
-		Color total = emb + difuse + spec + emit;
+		Color total = emb + diffuse + spec + emit;
 		Pixel p = Pixel(y, x, z, total);
 		if (pixels_drawn != NULL) {
 			pixels_drawn->push_back(p);
