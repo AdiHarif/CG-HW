@@ -100,7 +100,7 @@ class Renderer
 	void drawLineModerate(Line l, vector<Pixel>* pixels_drawn = NULL);
 	void drawLineSteep(Line l, vector<Pixel>* pixels_drawn = NULL);
 	void drawTriangleFlat(Triangle t, Color color);
-	void drawTriangleGouraud(Triangle t, Color ambient_color, MeshModel* m, vector<Normal> normals);
+	void drawTriangleGouraud(Triangle t, Color ambient_color, MeshModel* m,vector<Vertex> wr_vertices, vector<Normal> normals);
 	//==========
 
 
