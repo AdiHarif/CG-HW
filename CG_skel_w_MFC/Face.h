@@ -27,7 +27,8 @@ private:
 
 public:
 	Face();
-	Face(vec3, int normal_index = 0);
+	Face(vec3 v, int normal_index = 0);
+	Face(vec3 v, vec3 vn, int normal_index = 0);
 	Face(std::istream&, int normal_index = 0);
 
 	void calcCenter(Vertex v0, Vertex v1, Vertex v2);

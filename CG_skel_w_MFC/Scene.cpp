@@ -88,8 +88,10 @@ void Scene::draw()
 		}
 	}
 
-	for (vector<PointSource>::iterator i = point_sources.begin(); i != point_sources.end(); i++) {
-		m_renderer->drawLight(*i, i->getColor());
+	if (f_draw_lights) {
+		for (vector<PointSource>::iterator i = point_sources.begin(); i != point_sources.end(); i++) {
+			m_renderer->drawLight(*i);
+		}
 	}
 
 	m_renderer->drawOrigin(Color(RED));
@@ -355,6 +357,11 @@ void Scene::toggleFaceNormals() {
 void Scene::toggleCameras() {
 	f_draw_cameras = !f_draw_cameras;
 }
+
+void Scene::toggleLights() {
+	f_draw_lights = !f_draw_lights;
+}
+
 
 //==========
 

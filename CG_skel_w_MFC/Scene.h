@@ -60,6 +60,7 @@ class Scene {
 	//GLfloat ambient_light_intensity;
 
 	bool f_draw_cameras = false;
+	bool f_draw_lights = false;
 
 	bool f_blur;
 	bool f_bloom;
@@ -109,6 +110,7 @@ public:
 	void toggleVertexNormals();
 	void toggleFaceNormals();
 	void toggleCameras();
+	void toggleLights();
 	//==========
 
 	//===Cameras Interface===

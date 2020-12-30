@@ -233,7 +233,7 @@ void Renderer::drawTriangleGouraud(Triangle t, Color ambient_color, MeshModel* m
 
 	vector<Line> draw_between;
 	// init rows vector:
-	for (int i = 0; i < rows; i++) { 
+	for (int i = 0; i < rows; i++) {
 		Pixel left = Pixel(INT_MIN, i + min_y, -1, BLACK);// TODO: add z
 		Pixel right = Pixel(INT_MAX, i + min_y, -1, BLACK);// TODO: add z
 		draw_between.push_back(Line(left, right));
@@ -256,7 +256,7 @@ void Renderer::drawTriangleGouraud(Triangle t, Color ambient_color, MeshModel* m
 		Pixel& p = t.lines.at(i).end;
 		p = t.lines.at((i + 2) % 3).start;
 	}
-	
+
 	// fill rows vector:
 	for (Line l : t.lines) {
 		vector<Pixel> pixels_drawn;
@@ -507,14 +507,14 @@ void Renderer::drawModel(MeshModel& model) {
 		px_vertices.push_back(viewPort(v));
 	}
 
-	mat4 ntm_t1 = model.ntw *model.ntm;
+	mat4 ntm_t1 = model.ntw * model.ntm;
 	mat4 ntm_t2 = camera->tpn * camera->tcn;
 	vector<Normal> tr_vertex_normals;
 	for (vector<Normal>::iterator i = model.vertex_normals.begin(); i != model.vertex_normals.end(); i++) {
 		vec4 n = ntm_t1 * (*i);
 		n /= n.w;
 		n.w = 0;
-		n = normalize(n)/100;
+		n = normalize(n) / 100;
 		n.w = 1;
 		n = ntm_t2 * n;
 		n /= n.w;
@@ -536,7 +536,7 @@ void Renderer::drawModel(MeshModel& model) {
 		vec4 n = ntm_t1 * (*i);
 		n /= n.w;
 		n.w = 0;
-		n = normalize(n)/100;
+		n = normalize(n) / 100;
 		n.w = 1;
 		wr_face_normals.push_back(n);
 		n = ntm_t2 * n;
@@ -879,11 +879,13 @@ void Renderer::toggleShading() {
 	shading_method = Shading((shading_method + 1) % 3);
 }
 
-void Renderer::drawLight(PointSource point_s, Color c) {
+void Renderer::drawLight(PointSource point_s) {
+	// TODO: fix transformations
 	mat4 t_tot = camera->tp * camera->tc;
 	Pixel center = viewPort(t_tot * point_s.getPosition());
+	center.color = point_s.getColor();
 	for (int j = -2; j <= 2; j++) {
-		drawPixel(Pixel(center.x + j, center.y, center.z, c));
-		drawPixel(Pixel(center.x, center.y + j, center.z, c));
+		drawPixel(Pixel(center.x + j, center.y, center.z, center.color));
+		drawPixel(Pixel(center.x, center.y + j, center.z, center.color));
 	}
 }

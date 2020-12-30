@@ -155,7 +155,7 @@ public:
 	void drawModel(MeshModel& model);
 	void drawCamera(vec4 pos, Color c);
 	void drawOrigin(Color c);
-	void drawLight(PointSource point_s, Color c);
+	void drawLight(PointSource point_s);
 
 	void toggleAntiAliasing();
 	float* createAntiAliasedBuffer();
