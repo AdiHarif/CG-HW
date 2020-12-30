@@ -467,15 +467,18 @@ void special(int key, int x, int y) {
 		scene->toggleCameras();
 		break;
 	case GLUT_KEY_F7:
-		scene->toggleAntiAliasing();
+		scene->toggleLights();
 		break;
 	case GLUT_KEY_F8:
-		scene->toggleFog();
+		scene->toggleAntiAliasing();
 		break;
 	case GLUT_KEY_F9:
-		scene->toggleBlur();
+		scene->toggleFog();
 		break;
 	case GLUT_KEY_F10:
+		scene->toggleBlur();
+		break;
+	case GLUT_KEY_F11:
 		scene->toggleBloom();
 	}
 	scene->draw();
