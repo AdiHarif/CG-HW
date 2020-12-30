@@ -90,6 +90,7 @@ public:
 	//===Models Interface===
 	void loadOBJModel(string fileName);
 	void loadPrimModel();
+	void loadNonUniform();
 	void removeSelection();
 
 	void scaleSelection(double scale_factor);

@@ -4,6 +4,7 @@
 // CDlgEditModelColor dialog
 #include "afxdialogex.h"
 #include "PrimMeshModel.h"
+#include "NonUniformMeshModel.h"
 #include "MeshModel.h"
 
 class CDlgEditModelColor : public CDialog

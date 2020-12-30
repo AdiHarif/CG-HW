@@ -28,7 +28,7 @@ private:
 public:
 	Face();
 	Face(vec3 v, int normal_index = 0);
-	Face(vec3 v, vec3 vn, int normal_index = 0);
+	Face(vec3 v, vec3 vn);
 	Face(std::istream&, int normal_index = 0);
 
 	void calcCenter(Vertex v0, Vertex v1, Vertex v2);
@@ -37,4 +37,5 @@ public:
 	friend class Renderer;
 	friend class MeshModel;
 	friend class PrimMeshModel;
+	friend class NonUniformMeshModel;
 };
