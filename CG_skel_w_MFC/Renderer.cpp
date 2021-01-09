@@ -278,6 +278,267 @@ void Renderer::drawTriangleGouraud(Triangle t, Color ambient_color, MeshModel* m
 	}
 }
 
+
+//void Renderer::drawTrianglePhong(Triangle t, Color ambient_color, MeshModel* m, Face& f, vector<Vertex> wr_vertices, vector<Normal> wr_normals) {
+//	int max_y = t.findMaxY();
+//	int min_y = t.findMinY();
+//	int rows = max_y - min_y + 1;
+//
+//	vector<Line> draw_between;
+//	vector<Normal> start_normals;
+//	vector<Normal> end_normals;
+//	vector<Vertex> start_vertices;
+//	vector<Vertex> end_vertices;
+//	// init rows vector:
+//	for (int i = 0; i < rows; i++) {
+//		Pixel left = Pixel(INT_MIN, i + min_y, -1, BLACK);// TODO: add z
+//		Pixel right = Pixel(INT_MAX, i + min_y, -1, BLACK);// TODO: add z
+//		draw_between.push_back(Line(left, right));
+//
+//		start_normals.push_back(vec4(0));
+//		end_normals.push_back(vec4(0));
+//		start_vertices.push_back(vec4(0));
+//		end_vertices.push_back(vec4(0));
+//	}
+//
+//
+//	// copy lines' start point to previous lines' end point:
+//	//for (int i = 0; i < t.lines.size(); i++) {
+//	//	Pixel& p = t.lines.at(i).end;
+//	//	p = t.lines.at((i + 2) % 3).start;
+//	//}
+//
+//	// fill rows vector:
+//	for (int i = 0; i < t.lines.size(); i++) {
+//		vector<Pixel> pixels_drawn;
+//		vector<Normal> pixel_normals;
+//		vector<Vertex> pixel_vertices;
+//		Line l = t.lines[i];
+//		drawLinePhong(l, wr_vertices[i], wr_vertices[(i + 1) % 3], wr_normals[i], wr_normals[(i + 1) % 3], m, f, ambient_color, f.emit_color, &pixels_drawn, &pixel_vertices, &pixel_normals);
+//		for (int j = 0; j < pixels_drawn.size(); j++) {
+//			Pixel p = pixels_drawn[j];
+//			if (p.x > draw_between.at(p.y - min_y).start.x) {
+//				draw_between.at(p.y - min_y).start = p;
+//				start_normals.at(p.y - min_y) = pixel_normals[j];
+//				start_vertices.at(p.y - min_y) = pixel_vertices[j];
+//			}
+//			if (p.x < draw_between.at(p.y - min_y).end.x) {
+//				draw_between.at(p.y - min_y).end = p;
+//				end_normals.at(p.y - min_y) = pixel_normals[j];
+//				end_vertices.at(p.y - min_y) = pixel_vertices[j];
+//			}
+//		}
+//	}
+//
+//	for (int i = 0; i < rows; i++) {
+//		Line line_to_draw = Line(draw_between.at(i).start, draw_between.at(i).end);
+//		drawLinePhong(line_to_draw, start_vertices[i], end_vertices[i], start_normals[i], end_normals[i], m, f, ambient_color, f.emit_color);
+//	}
+//}
+
+void Renderer::drawLinePhong(Line l, Vertex v1, Vertex v2, Normal n1, Normal n2, MeshModel* m, Face& f, Color ambient, Color emit, vector<Pixel>* pixels_drawn, vector<Vertex>* pixel_vertices, vector<Normal>* pixel_normals) {
+	Pixel p0 = l.start;
+	Pixel p1 = l.end;
+	if (p0.x == p1.x) {
+		if (p0.y < p1.y) {
+			drawLineSteepPhong(Line(p0, p1), v1, v2, n1, n2, m, f, ambient, emit, pixels_drawn, pixel_vertices, pixel_normals);
+		}
+		else {
+			drawLineSteepPhong(Line(p1, p0), v2, v1, n2, n1, m, f, ambient, emit, pixels_drawn, pixel_vertices, pixel_normals);
+		}
+	}
+	if (p0.x > p1.x) {// make sure that v0 is left of v1
+		p0 = l.end;
+		p1 = l.start;
+	}
+
+	if (std::abs(p1.y - p0.y) < std::abs(p1.x - p0.x)) {//-1 <= m <= 1
+		drawLineModeratePhong(Line(p0, p1), v1, v2, n1, n2, m, f, ambient, emit, pixels_drawn, pixel_vertices, pixel_normals);
+	}
+	else { //|m|>1
+		drawLineSteepPhong(Line(p0, p1), v1, v2, n1, n2, m, f, ambient, emit, pixels_drawn, pixel_vertices, pixel_normals);
+	}
+}
+
+void Renderer::drawLineModeratePhong(Line l, Vertex v1, Vertex v2, Normal n1, Normal n2, MeshModel* m, Face& f, Color ambient, Color emit, vector<Pixel>* pixels_drawn, vector<Vertex>* pixel_vertices, vector<Normal>* pixel_normals) {
+	Pixel p0 = l.start;
+	Pixel p1 = l.end;
+	int dx = p1.x - p0.x;
+	int dy = p1.y - p0.y;
+
+	float dz = (p1.z - p0.z) / dx;
+	float z = p0.z;
+
+	int yi = 1;
+	if (dy < 0) {
+		yi = -1;
+		dy = -dy;
+
+		vec4 tmp1 = v1;
+		v1 = v2;
+		v2 = tmp1;
+
+		tmp1 = n1;
+		n1 = n2;
+		n2 = tmp1;
+	}
+
+	vec4 dn = (n2 - n1) / dx;
+	Normal n = n1;
+
+	vec4 dv = (v2 - v1) / dx;
+	Vertex v = v1;
+
+
+	int D = 2 * dy - dx;
+	int y = p0.y;
+
+
+	for (int x = p0.x; x <= p1.x; x++) {
+
+		vec4 dir_to_camera = camera->position - v;
+
+		//Face f;
+		Color difuse = calculateDiffuseColor(f, v, n);
+		Color spec = calculateSpecularColor(*m, f, v, n, dir_to_camera);
+		Color total = ambient + difuse + spec + emit;
+		Pixel p = Pixel(x, y, z, total);
+		if (pixels_drawn != NULL) {
+			pixels_drawn->push_back(p);
+			pixel_vertices->push_back(v);
+			pixel_normals->push_back(n);
+
+		}
+		this->drawPixel(p);
+		if (D > 0) {
+			y += yi;
+			D += 2 * (dy - dx);
+		}
+		else {
+			D += 2 * dy;
+		}
+		z += dz;
+		n += dn;
+		v += dv;
+
+	}
+}
+
+void Renderer::drawLineSteepPhong(Line l, Vertex v1, Vertex v2, Normal n1, Normal n2, MeshModel* m, Face& f, Color ambient, Color emit, vector<Pixel>* pixels_drawn, vector<Vertex>* pixel_vertices, vector<Normal>* pixel_normals) {
+	//flip x<->y
+	Pixel p0 = { l.start.y, l.start.x, l.start.z, l.start.color };
+	Pixel p1 = { l.end.y, l.end.x, l.end.z, l.end.color };
+
+
+	//make sure p0 is left of p1
+	if (p0.x > p1.x) {
+		Pixel tmp = p0;
+		p0 = p1;
+		p1 = tmp;
+
+		vec4 tmp1 = v1;
+		v1 = v2;
+		v2 = tmp1;
+
+		tmp1 = n1;
+		n1 = n2;
+		n2 = tmp1;
+	}
+
+	int dx = p1.x - p0.x;
+	int dy = p1.y - p0.y;
+
+	float dz = (p1.z - p0.z) / dx;
+	float z = p0.z;
+
+
+	vec4 dn = (n2 - n1) / dx;
+	Normal n = n1;
+
+	vec4 dv = (v2 - v1) / dx;
+	Vertex v = v1;
+
+	int yi = 1;
+	if (dy < 0) {
+		yi = -1;
+		dy = -dy;
+	}
+	int D = 2 * dy - dx;
+	int y = p0.y;
+
+	for (int x = p0.x; x <= p1.x; x++) {
+		vec4 dir_to_camera = camera->position - v;
+		Color diffuse = calculateDiffuseColor(f, v, n);
+		Color spec = calculateSpecularColor(*m, f, v, n, dir_to_camera);
+		Color total = ambient + diffuse + spec + emit;
+		Pixel p = Pixel(y, x, z, total);
+		if (pixels_drawn != NULL) {
+			pixels_drawn->push_back(p);
+			pixel_vertices->push_back(v);
+			pixel_normals->push_back(n);
+		}
+		this->drawPixel(p);
+		if (D > 0) {
+			y += yi;
+			D += 2 * (dy - dx);
+		}
+		else {
+			D += 2 * dy;
+		}
+		z += dz;
+		n += dn;
+		v += dv;
+	}
+}
+
+//void Renderer::drawTrianglePhong(Triangle t, Color ambient_color, MeshModel* m, Face& f, vector<Vertex> wr_vertices, vector<Normal> wr_normals) {
+//	int max_y = t.findMaxY();
+//	int min_y = t.findMinY();
+//	int rows = max_y - min_y + 1;
+//
+//	vector<Line> draw_between;
+//	// init rows vector:
+//	for (int i = 0; i < rows; i++) {
+//		Pixel left = Pixel(INT_MIN, i + min_y, -1, BLACK);// TODO: add z
+//		Pixel right = Pixel(INT_MAX, i + min_y, -1, BLACK);// TODO: add z
+//		draw_between.push_back(Line(left, right));
+//	}
+//
+//	// calculate colors and normals in corners:
+//	for (int i = 0; i < t.lines.size(); i++) {
+//		Pixel& p = t.lines.at(i).start;
+//		Vertex p_v = wr_vertices[i];
+//		p.normal = wr_normals[i];
+//		vec4 dir_to_camera = camera->position - p_v;
+//		Color diffuse_color = calculateDiffuseColor(f, p_v, p.normal);
+//		Color specular_color = calculateSpecularColor(*m, f, p_v, p.normal, dir_to_camera);
+//		p.color = m->emit_color + ambient_color + diffuse_color + specular_color;
+//		p.color = p.color;
+//	}
+//
+//	// copy lines' start point to previous lines' end point:
+//	//for (int i = 0; i < t.lines.size(); i++) {
+//	//	Pixel& p = t.lines.at(i).end;
+//	//	p = t.lines.at((i + 2) % 3).start;
+//	//}
+//
+//	// fill rows vector:
+//	for (Line l : t.lines) {
+//		vector<Pixel> pixels_drawn;
+//		drawLine(l, &pixels_drawn);
+//		for (Pixel p : pixels_drawn) {
+//			if (p.x > draw_between.at(p.y - min_y).start.x) {
+//				draw_between.at(p.y - min_y).start = p;
+//			}
+//			if (p.x < draw_between.at(p.y - min_y).end.x) {
+//				draw_between.at(p.y - min_y).end = p;
+//			}
+//		}
+//	}
+//
+//
+//}
+
 //==========
 
 
@@ -494,7 +755,7 @@ void Renderer::setAmbientColor(Color* color) { scene_ambient_light_color = color
 
 
 void Renderer::drawModel(MeshModel& model) {
-
+	int count = 0;
 
 	mat4 tm_tot1 = model.tw* model.tm;
 	mat4 tm_tot2 = camera->tp * camera->tc;
@@ -634,7 +895,17 @@ void Renderer::drawModel(MeshModel& model) {
 					triangle_normals.push_back(wr_vertex_normals.at(i->vertex_normals[0] - 1));
 					triangle_normals.push_back(wr_vertex_normals.at(i->vertex_normals[1] - 1));
 					triangle_normals.push_back(wr_vertex_normals.at(i->vertex_normals[2] - 1));
-					drawTrianglePhong(t, model_ambient_color, &model, *i,triangle_vertices, triangle_normals);
+					Color face_ambient_color;
+					if (NonUniformMeshModel* non_uni_model = dynamic_cast<NonUniformMeshModel*>(&model)) { // this is a non uniform model
+						face_ambient_color = non_uni_model->faces.at(i - model.faces.begin()).ambient_color;
+					}
+					else { // this is a uniform model
+						face_ambient_color = model_ambient_color;
+					}
+					if (true /*count < 50*/) {
+						drawTrianglePhong(t, face_ambient_color, &model, *i, triangle_vertices, triangle_normals);
+						count++;
+					}
 				}
 			}
 		}
@@ -919,7 +1190,6 @@ void Renderer::applyBloom(float bloom_threshold) {
 void Renderer::setCamera(Camera* camera) { this->camera = camera; }
 
 void Renderer::toggleShading() {
-	//shading_method = Shading((shading_method + 1) % 2);
 	shading_method = Shading((shading_method + 1) % 3);
 
 }
@@ -993,157 +1263,157 @@ void Renderer::drawTrianglePhong(Triangle t, Color ambient_color, MeshModel* m, 
 	}
 }
 
-void Renderer::drawLinePhong(Line l, Vertex v1, Vertex v2, Normal n1, Normal n2,  MeshModel* m, Face& f, Color emb, Color emit, vector<Pixel>* pixels_drawn, vector<Vertex>* pixel_vertices, vector<Normal>* pixel_normals) {
-	Pixel p0 = l.start;
-	Pixel p1 = l.end;
-	if (p0.x == p1.x) {
-		if (p0.y < p1.y) {
-			drawLineSteepPhong(Line(p0, p1),v1, v2, n1, n2,  m,f,emb,emit,  pixels_drawn, pixel_vertices, pixel_normals);
-		}
-		else {
-			drawLineSteepPhong(Line(p1, p0), v2, v1, n2, n1,  m, f,emb, emit, pixels_drawn,pixel_vertices, pixel_normals);
-		}
-	}
-	if (p0.x > p1.x) {// make sure that v0 is left of v1
-		p0 = l.end;
-		p1 = l.start;
-	}
-
-	if (std::abs(p1.y - p0.y) < std::abs(p1.x - p0.x)) {//-1 <= m <= 1
-		drawLineModeratePhong(Line(p0, p1), v1, v2, n1, n2,  m,f, emb, emit, pixels_drawn, pixel_vertices, pixel_normals);
-	}
-	else { //|m|>1
-		drawLineSteepPhong(Line(p0, p1), v1, v2, n1, n2,  m, f,emb, emit, pixels_drawn, pixel_vertices, pixel_normals);
-	}
-}
-
-
-void Renderer::drawLineModeratePhong(Line l, Vertex v1, Vertex v2, Normal n1, Normal n2, MeshModel* m, Face& f, Color emb, Color emit, vector<Pixel>* pixels_drawn, vector<Vertex>* pixel_vertices, vector<Normal>* pixel_normals) {
-	Pixel p0 = l.start;
-	Pixel p1 = l.end;
-	int dx = p1.x - p0.x;
-	int dy = p1.y - p0.y;
-
-	float dz = (p1.z - p0.z) / dx;
-	float z = p0.z;
-
-	int yi = 1;
-	if (dy < 0) {
-		yi = -1;
-		dy = -dy;
-
-		vec4 tmp1 = v1;
-		v1 = v2;
-		v2 = v1;
-
-		tmp1 = n1;
-		n1 = n2;
-		n2 = n1;
-	}
-
-	vec4 dn = (n2 - n1) / dx;
-	Normal n = n1;
-
-	vec4 dv = (v2 - v1) / dx;
-	Vertex v = v1;
-
-
-	int D = 2 * dy - dx;
-	int y = p0.y;
-
-
-	for (int x = p0.x; x <= p1.x; x++) {
-
-		vec4 dir_to_camera = camera->position - v;
-
-		//Face f;
-		Color difuse = calculateDiffuseColor( f, v, n);
-		Color spec = calculateSpecularColor(*m, f, v, n, dir_to_camera);
-		Color total = emb + difuse + spec + emit;
-		Pixel p = Pixel(x, y, z, total);
-		if (pixels_drawn != NULL) {
-			pixels_drawn->push_back(p);
-			pixel_vertices->push_back(v);
-			pixel_normals->push_back(n);
-
-		}
-		this->drawPixel(p);
-		if (D > 0) {
-			y += yi;
-			D += 2 * (dy - dx);
-		}
-		else {
-			D += 2 * dy;
-		}
-		z += dz;
-		n += dn;
-		v += dv;
-
-	}
-}
-
-void Renderer::drawLineSteepPhong(Line l, Vertex v1, Vertex v2, Normal n1, Normal n2, MeshModel* m, Face& f, Color emb, Color emit, vector<Pixel>* pixels_drawn, vector<Vertex>* pixel_vertices, vector<Normal>* pixel_normals) {
-	//flip x<->y
-	Pixel p0 = { l.start.y, l.start.x, l.start.z, l.start.color };
-	Pixel p1 = { l.end.y, l.end.x, l.end.z, l.end.color };
-
-
-	//make sure p0 is left of p1
-	if (p0.x > p1.x) {
-		Pixel tmp = p0;
-		p0 = p1;
-		p1 = tmp;
-
-		vec4 tmp1 = v1;
-		v1 = v2;
-		v2 = v1;
-
-		tmp1 = n1;
-		n1 = n2;
-		n2 = n1;
-	}
-	int dx = p1.x - p0.x;
-	int dy = p1.y - p0.y;
-
-	float dz = (p1.z - p0.z) / dx;
-	float z = p0.z;
-
-
-	vec4 dn = (n2 - n1) / dx;
-	Normal n = n1;
-
-	vec4 dv = (v2 - v1) / dx;
-	Vertex v = v1;
-
-	int yi = 1;
-	if (dy < 0) {
-		yi = -1;
-		dy = -dy;
-	}
-	int D = 2 * dy - dx;
-	int y = p0.y;
-
-	for (int x = p0.x; x <= p1.x; x++) {
-		vec4 dir_to_camera = camera->position - v;
-		Color difuse = calculateDiffuseColor(f, v, n);
-		Color spec = calculateSpecularColor(*m, f, v, n, dir_to_camera);
-		Color total = emb + difuse + spec + emit;
-		Pixel p = Pixel(y, x, z, total);
-		if (pixels_drawn != NULL) {
-			pixels_drawn->push_back(p);
-			pixel_vertices->push_back(v);
-			pixel_normals->push_back(n);
-		}
-		this->drawPixel(p);
-		if (D > 0) {
-			y += yi;
-			D += 2 * (dy - dx);
-		}
-		else {
-			D += 2 * dy;
-		}
-		z += dz;
-		n += dn;
-		v += dv;
-	}
-}
+//void Renderer::drawLinePhong(Line l, Vertex v1, Vertex v2, Normal n1, Normal n2,  MeshModel* m, Face& f, Color emb, Color emit, vector<Pixel>* pixels_drawn, vector<Vertex>* pixel_vertices, vector<Normal>* pixel_normals) {
+//	Pixel p0 = l.start;
+//	Pixel p1 = l.end;
+//	if (p0.x == p1.x) {
+//		if (p0.y < p1.y) {
+//			drawLineSteepPhong(Line(p0, p1),v1, v2, n1, n2,  m,f,emb,emit,  pixels_drawn, pixel_vertices, pixel_normals);
+//		}
+//		else {
+//			drawLineSteepPhong(Line(p1, p0), v2, v1, n2, n1,  m, f,emb, emit, pixels_drawn,pixel_vertices, pixel_normals);
+//		}
+//	}
+//	if (p0.x > p1.x) {// make sure that v0 is left of v1
+//		p0 = l.end;
+//		p1 = l.start;
+//	}
+//
+//	if (std::abs(p1.y - p0.y) < std::abs(p1.x - p0.x)) {//-1 <= m <= 1
+//		drawLineModeratePhong(Line(p0, p1), v1, v2, n1, n2,  m,f, emb, emit, pixels_drawn, pixel_vertices, pixel_normals);
+//	}
+//	else { //|m|>1
+//		drawLineSteepPhong(Line(p0, p1), v1, v2, n1, n2,  m, f,emb, emit, pixels_drawn, pixel_vertices, pixel_normals);
+//	}
+//}
+//
+//
+//void Renderer::drawLineModeratePhong(Line l, Vertex v1, Vertex v2, Normal n1, Normal n2, MeshModel* m, Face& f, Color emb, Color emit, vector<Pixel>* pixels_drawn, vector<Vertex>* pixel_vertices, vector<Normal>* pixel_normals) {
+//	Pixel p0 = l.start;
+//	Pixel p1 = l.end;
+//	int dx = p1.x - p0.x;
+//	int dy = p1.y - p0.y;
+//
+//	float dz = (p1.z - p0.z) / dx;
+//	float z = p0.z;
+//
+//	int yi = 1;
+//	if (dy < 0) {
+//		yi = -1;
+//		dy = -dy;
+//
+//		vec4 tmp1 = v1;
+//		v1 = v2;
+//		v2 = v1;
+//
+//		tmp1 = n1;
+//		n1 = n2;
+//		n2 = n1;
+//	}
+//
+//	vec4 dn = (n2 - n1) / dx;
+//	Normal n = n1;
+//
+//	vec4 dv = (v2 - v1) / dx;
+//	Vertex v = v1;
+//
+//
+//	int D = 2 * dy - dx;
+//	int y = p0.y;
+//
+//
+//	for (int x = p0.x; x <= p1.x; x++) {
+//
+//		vec4 dir_to_camera = camera->position - v;
+//
+//		//Face f;
+//		Color difuse = calculateDiffuseColor( f, v, n);
+//		Color spec = calculateSpecularColor(*m, f, v, n, dir_to_camera);
+//		Color total = emb + difuse + spec + emit;
+//		Pixel p = Pixel(x, y, z, total);
+//		if (pixels_drawn != NULL) {
+//			pixels_drawn->push_back(p);
+//			pixel_vertices->push_back(v);
+//			pixel_normals->push_back(n);
+//
+//		}
+//		this->drawPixel(p);
+//		if (D > 0) {
+//			y += yi;
+//			D += 2 * (dy - dx);
+//		}
+//		else {
+//			D += 2 * dy;
+//		}
+//		z += dz;
+//		n += dn;
+//		v += dv;
+//
+//	}
+//}
+//
+//void Renderer::drawLineSteepPhong(Line l, Vertex v1, Vertex v2, Normal n1, Normal n2, MeshModel* m, Face& f, Color emb, Color emit, vector<Pixel>* pixels_drawn, vector<Vertex>* pixel_vertices, vector<Normal>* pixel_normals) {
+//	//flip x<->y
+//	Pixel p0 = { l.start.y, l.start.x, l.start.z, l.start.color };
+//	Pixel p1 = { l.end.y, l.end.x, l.end.z, l.end.color };
+//
+//
+//	//make sure p0 is left of p1
+//	if (p0.x > p1.x) {
+//		Pixel tmp = p0;
+//		p0 = p1;
+//		p1 = tmp;
+//
+//		vec4 tmp1 = v1;
+//		v1 = v2;
+//		v2 = v1;
+//
+//		tmp1 = n1;
+//		n1 = n2;
+//		n2 = n1;
+//	}
+//	int dx = p1.x - p0.x;
+//	int dy = p1.y - p0.y;
+//
+//	float dz = (p1.z - p0.z) / dx;
+//	float z = p0.z;
+//
+//
+//	vec4 dn = (n2 - n1) / dx;
+//	Normal n = n1;
+//
+//	vec4 dv = (v2 - v1) / dx;
+//	Vertex v = v1;
+//
+//	int yi = 1;
+//	if (dy < 0) {
+//		yi = -1;
+//		dy = -dy;
+//	}
+//	int D = 2 * dy - dx;
+//	int y = p0.y;
+//
+//	for (int x = p0.x; x <= p1.x; x++) {
+//		vec4 dir_to_camera = camera->position - v;
+//		Color difuse = calculateDiffuseColor(f, v, n);
+//		Color spec = calculateSpecularColor(*m, f, v, n, dir_to_camera);
+//		Color total = emb + difuse + spec + emit;
+//		Pixel p = Pixel(y, x, z, total);
+//		if (pixels_drawn != NULL) {
+//			pixels_drawn->push_back(p);
+//			pixel_vertices->push_back(v);
+//			pixel_normals->push_back(n);
+//		}
+//		this->drawPixel(p);
+//		if (D > 0) {
+//			y += yi;
+//			D += 2 * (dy - dx);
+//		}
+//		else {
+//			D += 2 * dy;
+//		}
+//		z += dz;
+//		n += dn;
+//		v += dv;
+//	}
+//}
