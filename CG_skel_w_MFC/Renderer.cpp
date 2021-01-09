@@ -919,7 +919,9 @@ void Renderer::applyBloom(float bloom_threshold) {
 void Renderer::setCamera(Camera* camera) { this->camera = camera; }
 
 void Renderer::toggleShading() {
-	shading_method = Shading((shading_method + 1) % 2);
+	//shading_method = Shading((shading_method + 1) % 2);
+	shading_method = Shading((shading_method + 1) % 3);
+
 }
 
 void Renderer::drawLight(PointSource point_s) {
@@ -1054,7 +1056,7 @@ void Renderer::drawLineModeratePhong(Line l, Vertex v1, Vertex v2, Normal n1, No
 
 		vec4 dir_to_camera = camera->position - v;
 
-		Face f;
+		//Face f;
 		Color difuse = calculateDiffuseColor( f, v, n);
 		Color spec = calculateSpecularColor(*m, f, v, n, dir_to_camera);
 		Color total = emb + difuse + spec + emit;
