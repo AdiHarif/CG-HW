@@ -14,11 +14,11 @@ CG_skel_w_MFC/CG_skel_w_MFC.vcxproj.filters
 CG_skel_w_MFC/InitShader.cpp
 CG_skel_w_MFC/InitShader.h
 #CG_skel_w_MFC/Resource.h
-CG_skel_w_MFC/fshader.glsl
+#CG_skel_w_MFC/fshader.glsl
 CG_skel_w_MFC/stdafx.cpp
 CG_skel_w_MFC/stdafx.h
 CG_skel_w_MFC/targetver.h
-CG_skel_w_MFC/vshader.glsl
+#CG_skel_w_MFC/vshader.glsl
 CG_skel_w_MFC/Release
 CG_skel_w_MFC/Debug
 .vscode/
