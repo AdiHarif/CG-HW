@@ -16,6 +16,7 @@ Color camera_plus_color = { 1.0, 1.0, 0.0 };
 
 Camera* Scene::getActiveCamera() {
 	return cameras[active_camera];
+
 }
 //==========
 
@@ -33,6 +34,10 @@ Scene::Scene(Renderer* renderer) : m_renderer(renderer) {
 	parallel_sources.push_back(ParallelSource("Point Light 0", vec3(0.0, 0.0, -1.0), { 0.3, 0.1, 0.1 }));
 	point_sources.push_back(PointSource("Point Light 0", vec3(1.5, 1.5, 1.5), { 1, 1, 1 }));
 	m_renderer->setAmbientColor(&ambient_light_color);*/
+
+
+	gl_info.program = InitShader("vshader.glsl", "fshader.glsl");
+
 }
 
 Scene::~Scene() {
@@ -101,6 +106,32 @@ void Scene::draw()
 
 	//m_renderer->drawAxes();
 	//m_renderer->swapBuffers();
+
+	/*glGenVertexArrays(1, &gl_info.vao);
+	glBindVertexArray(gl_info.vao);*/
+	
+
+	
+
+
+	GLuint loc = glGetAttribLocation(gl_info.program, "vPosition");
+	glEnableVertexAttribArray(loc);
+	glVertexAttribPointer(loc, 4, GL_FLOAT, GL_FALSE, 0, 0);
+	glClearColor(0.2, 0.2, 0.2, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
+		MeshModel* m = dynamic_cast<MeshModel*> ((*i));
+		drawModel(m);
+	}
+
+	glutSwapBuffers();
+}
+
+void Scene::drawModel(MeshModel* m) {
+	glBindVertexArray(m->vao);
+	glDrawArrays(GL_LINE_LOOP, 0, m->vertices.size());
+	glFlush();
 }
 
 
@@ -111,12 +142,22 @@ void Scene::draw()
 
 void Scene::loadOBJModel(string fileName)
 {
-	MeshModel *model = new MeshModel(fileName);
+	GLuint vao;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	glUseProgram(gl_info.program);
+
+	MeshModel *model = new MeshModel(fileName, vao);
 	models.push_back(model);
 	activateLastModel();
-	//Camera* c = cameras[activeCamera];
 
-	//c->LookAt(model->getPosition());
+	GLuint vbo;
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, model->vertices.size()*sizeof(vec4),&model->vertices[0], GL_STATIC_DRAW);
+
+
 }
 
 void Scene::loadPrimModel() {

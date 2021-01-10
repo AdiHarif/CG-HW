@@ -7,6 +7,8 @@
 #include "Color.h"
 #include "Camera.h"
 #include "Light.h"
+#include "InitShader.h"
+#include "GL\freeglut.h"
 
 #define ALL_MODELS_ACTIVE -1
 #define NO_MODELS_ACTIVE -2
@@ -48,6 +50,12 @@ public:
 
 class Scene {
 
+	struct GLInfo {
+		GLuint program;
+		GLuint vao;
+	} gl_info;
+
+	
 	vector<Model*> models;
 
 	vector<ParallelSource> parallel_sources;
@@ -87,6 +95,7 @@ public:
 
 	//===Drawing Functions===
 	void draw();
+	void drawModel(MeshModel* m);
 	//void drawDemo();
 	//==========
 

@@ -41,9 +41,10 @@ protected :
 
 	DrawPref draw_pref;
 
+	GLuint vao;
 
 public:
-	MeshModel(string fileName);
+	MeshModel(string fileName, GLuint vao);
 	~MeshModel(void);
 	void loadFile(string fileName);
 	void initBoundingBox(vec4 min, vec4 max);
@@ -67,4 +68,5 @@ public:
 	void deactivate();
 
 	friend class Renderer;
+	friend class Scene;
 };

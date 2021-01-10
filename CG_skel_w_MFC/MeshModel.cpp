@@ -31,10 +31,10 @@ vec4 vec4fFromStream(std::istream& aStream) {
 	return vec4(vec3fFromStream(aStream));
 }
 
-MeshModel::MeshModel(string fileName)
+MeshModel::MeshModel(string fileName, GLuint vao)
 {
 	loadFile(fileName);
-	//position = vec4(0.0, 0.0, 0.0, 1.0);
+	this->vao = vao;
 }
 
 MeshModel::~MeshModel(void)
