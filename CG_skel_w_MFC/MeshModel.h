@@ -3,7 +3,7 @@
 #include "vec.h"
 #include "mat.h"
 #include <string>
-#include "Renderer.h"
+//#include "Renderer.h"
 #include "Color.h"
 
 using namespace std;

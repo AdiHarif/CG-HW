@@ -582,7 +582,7 @@ void mainMenuCB(int id) {
 		editActiveModelColor();
 		break;
 	case MAIN_MENU_PARTY:
-		scene->party();
+		//scene->party();
 		break;
 	case MAIN_MENU_ABOUT:
 		AfxMessageBox("I don't always write long manuals, but when I do:\r\n"

@@ -22,18 +22,17 @@ Camera* Scene::getActiveCamera() {
 //===C'tors / Destructors===
 
 Scene::Scene(Renderer* renderer) : m_renderer(renderer) {
-	f_blur = false;
+	/*f_blur = false;
 	f_bloom = false;
 	active_model = NO_MODELS_ACTIVE;
 	active_camera = -1;
 	ambient_light_color = { 0.1, 0.1, 0.1 };
-	//ambient_light_intensity = 0.5;
 	light_bloom_threshold = 0.9;
 	Camera* def_cam = new Camera(vec4(0.0, 0.0, 10.0));
 	addCamera(def_cam);
 	parallel_sources.push_back(ParallelSource("Point Light 0", vec3(0.0, 0.0, -1.0), { 0.3, 0.1, 0.1 }));
 	point_sources.push_back(PointSource("Point Light 0", vec3(1.5, 1.5, 1.5), { 1, 1, 1 }));
-	m_renderer->setAmbientColor(&ambient_light_color);
+	m_renderer->setAmbientColor(&ambient_light_color);*/
 }
 
 Scene::~Scene() {
@@ -60,60 +59,50 @@ Scene::~Scene() {
 
 void Scene::draw()
 {
-	//m_renderer->clearColorBuffer();
-	m_renderer->clearBuffer();
-	// 1. Send the renderer the current camera transform and the projection
-	/*m_renderer->setCameraTransform(getActiveCamera()->getTransform());
-	m_renderer->setProjection(getActiveCamera()->getProjection());*/
-	//m_renderer->setWorldTransform(tw);
+	//m_renderer->clearBuffer();
 
-	m_renderer->setCamera(cameras[active_camera]);
+	//// 1. Send the renderer the current camera transform and the projection
+	//m_renderer->setCamera(cameras[active_camera]);
 
-	//m_renderer->setLightSources(point_sources, parallel_sources);
-	m_renderer->point_sources = &this->point_sources;
-	m_renderer->parallel_sources = &this->parallel_sources;
+	//m_renderer->point_sources = &this->point_sources;
+	//m_renderer->parallel_sources = &this->parallel_sources;
 
-	// 2. Tell all models to draw themselves
-	for (vector<Model*>::iterator i = models.begin(); i!=models.end(); i++){
-		MeshModel* m = dynamic_cast<MeshModel*> ((*i));
-		m_renderer->drawModel(*m);
-	}
+	//// 2. Tell all models to draw themselves
+	//for (vector<Model*>::iterator i = models.begin(); i!=models.end(); i++){
+	//	MeshModel* m = dynamic_cast<MeshModel*> ((*i));
+	//	m_renderer->drawModel(*m);
+	//}
 
-	if (f_draw_cameras) {
-		for (vector<Camera*>::iterator i = cameras.begin(); i != cameras.end(); i++) {
-			if ((i - cameras.begin()) != active_camera) {
-				vec4 pos = (*i)->getPosition();
-				Color color = camera_plus_color;
-				m_renderer->drawCamera(pos, color);
-			}
-		}
-	}
+	//if (f_draw_cameras) {
+	//	for (vector<Camera*>::iterator i = cameras.begin(); i != cameras.end(); i++) {
+	//		if ((i - cameras.begin()) != active_camera) {
+	//			vec4 pos = (*i)->getPosition();
+	//			Color color = camera_plus_color;
+	//			m_renderer->drawCamera(pos, color);
+	//		}
+	//	}
+	//}
 
-	if (f_draw_lights) {
-		for (vector<PointSource>::iterator i = point_sources.begin(); i != point_sources.end(); i++) {
-			m_renderer->drawLight(*i);
-		}
-	}
+	//if (f_draw_lights) {
+	//	for (vector<PointSource>::iterator i = point_sources.begin(); i != point_sources.end(); i++) {
+	//		m_renderer->drawLight(*i);
+	//	}
+	//}
 
-	m_renderer->drawOrigin(Color(RED));
+	//m_renderer->drawOrigin(Color(RED));
 
-	if (f_blur) {
-		m_renderer->applyBlur(m_renderer->m_outBuffer);
-	}
+	//if (f_blur) {
+	//	m_renderer->applyBlur(m_renderer->m_outBuffer);
+	//}
 
-	if (f_bloom) {
-		m_renderer->applyBloom(light_bloom_threshold);
-	}
+	//if (f_bloom) {
+	//	m_renderer->applyBloom(light_bloom_threshold);
+	//}
 
-	m_renderer->drawAxes();
-	m_renderer->swapBuffers();
+	//m_renderer->drawAxes();
+	//m_renderer->swapBuffers();
 }
 
-//void Scene::drawDemo()
-//{
-//	m_renderer->SetDemoBuffer();
-//	m_renderer->swapBuffers();
-//}
 
 //==========
 
@@ -499,26 +488,12 @@ void Scene::addPointSource(PointSource point_source) {
 //====
 //==========
 
-//===Other===
-void Scene::party() {
-	for (int i = 0; i < 10; i++) {
-		float r = ((double)rand() / (RAND_MAX));
-		float g = ((double)rand() / (RAND_MAX));
-		float b = ((double)rand() / (RAND_MAX));
-		Color color = { r, g, b };
-		m_renderer->colorBackground(color);
-		m_renderer->swapBuffers();
-		Sleep(500);
-	}
-}
-//==========
-
 void Scene::toggleAntiAliasing() {
-	m_renderer->toggleAntiAliasing();
+	//m_renderer->toggleAntiAliasing();
 }
 
 void Scene::toggleFog() {
-	m_renderer->toggleFog();
+	//m_renderer->toggleFog();
 }
 
 void Scene::toggleBlur() {

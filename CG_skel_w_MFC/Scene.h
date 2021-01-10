@@ -3,7 +3,7 @@
 #include "gl/glew.h"
 #include <vector>
 #include <string>
-#include "Renderer.h"
+//#include "Renderer.h"
 #include "Color.h"
 #include "Camera.h"
 #include "Light.h"
@@ -161,11 +161,6 @@ public:
 	//PointSource Interface
 	void addPointSource(PointSource point_source);
 	//====
-	//==========
-
-	//===Other===
-	void party();
-	//==========
 
 
 	void toggleAntiAliasing();
