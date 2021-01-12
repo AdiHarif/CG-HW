@@ -56,4 +56,5 @@ public:
 	friend class MeshModel;
 	friend class PrimMeshModel;
 	friend class NonUniformMeshModel;
+	friend class Scene;
 };

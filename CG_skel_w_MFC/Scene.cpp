@@ -130,7 +130,7 @@ void Scene::draw()
 
 void Scene::drawModel(MeshModel* m) {
 	glBindVertexArray(m->vao);
-	glDrawArrays(GL_LINE_LOOP, 0, m->vertices.size());
+	glDrawArrays(GL_LINES, 0, m->faces.size()*3);
 	glFlush();
 }
 
@@ -152,12 +152,18 @@ void Scene::loadOBJModel(string fileName)
 	models.push_back(model);
 	activateLastModel();
 
+	vec4* vertex_positions = (vec4*)alloca(model->faces.size() * 3 * sizeof(vec4));
+	for (int i = 0; i < model->faces.size(); i++) {
+		vertex_positions[3 * i] = model->vertices[model->faces[i].vertices[0] - 1];
+		vertex_positions[(3 * i) + 1] = model->vertices[model->faces[i].vertices[1] - 1];
+		vertex_positions[(3 * i) + 2] = model->vertices[model->faces[i].vertices[2] - 1];
+	}
+
+
 	GLuint vbo;
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, model->vertices.size()*sizeof(vec4),&model->vertices[0], GL_STATIC_DRAW);
-
-
+	glBufferData(GL_ARRAY_BUFFER, model->faces.size()*3*sizeof(vec4), vertex_positions, GL_STATIC_DRAW);
 }
 
 void Scene::loadPrimModel() {
