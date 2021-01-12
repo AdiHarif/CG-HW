@@ -130,7 +130,14 @@ void Scene::draw()
 
 void Scene::drawModel(MeshModel* m) {
 	glBindVertexArray(m->vao);
-	glDrawArrays(GL_LINES, 0, m->faces.size()*3);
+	if (m->draw_pref.EDGES_ONLY) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	}
+	else {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
+
+	glDrawArrays(GL_TRIANGLES, 0, m->faces.size()*3);
 	glFlush();
 }
 

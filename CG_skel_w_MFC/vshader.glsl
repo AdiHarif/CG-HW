@@ -6,5 +6,5 @@ in vec4 vPosition;
 void main()
 {
     gl_Position = vPosition;
-    gl_Position.w=2;
+    gl_Position.w=3;
 }
