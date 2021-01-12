@@ -23,7 +23,7 @@ Camera* Scene::getActiveCamera() {
 //===C'tors / Destructors===
 
 Scene::Scene(Renderer* renderer) : m_renderer(renderer) {
-	/*f_blur = false;
+	f_blur = false;
 	f_bloom = false;
 	active_model = NO_MODELS_ACTIVE;
 	active_camera = -1;
@@ -33,7 +33,7 @@ Scene::Scene(Renderer* renderer) : m_renderer(renderer) {
 	addCamera(def_cam);
 	parallel_sources.push_back(ParallelSource("Point Light 0", vec3(0.0, 0.0, -1.0), { 0.3, 0.1, 0.1 }));
 	point_sources.push_back(PointSource("Point Light 0", vec3(1.5, 1.5, 1.5), { 1, 1, 1 }));
-	m_renderer->setAmbientColor(&ambient_light_color);*/
+	//m_renderer->setAmbientColor(&ambient_light_color);
 
 
 	gl_info.program = InitShader("vshader.glsl", "fshader.glsl");
@@ -130,6 +130,8 @@ void Scene::draw()
 
 void Scene::drawModel(MeshModel* m) {
 	glBindVertexArray(m->vao);
+	GLuint tm_loc = glGetUniformLocation(gl_info.program, "tm");
+	glUniformMatrix4fv(tm_loc, 1, GL_TRUE, m->tm);
 	glDrawArrays(GL_LINES, 0, m->faces.size()*3);
 	glFlush();
 }
@@ -158,7 +160,6 @@ void Scene::loadOBJModel(string fileName)
 		vertex_positions[(3 * i) + 1] = model->vertices[model->faces[i].vertices[1] - 1];
 		vertex_positions[(3 * i) + 2] = model->vertices[model->faces[i].vertices[2] - 1];
 	}
-
 
 	GLuint vbo;
 	glGenBuffers(1, &vbo);
