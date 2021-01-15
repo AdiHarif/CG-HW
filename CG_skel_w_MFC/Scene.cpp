@@ -16,7 +16,6 @@ Color camera_plus_color = { 1.0, 1.0, 0.0 };
 
 Camera* Scene::getActiveCamera() {
 	return cameras[active_camera];
-
 }
 //==========
 
@@ -33,7 +32,6 @@ Scene::Scene(Renderer* renderer) : m_renderer(renderer) {
 	addCamera(def_cam);
 	parallel_sources.push_back(ParallelSource("Point Light 0", vec3(0.0, 0.0, -1.0), { 0.3, 0.1, 0.1 }));
 	point_sources.push_back(PointSource("Point Light 0", vec3(1.5, 1.5, 1.5), { 1, 1, 1 }));
-	//m_renderer->setAmbientColor(&ambient_light_color);
 
 
 	gl_info.program = InitShader("vshader.glsl", "fshader.glsl");
