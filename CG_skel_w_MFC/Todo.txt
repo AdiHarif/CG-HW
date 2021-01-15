@@ -1,19 +1,7 @@
 Todo, Todo, Todo todo todo todo todoooooo... Todododo
 
 Model:
-	drawVertexNormals
-	drawFacesNormals
-	remove is_active 
-
-Camera:
-	transformations
-	implement perspective
+	delete unnecessary stuff from constructor
 
 Scene:
-	change interface to transform the right thing on zoom
-
-
-Renderer:
-	add z cliping and improve current x,y cliping
-	calculate normals before converting to pixels
-	fix normals out of bounds error
+	change constructor to no parameters constructor
