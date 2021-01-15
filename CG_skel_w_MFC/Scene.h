@@ -15,11 +15,18 @@
 
 using namespace std;
 
-class Scene {
+typedef enum {
+	FLAT_SHADING = 0,
+	GOURAUD_SHADING = 1,
+	PHONG_SHADING = 2,
+} ShadingModel;
 
-	struct GLInfo {
-		GLuint program;
-	} gl_info;
+class Scene {
+	
+	
+	ShadingModel active_shading_model;
+
+	GLuint programs[3];
 	
 	vector<Model*> models;
 	int active_model;
