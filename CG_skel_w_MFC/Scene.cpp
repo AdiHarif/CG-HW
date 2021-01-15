@@ -28,14 +28,10 @@ Scene::Scene() {
 	parallel_sources.push_back(ParallelSource("Point Light 0", vec3(0.0, 0.0, -1.0), { 0.3, 0.1, 0.1 }));
 	point_sources.push_back(PointSource("Point Light 0", vec3(1.5, 1.5, 1.5), { 1, 1, 1 }));
 
-<<<<<<< HEAD
 	programs[FLAT_SHADING] = InitShader("flat_vshader.glsl", "flat_fshader.glsl");
 	//TODO: add initializing of other shaders
 	active_shading_model = FLAT_SHADING;
-=======
-	gl_info.program = InitShader("vshader.glsl", "fshader.glsl");
-	glUseProgram(gl_info.program);
->>>>>>> d422aaf176f149fd97f1a15354a4f6c45c82fe9a
+	glUseProgram(programs[active_shading_model]);
 }
 
 Scene::~Scene() {
