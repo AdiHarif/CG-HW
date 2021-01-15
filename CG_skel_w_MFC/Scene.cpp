@@ -28,9 +28,14 @@ Scene::Scene() {
 	parallel_sources.push_back(ParallelSource("Point Light 0", vec3(0.0, 0.0, -1.0), { 0.3, 0.1, 0.1 }));
 	point_sources.push_back(PointSource("Point Light 0", vec3(1.5, 1.5, 1.5), { 1, 1, 1 }));
 
+<<<<<<< HEAD
 	programs[FLAT_SHADING] = InitShader("flat_vshader.glsl", "flat_fshader.glsl");
 	//TODO: add initializing of other shaders
 	active_shading_model = FLAT_SHADING;
+=======
+	gl_info.program = InitShader("vshader.glsl", "fshader.glsl");
+	glUseProgram(gl_info.program);
+>>>>>>> d422aaf176f149fd97f1a15354a4f6c45c82fe9a
 }
 
 Scene::~Scene() {
@@ -71,26 +76,41 @@ void Scene::loadOBJModel(string fileName)
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-
 	MeshModel *model = new MeshModel(fileName, vao);
 	models.push_back(model);
 	activateLastModel();
 
-	vec4* vertex_positions = (vec4*)alloca(model->faces.size() * 3 * sizeof(vec4));
+	int vertex_positions_tot_size = model->faces.size() * 3 * sizeof(vec4);
+	int vertex_normals_tot_size = vertex_positions_tot_size;
+
+	vec4* vertex_positions = (vec4*)alloca(vertex_positions_tot_size);
+	vec4* vertex_normals = (vec4*)alloca(vertex_normals_tot_size);
+
 	for (int i = 0; i < model->faces.size(); i++) {
 		vertex_positions[3 * i] = model->vertices[model->faces[i].vertices[0] - 1];
 		vertex_positions[(3 * i) + 1] = model->vertices[model->faces[i].vertices[1] - 1];
 		vertex_positions[(3 * i) + 2] = model->vertices[model->faces[i].vertices[2] - 1];
+		vertex_normals[3 * i] = model->vertex_normals[model->faces[i].vertices[0] - 1];
+		vertex_normals[(3 * i) + 1] = model->vertex_normals[model->faces[i].vertices[1] - 1];
+		vertex_normals[(3 * i) + 2] = model->vertex_normals[model->faces[i].vertices[2] - 1];
 	}
 
 	GLuint vbo;
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, model->faces.size()*3*sizeof(vec4), vertex_positions, GL_STATIC_DRAW);
+	//glBufferData(GL_ARRAY_BUFFER, model->faces.size()*3*sizeof(vec4), vertex_positions, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertex_positions_tot_size + vertex_normals_tot_size, NULL, GL_STATIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, vertex_positions_tot_size, vertex_positions);
+	glBufferSubData(GL_ARRAY_BUFFER, vertex_positions_tot_size, vertex_normals_tot_size, vertex_normals);
 }
 
 void Scene::loadPrimModel() {
-	//PrimMeshModel* model = new PrimMeshModel(file_name);
+	GLuint vao;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	//glUseProgram(gl_info.program);
+
 	PrimMeshModel* model = new PrimMeshModel();
 	models.push_back(model);
 	activateLastModel();
