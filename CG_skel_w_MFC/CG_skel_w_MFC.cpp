@@ -18,7 +18,6 @@
 #include "mat.h"
 #include "InitShader.h"
 #include "Scene.h"
-#include "Renderer.h"
 #include "CDlgNewCam.h"
 #include "CDlgEditCam.h"
 #include "CDlgTransformModel.h"
@@ -334,7 +333,6 @@ void display(void)
 
 void reshape(int width, int height)
 {
-	renderer->setSize(width, height);
 	scene->draw();
 }
 
@@ -470,7 +468,6 @@ void special(int key, int x, int y) {
 		scene->togglePolyMode();
 		break;
 	case GLUT_KEY_F2:
-		renderer->toggleShading();
 		break;
 	case GLUT_KEY_F3:
 		scene->toggleBB();
@@ -487,17 +484,6 @@ void special(int key, int x, int y) {
 	case GLUT_KEY_F7:
 		scene->toggleLights();
 		break;
-	case GLUT_KEY_F8:
-		scene->toggleAntiAliasing();
-		break;
-	case GLUT_KEY_F9:
-		scene->toggleFog();
-		break;
-	case GLUT_KEY_F10:
-		scene->toggleBlur();
-		break;
-	case GLUT_KEY_F11:
-		scene->toggleBloom();
 	}
 	scene->draw();
 }
@@ -680,10 +666,7 @@ int my_main(int argc, char** argv)
 	}
 	fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
 
-
-
-	renderer = new Renderer(512, 512);
-	scene = new Scene(renderer);
+	scene = new Scene();
 	//----------------------------------------------------------------------------
 	// Initialize Callbacks
 

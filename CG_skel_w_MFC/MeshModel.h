@@ -1,4 +1,4 @@
-#pragma once
+ #pragma once
 #include "scene.h"
 #include "vec.h"
 #include "mat.h"
@@ -67,6 +67,8 @@ public:
 	void activate();
 	void deactivate();
 
-	friend class Renderer;
+	void draw(mat4 tpc, GLuint program);
+
 	friend class Scene;
+	friend class Renderer;
 };
