@@ -28,8 +28,14 @@ Scene::Scene() {
 	parallel_sources.push_back(ParallelSource("Point Light 0", vec3(0.0, 0.0, -1.0), { 0.3, 0.1, 0.1 }));
 	point_sources.push_back(PointSource("Point Light 0", vec3(1.5, 1.5, 1.5), { 1, 1, 1 }));
 
+<<<<<<< HEAD
+	programs[FLAT_SHADING] = InitShader("flat_vshader.glsl", "flat_fshader.glsl");
+	//TODO: add initializing of other shaders
+	active_shading_model = FLAT_SHADING;
+=======
 	gl_info.program = InitShader("vshader.glsl", "fshader.glsl");
 	glUseProgram(gl_info.program);
+>>>>>>> d422aaf176f149fd97f1a15354a4f6c45c82fe9a
 }
 
 Scene::~Scene() {
@@ -43,8 +49,8 @@ Scene::~Scene() {
 //===Drawing Functions===
 
 void Scene::draw(){
-
-	GLuint loc = glGetAttribLocation(gl_info.program, "v_position");
+	GLuint active_program = programs[active_shading_model];
+	GLuint loc = glGetAttribLocation(active_program, "v_position");
 	glEnableVertexAttribArray(loc);
 	glVertexAttribPointer(loc, 4, GL_FLOAT, GL_FALSE, 0, 0);
 	glClearColor(0.2, 0.2, 0.2, 1.0);
@@ -53,7 +59,7 @@ void Scene::draw(){
 	Camera* active_camera = getActiveCamera();
 	mat4 tpc = active_camera->tp * active_camera->tc;
 	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
-		(*i)->draw(tpc, gl_info.program);
+		(*i)->draw(tpc, active_program);
 	}
 
 	glutSwapBuffers();
@@ -69,8 +75,6 @@ void Scene::loadOBJModel(string fileName)
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
-
-	//glUseProgram(gl_info.program);
 
 	MeshModel *model = new MeshModel(fileName, vao);
 	models.push_back(model);
