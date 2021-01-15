@@ -114,7 +114,7 @@ void Scene::draw()
 	
 
 
-	GLuint loc = glGetAttribLocation(gl_info.program, "vPosition");
+	GLuint loc = glGetAttribLocation(gl_info.program, "v_position");
 	glEnableVertexAttribArray(loc);
 	glVertexAttribPointer(loc, 4, GL_FLOAT, GL_FALSE, 0, 0);
 	glClearColor(0.2, 0.2, 0.2, 1.0);
@@ -129,9 +129,12 @@ void Scene::draw()
 }
 
 void Scene::drawModel(MeshModel* m) {
+
+	mat4 vt = this->cameras[active_camera]->tp * this->cameras[active_camera]->tc * m->tw * m->tm;
+
 	glBindVertexArray(m->vao);
-	GLuint tm_loc = glGetUniformLocation(gl_info.program, "tm");
-	glUniformMatrix4fv(tm_loc, 1, GL_TRUE, m->tm);
+	GLuint vt_loc = glGetUniformLocation(gl_info.program, "v_transform");
+	glUniformMatrix4fv(vt_loc, 1, GL_TRUE, vt);
 	if (m->draw_pref.EDGES_ONLY) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}

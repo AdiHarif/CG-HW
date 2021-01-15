@@ -28,6 +28,7 @@ class Camera {
 
 	enum proj_type { p_ortho = 0, p_persp = 1 } projection;
 
+	
 
 public:
 	//===C'tor===
@@ -78,4 +79,6 @@ public:
 	//==========
 
 	friend class Renderer;
+	friend class Scene;
+
 };

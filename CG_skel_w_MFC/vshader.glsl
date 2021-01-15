@@ -1,13 +1,11 @@
 #version 150
 
 
-in vec4 vPosition;
+in vec4 v_position;
 
-uniform mat4 tm;
-uniform mat4 tc;
-uniform mat4 tp;
+uniform mat4 v_transform;
 
 void main()
 {
-    gl_Position = tm * vPosition;
+    gl_Position = v_transform * v_position;
 }
