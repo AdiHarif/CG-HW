@@ -3,7 +3,6 @@
 #include "gl/glew.h"
 #include <vector>
 #include <string>
-//#include "Renderer.h"
 #include "Color.h"
 #include "Camera.h"
 #include "Light.h"
@@ -20,51 +19,35 @@ class Scene {
 
 	struct GLInfo {
 		GLuint program;
-		GLuint vao;
 	} gl_info;
-
 	
 	vector<Model*> models;
-
-	vector<ParallelSource> parallel_sources;
-	vector<PointSource> point_sources;
+	int active_model;
 
 	vector<Camera*> cameras;
-	Renderer *m_renderer;
-
-	int active_model;
-	int active_light;
 	int active_camera;
+
 	Color ambient_light_color;
-	//GLfloat ambient_light_intensity;
+	vector<ParallelSource> parallel_sources;
+	vector<PointSource> point_sources;
 
 	bool f_draw_cameras = false;
 	bool f_draw_lights = false;
 
-	bool f_blur;
-	bool f_bloom;
-	float light_bloom_threshold;
-
-	//mat4 tw;
-
-	friend class Renderer;
 public:
 	//===C'tors / Destructors===
-	Scene() {}; //unimplemented
-	Scene(Renderer *renderer);
+	Scene();
 	~Scene();
 	//==========
 
 	//===Getters/Setters===
-	Model* getActiveModel();
 	Camera* getActiveCamera();
+	Model* getActiveModel();
 	//==========
-
 
 	//===Drawing Functions===
 	void draw();
 	void drawModel(MeshModel* m);
-	//void drawDemo();
 	//==========
 
 	//===Models Interface===
@@ -125,25 +108,13 @@ public:
 	//==========
 
 	//===Lights Interface===
-	//General
 	vector<ParallelSource>* getParallelSources() { return &parallel_sources; }
 	vector<PointSource>* getPointSources() { return &point_sources; }
+
 	Color getAmbientColor() { return ambient_light_color; }
 	void setAmbientColor(Color c) { ambient_light_color = c; }
-	//====
-	//ParallelSource Interface
+
 	void addParallelSource(ParallelSource parallel_source);
-	//====
-	
-	//PointSource Interface
 	void addPointSource(PointSource point_source);
-	//====
-
-
-	void toggleAntiAliasing();
-	void toggleFog();
-	void toggleBlur();
-	void toggleBloom();
-
-	void updateActiveModelFacesColors();
+	//==========
 };

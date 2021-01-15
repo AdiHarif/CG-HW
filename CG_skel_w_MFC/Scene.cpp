@@ -9,10 +9,6 @@ using namespace std;
 
 Color camera_plus_color = { 1.0, 1.0, 0.0 };
 
-//===Inner Getters===
-//Model* Scene::getActiveModel() {
-//	return models[active_model];
-//}
 
 Camera* Scene::getActiveCamera() {
 	return cameras[active_camera];
@@ -21,18 +17,16 @@ Camera* Scene::getActiveCamera() {
 
 //===C'tors / Destructors===
 
-Scene::Scene(Renderer* renderer) : m_renderer(renderer) {
-	f_blur = false;
-	f_bloom = false;
+Scene::Scene() {
 	active_model = NO_MODELS_ACTIVE;
+
 	active_camera = -1;
-	ambient_light_color = { 0.1, 0.1, 0.1 };
-	light_bloom_threshold = 0.9;
 	Camera* def_cam = new Camera(vec4(0.0, 0.0, 10.0));
 	addCamera(def_cam);
+
+	ambient_light_color = { 0.1, 0.1, 0.1 };
 	parallel_sources.push_back(ParallelSource("Point Light 0", vec3(0.0, 0.0, -1.0), { 0.3, 0.1, 0.1 }));
 	point_sources.push_back(PointSource("Point Light 0", vec3(1.5, 1.5, 1.5), { 1, 1, 1 }));
-
 
 	gl_info.program = InitShader("vshader.glsl", "fshader.glsl");
 
@@ -46,71 +40,9 @@ Scene::~Scene() {
 }
 //==========
 
-//===Getters/Setters===
-
-//vector<Model*> Scene::getModels() {
-//	return models;
-//}
-
-//int Scene::getActiveModelIndex() { return active_model; }
-//
-//int Scene::getActiveCameraIndex() { return active_camera; }
-
-//==========
-
 //===Drawing Functions===
 
-void Scene::draw()
-{
-	//m_renderer->clearBuffer();
-
-	//// 1. Send the renderer the current camera transform and the projection
-	//m_renderer->setCamera(cameras[active_camera]);
-
-	//m_renderer->point_sources = &this->point_sources;
-	//m_renderer->parallel_sources = &this->parallel_sources;
-
-	//// 2. Tell all models to draw themselves
-	//for (vector<Model*>::iterator i = models.begin(); i!=models.end(); i++){
-	//	MeshModel* m = dynamic_cast<MeshModel*> ((*i));
-	//	m_renderer->drawModel(*m);
-	//}
-
-	//if (f_draw_cameras) {
-	//	for (vector<Camera*>::iterator i = cameras.begin(); i != cameras.end(); i++) {
-	//		if ((i - cameras.begin()) != active_camera) {
-	//			vec4 pos = (*i)->getPosition();
-	//			Color color = camera_plus_color;
-	//			m_renderer->drawCamera(pos, color);
-	//		}
-	//	}
-	//}
-
-	//if (f_draw_lights) {
-	//	for (vector<PointSource>::iterator i = point_sources.begin(); i != point_sources.end(); i++) {
-	//		m_renderer->drawLight(*i);
-	//	}
-	//}
-
-	//m_renderer->drawOrigin(Color(RED));
-
-	//if (f_blur) {
-	//	m_renderer->applyBlur(m_renderer->m_outBuffer);
-	//}
-
-	//if (f_bloom) {
-	//	m_renderer->applyBloom(light_bloom_threshold);
-	//}
-
-	//m_renderer->drawAxes();
-	//m_renderer->swapBuffers();
-
-	/*glGenVertexArrays(1, &gl_info.vao);
-	glBindVertexArray(gl_info.vao);*/
-	
-
-	
-
+void Scene::draw(){
 
 	GLuint loc = glGetAttribLocation(gl_info.program, "v_position");
 	glEnableVertexAttribArray(loc);
@@ -336,30 +268,6 @@ void Scene::changeAllModelsActiveness(bool is_active) {
 
 //===Display Toggles===
 
-//void Scene::toggleVertices() {
-//	if (false) {	//TODO: toggle selected model
-//
-//	}
-//	else {	//toggle world
-//		for (int i = 0; i < this->models.size(); i++) {
-//			MeshModel* m = dynamic_cast<MeshModel*> (this->models[i]);
-//			m->toggleVertices();
-//		}
-//	}
-//}
-//
-//void Scene::toggleEdges() {
-//	if (false) {	//TODO: toggle selected model
-//
-//	}
-//	else {	//toggle world
-//		for (int i = 0; i < this->models.size(); i++) {
-//			MeshModel* m = dynamic_cast<MeshModel*> (this->models[i]);
-//			m->toggleEdges();
-//		}
-//	}
-//}
-
 void Scene::togglePolyMode() {
 	if (active_model == ALL_MODELS_ACTIVE) {
 		for (int i = 0; i < this->models.size(); i++) {
@@ -483,13 +391,6 @@ void Scene::lookAtActiveModel() {
 }
 
 
-//void Scene::deactivateAllCameras() {
-//	Camera* c = NULL;
-//	for (vector<Camera*>::iterator i = cameras.begin(); i != cameras.end(); i++) {
-//		c = dynamic_cast<Camera*> ((*i));
-//		c->setIsActive(false);
-//	}
-//}
 
 void Scene::toggleCameraProjection() {
 	getActiveCamera()->toggleProjection();
@@ -551,23 +452,3 @@ void Scene::addPointSource(PointSource point_source) {
 
 //====
 //==========
-
-void Scene::toggleAntiAliasing() {
-	//m_renderer->toggleAntiAliasing();
-}
-
-void Scene::toggleFog() {
-	//m_renderer->toggleFog();
-}
-
-void Scene::toggleBlur() {
-	f_blur = !f_blur;
-}
-
-void Scene::toggleBloom() {
-	f_bloom = !f_bloom;
-}
-
-void Scene::updateActiveModelFacesColors() {
-
-}
