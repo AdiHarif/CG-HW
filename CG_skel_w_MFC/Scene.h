@@ -23,7 +23,6 @@ typedef enum {
 
 class Scene {
 	
-	
 	ShadingModel active_shading_model;
 
 	GLuint programs[3];
