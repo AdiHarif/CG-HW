@@ -135,11 +135,19 @@ void Scene::drawModel(MeshModel* m) {
 	glBindVertexArray(m->vao);
 	GLuint vt_loc = glGetUniformLocation(gl_info.program, "v_transform");
 	glUniformMatrix4fv(vt_loc, 1, GL_TRUE, vt);
-	if (m->draw_pref.EDGES_ONLY) {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	switch (m->draw_pref.poly_mode) {
+	case DrawPref::VERTICES_ONLY: {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+		break;
 	}
-	else {
+	case DrawPref::EDGES_ONLY: {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		break;
+	}
+	case DrawPref::FILLED: {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		break;
+	}
 	}
 
 	glDrawArrays(GL_TRIANGLES, 0, m->faces.size()*3);
