@@ -50,40 +50,14 @@ void Scene::draw(){
 	glClearColor(0.2, 0.2, 0.2, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	Camera* active_camera = getActiveCamera();
+	mat4 tpc = active_camera->tp * active_camera->tc;
 	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
-		MeshModel* m = dynamic_cast<MeshModel*> ((*i));
-		drawModel(m);
+		(*i)->draw(tpc, gl_info.program);
 	}
 
 	glutSwapBuffers();
 }
-
-void Scene::drawModel(MeshModel* m) {
-
-	mat4 vt = this->cameras[active_camera]->tp * this->cameras[active_camera]->tc * m->tw * m->tm;
-
-	glBindVertexArray(m->vao);
-	GLuint vt_loc = glGetUniformLocation(gl_info.program, "v_transform");
-	glUniformMatrix4fv(vt_loc, 1, GL_TRUE, vt);
-	switch (m->draw_pref.poly_mode) {
-	case DrawPref::VERTICES_ONLY: {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-		break;
-	}
-	case DrawPref::EDGES_ONLY: {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		break;
-	}
-	case DrawPref::FILLED: {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		break;
-	}
-	}
-
-	glDrawArrays(GL_TRIANGLES, 0, m->faces.size()*3);
-	glFlush();
-}
-
 
 //==========
 

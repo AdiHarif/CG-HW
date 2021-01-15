@@ -47,7 +47,6 @@ public:
 
 	//===Drawing Functions===
 	void draw();
-	void drawModel(MeshModel* m);
 	//==========
 
 	//===Models Interface===

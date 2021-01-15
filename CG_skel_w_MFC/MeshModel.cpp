@@ -279,3 +279,29 @@ void MeshModel::activate() {
 void MeshModel::deactivate() {
 	mesh_color = vertex_normals_color = face_normals_color = bb_color = INACTIVE_GRAY;
 }
+
+void MeshModel::draw(mat4 tpc, GLuint program) {
+	mat4 vt = tpc * tw * tm;
+
+	glBindVertexArray(vao);
+	GLuint vt_loc = glGetUniformLocation(program, "v_transform");
+	glUniformMatrix4fv(vt_loc, 1, GL_TRUE, vt);
+	switch (draw_pref.poly_mode) {
+	case DrawPref::VERTICES_ONLY: {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+		break;
+	}
+	case DrawPref::EDGES_ONLY: {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		break;
+	}
+	case DrawPref::FILLED: {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		break;
+	}
+	}
+
+	glDrawArrays(GL_TRIANGLES, 0, faces.size() * 3);
+	glFlush();
+
+}
