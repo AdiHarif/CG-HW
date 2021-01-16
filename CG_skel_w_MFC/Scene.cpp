@@ -67,11 +67,8 @@ void Scene::draw(){
 
 void Scene::loadOBJModel(string fileName)
 {
-	GLuint vao;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
 
-	MeshModel *model = new MeshModel(fileName, vao);
+	MeshModel *model = new MeshModel(fileName);
 	models.push_back(model);
 	activateLastModel();
 
@@ -79,9 +76,13 @@ void Scene::loadOBJModel(string fileName)
 	int vertex_normals_tot_size = vertex_positions_tot_size;
 	int face_normals_tot_size = vertex_positions_tot_size;
 
-	vec4* vertex_positions = (vec4*)alloca(vertex_positions_tot_size);
-	vec4* vertex_normals = (vec4*)alloca(vertex_normals_tot_size);
-	vec4* face_normals = (vec4*)alloca(face_normals_tot_size);
+	/*vec4* vertex_positions = (vec4*)alloca(vertex_positions_tot_size);
+	vec4* vertex_normals = (vec4*)alloca(vertex_normals_tot_size);*/
+
+	vec4* vertex_positions = new vec4[model->faces.size() * 3];
+	vec4* vertex_normals = new vec4[model->faces.size() * 3];
+	vec4* face_normals = new vec4[face_normals_tot_size() * 3];
+
 
 	for (int i = 0; i < model->faces.size(); i++) {
 		vertex_positions[3 * i] = model->vertices[model->faces[i].vertices[0] - 1];
@@ -103,7 +104,8 @@ void Scene::loadOBJModel(string fileName)
 	glBufferSubData(GL_ARRAY_BUFFER, vertex_positions_tot_size, vertex_normals_tot_size, vertex_normals);
 	glBufferSubData(GL_ARRAY_BUFFER, vertex_positions_tot_size + vertex_normals_tot_size, face_normals_tot_size, face_normals);
 
-
+	delete[] vertex_positions;
+	delete[] vertex_normals;
 }
 
 void Scene::loadPrimModel() {

@@ -31,10 +31,11 @@ vec4 vec4fFromStream(std::istream& aStream) {
 	return vec4(vec3fFromStream(aStream));
 }
 
-MeshModel::MeshModel(string fileName, GLuint vao)
+MeshModel::MeshModel(string fileName)
 {
 	loadFile(fileName);
-	this->vao = vao;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
 }
 
 MeshModel::~MeshModel(void)
