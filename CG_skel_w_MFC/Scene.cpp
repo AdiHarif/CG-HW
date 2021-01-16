@@ -76,8 +76,8 @@ void Scene::loadOBJModel(string fileName)
 	int vertex_positions_tot_size = model->faces.size() * 3 * sizeof(vec4);
 	int vertex_normals_tot_size = vertex_positions_tot_size;
 
-	vec4* vertex_positions = (vec4*)alloca(vertex_positions_tot_size);
-	vec4* vertex_normals = (vec4*)alloca(vertex_normals_tot_size);
+	vec4* vertex_positions = new vec4[model->faces.size() * 3];
+	vec4* vertex_normals = new vec4[model->faces.size() * 3];
 
 	for (int i = 0; i < model->faces.size(); i++) {
 		vertex_positions[3 * i] = model->vertices[model->faces[i].vertices[0] - 1];
@@ -95,6 +95,9 @@ void Scene::loadOBJModel(string fileName)
 	glBufferData(GL_ARRAY_BUFFER, vertex_positions_tot_size + vertex_normals_tot_size, NULL, GL_STATIC_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, vertex_positions_tot_size, vertex_positions);
 	glBufferSubData(GL_ARRAY_BUFFER, vertex_positions_tot_size, vertex_normals_tot_size, vertex_normals);
+
+	delete[] vertex_positions;
+	delete[] vertex_normals;
 }
 
 void Scene::loadPrimModel() {
