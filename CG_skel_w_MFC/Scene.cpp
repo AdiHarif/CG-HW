@@ -80,7 +80,6 @@ void Scene::loadOBJModel(string fileName)
 	vec4* vertex_normals = new vec4[model->faces.size() * 3];
 	vec4* face_normals = new vec4[model->faces.size() * 3];
 
-
 	for (int i = 0; i < model->faces.size(); i++) {
 		vertex_positions[3 * i] = model->vertices[model->faces[i].vertices[0] - 1];
 		vertex_positions[(3 * i) + 1] = model->vertices[model->faces[i].vertices[1] - 1];
