@@ -303,13 +303,13 @@ void editActiveModelColor() {
 			//do nothing
 		}
 		else {
-			MeshModel* model = dynamic_cast<MeshModel*>(m);
+			/*MeshModel* model = dynamic_cast<MeshModel*>(m);
 			for (vector<Face>::iterator i = (*model->getFaces()).begin(); i != (*model->getFaces()).end(); i++) {
 				i->setEmitColor(emit_color);
 				i->setAmbientColor(ambient_color);
 				i->setDiffuseColor(diffuse_color);
 				i->setSpecularColor(specular_color);
-			}
+			}*/
 		}
 	}
 }

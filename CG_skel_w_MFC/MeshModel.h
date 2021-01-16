@@ -3,8 +3,9 @@
 #include "vec.h"
 #include "mat.h"
 #include <string>
-//#include "Renderer.h"
 #include "Color.h"
+
+#define BUFFERS_COUNT 2
 
 using namespace std;
 
@@ -16,19 +17,23 @@ typedef struct s_draw_pref {
 } DrawPref;
 
 
+typedef enum {
+	BT_VERTICES = 0,
+	BT_NORMALS = 1
+} BufferType;
+
 class MeshModel : public Model
 {
 protected :
 	MeshModel() {}
 
-	vector<Face> faces;
+	/*vector<Face> faces;
 	vector<Vertex> vertices;
 	vector<Normal> vertex_normals;
-	vector<Normal> face_normals;
+	vector<Normal> face_normals;*/
 
-	vector<Edge> bb_edges;
+	//vector<Edge> bb_edges;
 
-	//vec4 position;
 	mat4 tm;
 	mat4 tw;
 	mat4 ntm;
@@ -43,8 +48,12 @@ protected :
 
 	GLuint vao;
 
+	GLuint vbos[BUFFERS_COUNT];
+
+	int faces_count;
+
 public:
-	MeshModel(string fileName);
+	explicit MeshModel(string fileName = "");
 	~MeshModel(void);
 	void loadFile(string fileName);
 	void initBoundingBox(vec4 min, vec4 max);
@@ -55,9 +64,8 @@ public:
 	void rotateY(GLfloat, bool f_world_frame = false);
 	void rotateZ(GLfloat, bool f_world_frame = false);
 
-	//mat4 getWorldTransform();
 	vec4 getPosition();
-	vector<Face>* getFaces();
+	//vector<Face>* getFaces();
 	
 	void togglePolyMode();
 	void toggleBB();
