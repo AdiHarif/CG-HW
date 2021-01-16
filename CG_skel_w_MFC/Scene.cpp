@@ -76,12 +76,9 @@ void Scene::loadOBJModel(string fileName)
 	int vertex_normals_tot_size = vertex_positions_tot_size;
 	int face_normals_tot_size = vertex_positions_tot_size;
 
-	/*vec4* vertex_positions = (vec4*)alloca(vertex_positions_tot_size);
-	vec4* vertex_normals = (vec4*)alloca(vertex_normals_tot_size);*/
-
 	vec4* vertex_positions = new vec4[model->faces.size() * 3];
 	vec4* vertex_normals = new vec4[model->faces.size() * 3];
-	vec4* face_normals = new vec4[face_normals_tot_size * 3];
+	vec4* face_normals = new vec4[model->faces.size() * 3];
 
 
 	for (int i = 0; i < model->faces.size(); i++) {
@@ -106,6 +103,7 @@ void Scene::loadOBJModel(string fileName)
 
 	delete[] vertex_positions;
 	delete[] vertex_normals;
+	delete[] face_normals;
 }
 
 void Scene::loadPrimModel() {
