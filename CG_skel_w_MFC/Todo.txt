@@ -1,7 +1,1 @@
 Todo, Todo, Todo todo todo todo todoooooo... Todododo
-
-Model:
-	delete unnecessary stuff from constructor
-
-Scene:
-	change constructor to no parameters constructor
