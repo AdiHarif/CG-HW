@@ -44,7 +44,7 @@ protected :
 	GLuint vao;
 
 public:
-	MeshModel(string fileName, GLuint vao);
+	MeshModel(string fileName);
 	~MeshModel(void);
 	void loadFile(string fileName);
 	void initBoundingBox(vec4 min, vec4 max);
@@ -70,5 +70,4 @@ public:
 	void draw(mat4 tpc, GLuint program);
 
 	friend class Scene;
-	friend class Renderer;
 };

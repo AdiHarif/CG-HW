@@ -68,11 +68,8 @@ void Scene::draw(){
 
 void Scene::loadOBJModel(string fileName)
 {
-	GLuint vao;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
 
-	MeshModel *model = new MeshModel(fileName, vao);
+	MeshModel *model = new MeshModel(fileName);
 	models.push_back(model);
 	activateLastModel();
 
