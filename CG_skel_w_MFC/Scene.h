@@ -19,11 +19,11 @@ typedef enum {
 	FLAT_SHADING = 0,
 	GOURAUD_SHADING = 1,
 	PHONG_SHADING = 2,
-} ShadingModel;
+} ShadingMethod;
 
 class Scene {
 	
-	ShadingModel active_shading_model;
+	ShadingMethod active_shading_method;
 
 	GLuint programs[3];
 	
