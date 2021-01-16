@@ -30,8 +30,8 @@ Scene::Scene() {
 
 	programs[FLAT_SHADING] = InitShader("flat_vshader.glsl", "flat_fshader.glsl");
 	//TODO: add initializing of other shaders
-	active_shading_model = FLAT_SHADING;
-	glUseProgram(programs[active_shading_model]);
+	active_shading_method = FLAT_SHADING;
+	glUseProgram(programs[active_shading_method]);
 }
 
 Scene::~Scene() {
@@ -45,10 +45,9 @@ Scene::~Scene() {
 //===Drawing Functions===
 
 void Scene::draw(){
-	GLuint active_program = programs[active_shading_model];
-	GLuint loc = glGetAttribLocation(active_program, "v_position");
-	glEnableVertexAttribArray(loc);
-	glVertexAttribPointer(loc, 4, GL_FLOAT, GL_FALSE, 0, 0);
+	GLuint active_program = programs[active_shading_method];
+
+
 	glClearColor(0.2, 0.2, 0.2, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -75,9 +74,14 @@ void Scene::loadOBJModel(string fileName)
 
 	int vertex_positions_tot_size = model->faces.size() * 3 * sizeof(vec4);
 	int vertex_normals_tot_size = vertex_positions_tot_size;
+	int face_normals_tot_size = vertex_positions_tot_size;
+
+	/*vec4* vertex_positions = (vec4*)alloca(vertex_positions_tot_size);
+	vec4* vertex_normals = (vec4*)alloca(vertex_normals_tot_size);*/
 
 	vec4* vertex_positions = new vec4[model->faces.size() * 3];
 	vec4* vertex_normals = new vec4[model->faces.size() * 3];
+	vec4* face_normals = new vec4[face_normals_tot_size * 3];
 
 	for (int i = 0; i < model->faces.size(); i++) {
 		vertex_positions[3 * i] = model->vertices[model->faces[i].vertices[0] - 1];
@@ -86,18 +90,22 @@ void Scene::loadOBJModel(string fileName)
 		vertex_normals[3 * i] = model->vertex_normals[model->faces[i].vertices[0] - 1];
 		vertex_normals[(3 * i) + 1] = model->vertex_normals[model->faces[i].vertices[1] - 1];
 		vertex_normals[(3 * i) + 2] = model->vertex_normals[model->faces[i].vertices[2] - 1];
+		face_normals[3 * i] = model->face_normals[model->faces[i].normal];
+		face_normals[(3 * i) + 1] = model->face_normals[model->faces[i].normal];
+		face_normals[(3 * i) + 2] = model->face_normals[model->faces[i].normal];
 	}
 
 	GLuint vbo;
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	//glBufferData(GL_ARRAY_BUFFER, model->faces.size()*3*sizeof(vec4), vertex_positions, GL_STATIC_DRAW);
 	glBufferData(GL_ARRAY_BUFFER, vertex_positions_tot_size + vertex_normals_tot_size, NULL, GL_STATIC_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, vertex_positions_tot_size, vertex_positions);
 	glBufferSubData(GL_ARRAY_BUFFER, vertex_positions_tot_size, vertex_normals_tot_size, vertex_normals);
+	glBufferSubData(GL_ARRAY_BUFFER, vertex_positions_tot_size + vertex_normals_tot_size, face_normals_tot_size, face_normals);
 
 	delete[] vertex_positions;
 	delete[] vertex_normals;
+	delete[] face_normals;
 }
 
 void Scene::loadPrimModel() {
