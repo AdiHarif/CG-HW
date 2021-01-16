@@ -9,16 +9,12 @@
 
 using namespace std;
 
-
-
-
 vec3 vec3fFromStream(std::istream & aStream)
 {
 	float x, y, z;
 	aStream >> x >> std::ws >> y >> std::ws >> z;
 	return vec3(x, y, z);
 }
-
 
 vec2 vec2fFromStream(std::istream & aStream)
 {

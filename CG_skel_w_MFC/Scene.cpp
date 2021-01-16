@@ -75,14 +75,9 @@ void Scene::loadOBJModel(string fileName)
 }
 
 void Scene::loadPrimModel() {
-	GLuint vao;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
 
-	//glUseProgram(gl_info.program);
-
-	//PrimMeshModel* model = new PrimMeshModel();
-	//models.push_back(model);
+	PrimMeshModel* model = new PrimMeshModel();
+	models.push_back(model);
 	activateLastModel();
 }
 
