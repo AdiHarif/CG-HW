@@ -26,7 +26,7 @@ void main()
 	vec4 face_ambient_color = vec4(0, 0, 0, 1);
 	vec4 face_diffuse_color = vec4(0, 0.5, 0, 1);
 	
-	vec4 light_dir = vec4(0, 1, 0, 1);
+	vec4 face_to_light_dir = vec4(0, -1, 0, 1); //vector from face to light
 	vec4 light_color = vec4(0, 0.6, 0, 1);
 	//-------------
 	
@@ -35,7 +35,7 @@ void main()
 
 	
 	//calculate diffuse:
-	float factor = clamp(dot(normalize(tr_f_normal), normalize(light_dir)), 0, 1);
+	float factor = clamp(dot(normalize(tr_f_normal), normalize(face_to_light_dir)), 0, 1);
 	final_diffuse_color += (face_diffuse_color * light_color)*factor;
 	
 	color = face_emit_color + final_ambient_color + final_diffuse_color;
