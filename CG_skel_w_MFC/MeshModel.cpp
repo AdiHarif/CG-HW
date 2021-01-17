@@ -51,8 +51,10 @@ void MeshModel::loadFile(string fileName)
 	vector<Face> faces;
 	vector<Vertex> vertices;
 	vector<Normal> vertex_normals;
+	vector<Normal> vertex_textures;
 	vector<Normal> face_normals;
 	vector<Edge> bb_edges;
+	vector<vec2> textures;
 
 
 	ifstream ifile(fileName.c_str());
@@ -87,13 +89,16 @@ void MeshModel::loadFile(string fileName)
 		else if (lineType == "vn") {
 			vertex_normals.push_back(vec4fFromStream(issLine));
 		}
+		else if (lineType == "vt") {
+			textures.push_back(vec2fFromStream(issLine));
+		}
 		else if (lineType == "#" || lineType == "")
 		{
 			// comment / empty line
 		}
 		else
 		{
-			cout<< "Found unknown line Type \"" << lineType << "\"";
+			cout<< "Found unknown line Type \"" << lineType << "\"\n";
 		}
 	}
 	
@@ -141,17 +146,22 @@ void MeshModel::loadFile(string fileName)
 	vec4* vertex_positions_buff = new vec4[faces.size() * 3];
 	vec4* vertex_normals_buff = new vec4[faces.size() * 3];
 	vec4* face_normals_buff = new vec4[faces.size() * 3];
+	vec2* vertex_textures_buff = new vec2[faces.size() * 3];
 
 	for (int i = 0; i < faces.size(); i++) {
 		vertex_positions_buff[3 * i] = vertices[faces[i].vertices[0] - 1];
 		vertex_positions_buff[(3 * i) + 1] = vertices[faces[i].vertices[1] - 1];
 		vertex_positions_buff[(3 * i) + 2] = vertices[faces[i].vertices[2] - 1];
+
 		vertex_normals_buff[3 * i] = vertex_normals[faces[i].vertices[0] - 1];
 		vertex_normals_buff[(3 * i) + 1] = vertex_normals[faces[i].vertices[1] - 1];
 		vertex_normals_buff[(3 * i) + 2] = vertex_normals[faces[i].vertices[2] - 1];
+
 		face_normals_buff[3 * i] = face_normals[faces[i].normal];
 		face_normals_buff[(3 * i) + 1] = face_normals[faces[i].normal];
 		face_normals_buff[(3 * i) + 2] = face_normals[faces[i].normal];
+
+		//vertex_textures_buff[3  * i] = textures[]
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbos[BT_VERTICES]);

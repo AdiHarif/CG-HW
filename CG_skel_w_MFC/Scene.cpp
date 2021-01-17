@@ -67,21 +67,15 @@ void Scene::draw(){
 
 void Scene::loadOBJModel(string fileName)
 {
-
 	MeshModel *model = new MeshModel(fileName);
-
 	bindAttributesToFlatShader(model);
-
 	models.push_back(model);
 	activateLastModel();
 }
 
 void Scene::loadPrimModel() {
-
 	PrimMeshModel* model = new PrimMeshModel();
-
 	bindAttributesToFlatShader(model);
-
 	models.push_back(model);
 	activateLastModel();
 }
