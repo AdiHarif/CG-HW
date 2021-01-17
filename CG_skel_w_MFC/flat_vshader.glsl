@@ -13,20 +13,21 @@ uniform mat4 n_transform;
 void main()
 {
     gl_Position = v_transform * v_position;
-    vec4 tr_f_normal = n_transform * f_normal;
+
+    vec4 tr_f_normal = normalize(n_transform * f_normal);
 
     vec4 final_ambient_color = vec4(0,0,0,0);
 	vec4 final_diffuse_color = vec4(0,0,0,0);
 
 	//delete these later, add them as input
 	//-------------
-	vec4 scene_ambient_color = vec4(0.2, 0, 0, 1);
-	vec4 face_emit_color = vec4(0, 0, 0.1, 1);
-	vec4 face_ambient_color = vec4(1, 0, 0.2, 1);
-	vec4 face_diffuse_color = vec4(0.2, 0, 0.8, 1);
+	vec4 scene_ambient_color = vec4(0, 0, 0, 1);
+	vec4 face_emit_color = vec4(0, 0, 0, 1);
+	vec4 face_ambient_color = vec4(0, 0, 0, 1);
+	vec4 face_diffuse_color = vec4(0, 0.5, 0, 1);
 	
-	vec4 light_dir = vec4(0, 0, 1, 1);
-	vec4 light_color = vec4(0.1, 0.1, 0.2, 1);
+	vec4 light_dir = vec4(0, 1, 0, 1);
+	vec4 light_color = vec4(0, 0.6, 0, 1);
 	//-------------
 	
 	//calculate ambient:
@@ -34,10 +35,7 @@ void main()
 
 	
 	//calculate diffuse:
-	float factor = dot(normalize(tr_f_normal), normalize(light_dir));
-	if(factor<0){
-		factor=0;
-	}
+	float factor = clamp(dot(normalize(tr_f_normal), normalize(light_dir)), 0, 1);
 	final_diffuse_color += (face_diffuse_color * light_color)*factor;
 	
 	color = face_emit_color + final_ambient_color + final_diffuse_color;

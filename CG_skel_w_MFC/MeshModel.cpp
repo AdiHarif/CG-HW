@@ -124,11 +124,12 @@ void MeshModel::loadFile(string fileName)
 		v1 = vertices[f.vertices[1] - 1];
 		v2 = vertices[f.vertices[2] - 1];
 
-		f.calcCenter(v0, v1, v2); 
+		f.calcCenter(v0, v1, v2);
 
 		vec4 e0 = v1 - v0;
-		vec4 e1 = v2 - v1;
-		Normal n = cross(e0, e1);
+		vec4 e1 = v1 - v2;
+		Normal n = cross(normalize(e0), normalize(e1));
+		//Normal n = normalize(vertex_normals[f.vertices[0] - 1] + vertex_normals[f.vertices[1] - 1] + vertex_normals[f.vertices[2] - 1]);
 		face_normals.push_back(n);
 		faces[i].normal = i;
 
@@ -174,7 +175,7 @@ void MeshModel::loadFile(string fileName)
 	glBufferSubData(GL_ARRAY_BUFFER, 0, vertex_positions_tot_size, vertex_positions_buff);
 	glBufferSubData(GL_ARRAY_BUFFER, vertex_positions_tot_size, vertex_normals_tot_size, vertex_normals_buff);
 	glBufferSubData(GL_ARRAY_BUFFER, vertex_positions_tot_size + vertex_normals_tot_size, face_normals_tot_size, face_normals_buff);
-	//glBufferSubData(GL_ARRAY_BUFFER, vertex_positions_tot_size + vertex_normals_tot_size, face_normals_tot_size, vertex_textures_buff);
+	glBufferSubData(GL_TEXTURE_BUFFER, vertex_positions_tot_size + vertex_normals_tot_size, face_normals_tot_size, vertex_textures_buff);
 
 	//glBindBuffer(GL_ARRAY_BUFFER, vbos[BT_NORMALS]);
 	//gl
