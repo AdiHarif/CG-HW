@@ -303,13 +303,13 @@ void editActiveModelColor() {
 			//do nothing
 		}
 		else {
-			MeshModel* model = dynamic_cast<MeshModel*>(m);
+			/*MeshModel* model = dynamic_cast<MeshModel*>(m);
 			for (vector<Face>::iterator i = (*model->getFaces()).begin(); i != (*model->getFaces()).end(); i++) {
 				i->setEmitColor(emit_color);
 				i->setAmbientColor(ambient_color);
 				i->setDiffuseColor(diffuse_color);
 				i->setSpecularColor(specular_color);
-			}
+			}*/
 		}
 	}
 }
@@ -655,6 +655,7 @@ int my_main(int argc, char** argv)
 	glutInitContextVersion(3, 2);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 	glutCreateWindow("I AM GLUT");
+	glEnable(GL_DEPTH_TEST);
 	glewExperimental = GL_TRUE;
 	glewInit();
 	GLenum err = glewInit();
@@ -677,7 +678,6 @@ int my_main(int argc, char** argv)
 	glutMotionFunc(motion);
 	glutReshapeFunc(reshape);
 	initMenu();
-
 
 	glutMainLoop();
 	delete scene;

@@ -31,21 +31,34 @@ vec4 vec4fFromStream(std::istream& aStream) {
 	return vec4(vec3fFromStream(aStream));
 }
 
-MeshModel::MeshModel(string fileName)
+MeshModel::MeshModel(string file_name)
 {
-	loadFile(fileName);
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
+
+	glGenBuffers(BUFFERS_COUNT, vbos);
+
+	if (file_name != "") {
+		loadFile(file_name);
+	}
+	
 }
 
 MeshModel::~MeshModel(void)
 {
-	//delete[] vertex_positions;
+	//TODO: delete openGL buffers related to this model
 }
 
 void MeshModel::loadFile(string fileName)
 {
 	vec4 min, max;
+	vector<Face> faces;
+	vector<Vertex> vertices;
+	vector<Normal> vertex_normals;
+	vector<Normal> face_normals;
+	vector<Edge> bb_edges;
+
+
 	ifstream ifile(fileName.c_str());
 	// while not end of file
 	while (!ifile.eof())
@@ -69,14 +82,14 @@ void MeshModel::loadFile(string fileName)
 			max.x = (std::max)(max.x, cur_v.x);
 			max.y = (std::max)(max.y, cur_v.y);
 			max.z = (std::max)(max.z, cur_v.z);
-			this->vertices.push_back(cur_v);
+			vertices.push_back(cur_v);
 			
 		}
 		else if (lineType == "f"){ 
 			faces.push_back(issLine);
 		} 
 		else if (lineType == "vn") {
-			this->vertex_normals.push_back(vec4fFromStream(issLine));
+			vertex_normals.push_back(vec4fFromStream(issLine));
 		}
 		else if (lineType == "#" || lineType == "")
 		{
@@ -123,6 +136,42 @@ void MeshModel::loadFile(string fileName)
 		faces[i].specular_color = specular_color;
 		faces[i].emit_color = emit_color;
 	}
+
+
+	int vertex_positions_tot_size = faces.size() * 3 * sizeof(vec4);
+	int vertex_normals_tot_size = vertex_positions_tot_size;
+	int face_normals_tot_size = vertex_positions_tot_size;
+
+	vec4* vertex_positions_buff = new vec4[faces.size() * 3];
+	vec4* vertex_normals_buff = new vec4[faces.size() * 3];
+	vec4* face_normals_buff = new vec4[faces.size() * 3];
+
+	for (int i = 0; i < faces.size(); i++) {
+		vertex_positions_buff[3 * i] = vertices[faces[i].vertices[0] - 1];
+		vertex_positions_buff[(3 * i) + 1] = vertices[faces[i].vertices[1] - 1];
+		vertex_positions_buff[(3 * i) + 2] = vertices[faces[i].vertices[2] - 1];
+		vertex_normals_buff[3 * i] = vertex_normals[faces[i].vertices[0] - 1];
+		vertex_normals_buff[(3 * i) + 1] = vertex_normals[faces[i].vertices[1] - 1];
+		vertex_normals_buff[(3 * i) + 2] = vertex_normals[faces[i].vertices[2] - 1];
+		face_normals_buff[3 * i] = face_normals[faces[i].normal];
+		face_normals_buff[(3 * i) + 1] = face_normals[faces[i].normal];
+		face_normals_buff[(3 * i) + 2] = face_normals[faces[i].normal];
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbos[BT_VERTICES]);
+	glBufferData(GL_ARRAY_BUFFER, vertex_positions_tot_size + vertex_normals_tot_size + face_normals_tot_size, NULL, GL_STATIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, vertex_positions_tot_size, vertex_positions_buff);
+	glBufferSubData(GL_ARRAY_BUFFER, vertex_positions_tot_size, vertex_normals_tot_size, vertex_normals_buff);
+	glBufferSubData(GL_ARRAY_BUFFER, vertex_positions_tot_size + vertex_normals_tot_size, face_normals_tot_size, face_normals_buff);
+
+	//glBindBuffer(GL_ARRAY_BUFFER, vbos[BT_NORMALS]);
+	//gl
+
+	delete[] vertex_positions_buff;
+	delete[] vertex_normals_buff;
+	delete[] face_normals_buff;
+
+	faces_count = faces.size();
 }
 
 void MeshModel::translate(vec4 v, bool f_world_frame) {
@@ -226,32 +275,31 @@ void MeshModel::rotateZ(GLfloat theta, bool f_world_frame) {
 //}
 
 vec4 MeshModel::getPosition(){ 
-	//return position; 
 	return tw * tm * vec4(0, 0, 0, 1);
 }
 
-vector<Face>* MeshModel::getFaces() {
-	return &faces;
-}
+//vector<Face>* MeshModel::getFaces() {
+//	return &faces;
+//}
 
 void MeshModel::initBoundingBox(vec4 min, vec4 max) {
-	vector<Vertex> bb_vertices;
-	//bottom face:
-	bb_vertices.push_back(vec4(min.x, min.y, min.z));
-	bb_vertices.push_back(vec4(max.x, min.y, min.z));
-	bb_vertices.push_back(vec4(max.x, max.y, min.z));
-	bb_vertices.push_back(vec4(min.x, max.y, min.z));
-	//upper face:
-	bb_vertices.push_back(vec4(min.x, min.y, max.z));
-	bb_vertices.push_back(vec4(max.x, min.y, max.z));
-	bb_vertices.push_back(vec4(max.x, max.y, max.z));
-	bb_vertices.push_back(vec4(min.x, max.y, max.z));
+	//vector<Vertex> bb_vertices;
+	////bottom face:
+	//bb_vertices.push_back(vec4(min.x, min.y, min.z));
+	//bb_vertices.push_back(vec4(max.x, min.y, min.z));
+	//bb_vertices.push_back(vec4(max.x, max.y, min.z));
+	//bb_vertices.push_back(vec4(min.x, max.y, min.z));
+	////upper face:
+	//bb_vertices.push_back(vec4(min.x, min.y, max.z));
+	//bb_vertices.push_back(vec4(max.x, min.y, max.z));
+	//bb_vertices.push_back(vec4(max.x, max.y, max.z));
+	//bb_vertices.push_back(vec4(min.x, max.y, max.z));
 
-	for (int i = 0; i < 4; i++) {
-		bb_edges.push_back(Edge(bb_vertices[i], bb_vertices[(i + 1)%4]));
-		bb_edges.push_back(Edge(bb_vertices[i+4], bb_vertices[((i+1)%4)+4]));
-		bb_edges.push_back(Edge(bb_vertices[i], bb_vertices[i + 4]));
-	}
+	//for (int i = 0; i < 4; i++) {
+	//	bb_edges.push_back(Edge(bb_vertices[i], bb_vertices[(i + 1)%4]));
+	//	bb_edges.push_back(Edge(bb_vertices[i+4], bb_vertices[((i+1)%4)+4]));
+	//	bb_edges.push_back(Edge(bb_vertices[i], bb_vertices[i + 4]));
+	//}
 }
 
 void MeshModel::togglePolyMode() {
@@ -288,13 +336,19 @@ void MeshModel::draw(mat4 tpc, GLuint program) {
 
 	GLuint f_normal_loc = glGetAttribLocation(program, "f_normal");
 	glEnableVertexAttribArray(f_normal_loc);
-	glVertexAttribPointer(f_normal_loc, 4, GL_FLOAT, GL_TRUE, 0, (GLvoid*)(faces.size() * 3 * sizeof(vec4)));
+	glVertexAttribPointer(f_normal_loc, 4, GL_FLOAT, GL_TRUE, 0, (GLvoid*)(2 * faces_count * 3 * sizeof(vec4)));
+
 
 	mat4 vt = tpc * tw * tm;
+	mat4 nt = ntw * ntm;
 
 	glBindVertexArray(vao);
 	GLuint vt_loc = glGetUniformLocation(program, "v_transform");
 	glUniformMatrix4fv(vt_loc, 1, GL_TRUE, vt);
+
+	GLuint nt_loc = glGetUniformLocation(program, "n_transform");
+	glUniformMatrix4fv(nt_loc, 1, GL_TRUE, nt);
+
 	switch (draw_pref.poly_mode) {
 	case DrawPref::VERTICES_ONLY: {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
@@ -309,7 +363,7 @@ void MeshModel::draw(mat4 tpc, GLuint program) {
 		break;
 	}
 	}
-	glDrawArrays(GL_TRIANGLES, 0, faces.size() * 3);
+	glDrawArrays(GL_TRIANGLES, 0, faces_count * 3);
 	//glDrawArrays(GL_LINE, faces.size() * 3, faces.size() * 3);
 	glFlush();
 
