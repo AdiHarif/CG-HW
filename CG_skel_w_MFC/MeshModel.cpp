@@ -128,7 +128,7 @@ void MeshModel::loadFile(string fileName)
 
 		vec4 e0 = v1 - v0;
 		vec4 e1 = v1 - v2;
-		Normal n = cross(normalize(e0), normalize(e1));
+		Normal n = normalize(cross(normalize(e0), normalize(e1)));
 		//Normal n = normalize(vertex_normals[f.vertices[0] - 1] + vertex_normals[f.vertices[1] - 1] + vertex_normals[f.vertices[2] - 1]);
 		face_normals.push_back(n);
 		faces[i].normal = i;
