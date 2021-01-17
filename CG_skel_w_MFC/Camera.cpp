@@ -216,11 +216,11 @@ void Camera::ortho(const float left, const float right,
     projection = p_ortho;
 
     mat4 t = translateMat(-(right + left) / 2, -(bottom + top) / 2, -(z_near + z_far) / 2);
-    mat4 s = scaleMat(2 / (right - left), 2 / (top - bottom), 2 / (z_near - z_far));
+    mat4 s = scaleMat(2 / (right - left), 2 / (top - bottom), -2 / (z_near - z_far));
     tp = s * t;
 
     mat4 ti = translateMat((right + left) / 2, (bottom + top) / 2, (z_near + z_far) / 2);
-    mat4 si = scaleMat((right - left)/2, (top - bottom)/2, (z_near - z_far)/2);
+    mat4 si = scaleMat((right - left)/2, (top - bottom)/2, -(z_near - z_far)/2);
     tpn = transpose(ti * si);
 }
 
@@ -241,7 +241,7 @@ void Camera::frustum(const float left, const float right,
     mat4 h;
     h[0][2] = (left + right) / 2;
     h[1][2] = (top + bottom) / 2;
-    mat4 s = scaleMat((2 * z_near) / (right - left), (2 * z_near) / (top - bottom), 1.0);
+    mat4 s = scaleMat((2 * z_near) / (right - left), -(2 * z_near) / (top - bottom), 1.0);
     mat4 n;
     n[2][2] = (z_near + z_far) / (z_near - z_far);
     n[2][3] = (2 * z_near * z_far) / (z_far-z_near);
@@ -252,7 +252,7 @@ void Camera::frustum(const float left, const float right,
     mat4 hi;
     hi[0][2] = -(left + right) / 2;
     hi[1][2] = -(top + bottom) / 2;
-    mat4 si = scaleMat((right - left)/(2 * z_near),  (top - bottom)/ (2 * z_near) , 1.0);
+    mat4 si = scaleMat((right - left)/(2 * z_near), -(top - bottom)/ (2 * z_near) , 1.0);
     mat4 ni;
     ni[2][2] = 0;
     ni[2][3] = 1;
