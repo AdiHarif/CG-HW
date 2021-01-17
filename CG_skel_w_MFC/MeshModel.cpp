@@ -162,9 +162,11 @@ void MeshModel::loadFile(string fileName)
 		face_normals_buff[(3 * i) + 1] = face_normals[faces[i].normal];
 		face_normals_buff[(3 * i) + 2] = face_normals[faces[i].normal];
 
-		vertex_textures_buff[3 * i] = textures[faces[i].textures[0] - 1];
-		vertex_textures_buff[(3 * i) + 1] = textures[faces[i].textures[1] - 1];
-		vertex_textures_buff[(3 * i) + 2] = textures[faces[i].textures[2] - 1];
+		if (textures.size() > 0) {
+			vertex_textures_buff[3 * i] = textures[faces[i].textures[0] - 1];
+			vertex_textures_buff[(3 * i) + 1] = textures[faces[i].textures[1] - 1];
+			vertex_textures_buff[(3 * i) + 2] = textures[faces[i].textures[2] - 1];
+		}
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbos[BT_VERTICES]);
@@ -172,7 +174,7 @@ void MeshModel::loadFile(string fileName)
 	glBufferSubData(GL_ARRAY_BUFFER, 0, vertex_positions_tot_size, vertex_positions_buff);
 	glBufferSubData(GL_ARRAY_BUFFER, vertex_positions_tot_size, vertex_normals_tot_size, vertex_normals_buff);
 	glBufferSubData(GL_ARRAY_BUFFER, vertex_positions_tot_size + vertex_normals_tot_size, face_normals_tot_size, face_normals_buff);
-	glBufferSubData(GL_ARRAY_BUFFER, vertex_positions_tot_size + vertex_normals_tot_size, face_normals_tot_size + vertex_textures_tot_size, vertex_textures_buff);
+	//glBufferSubData(GL_ARRAY_BUFFER, vertex_positions_tot_size + vertex_normals_tot_size, face_normals_tot_size, vertex_textures_buff);
 
 	//glBindBuffer(GL_ARRAY_BUFFER, vbos[BT_NORMALS]);
 	//gl
