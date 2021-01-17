@@ -25,10 +25,11 @@ Scene::Scene() {
 	addCamera(def_cam);
 
 	ambient_light_color = { 0.1, 0.1, 0.1 };
-	parallel_sources.push_back(ParallelSource("Point Light 0", vec3(0.0, 0.0, -1.0), { 0.3, 0.1, 0.1 }));
+	parallel_sources.push_back(ParallelSource("Parallel Light 0", vec3(0.0, 0.0, -1.0), { 0.3, 0.1, 0.1 }));
 	point_sources.push_back(PointSource("Point Light 0", vec3(1.5, 1.5, 1.5), { 1, 1, 1 }));
 
 	programs[FLAT_SHADING] = InitShader("flat_vshader.glsl", "flat_fshader.glsl");
+	programs[GOURAUD_SHADING] = InitShader("gouraud_vshader.glsl", "gouraud_fshader.glsl");
 	//TODO: add initializing of other shaders
 	active_shading_method = FLAT_SHADING;
 	glUseProgram(programs[active_shading_method]);
@@ -288,6 +289,10 @@ void Scene::toggleLights() {
 	f_draw_lights = !f_draw_lights;
 }
 
+void Scene::toggleShadingMethod() {
+	active_shading_method = ShadingMethod((active_shading_method + 1) % 3);
+	glUseProgram(programs[active_shading_method]);
+}
 
 //==========
 

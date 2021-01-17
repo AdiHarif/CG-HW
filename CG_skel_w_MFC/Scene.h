@@ -80,6 +80,7 @@ public:
 	void toggleFaceNormals();
 	void toggleCameras();
 	void toggleLights();
+	void toggleShadingMethod();
 	//==========
 
 	//===Cameras Interface===
