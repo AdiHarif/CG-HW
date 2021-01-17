@@ -48,7 +48,6 @@ Scene::~Scene() {
 void Scene::draw(){
 	GLuint active_program = programs[active_shading_method];
 
-
 	glClearColor(0.2, 0.2, 0.2, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
