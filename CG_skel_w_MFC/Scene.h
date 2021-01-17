@@ -122,4 +122,8 @@ public:
 	void addParallelSource(ParallelSource parallel_source);
 	void addPointSource(PointSource point_source);
 	//==========
+
+	//===OpenGL===
+	void bindAttributesToFlatShader(MeshModel* model);
+	//==========
 };

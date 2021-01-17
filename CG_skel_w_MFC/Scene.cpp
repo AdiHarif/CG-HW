@@ -69,6 +69,9 @@ void Scene::loadOBJModel(string fileName)
 {
 
 	MeshModel *model = new MeshModel(fileName);
+
+	bindAttributesToFlatShader(model);
+
 	models.push_back(model);
 	activateLastModel();
 }
@@ -76,6 +79,9 @@ void Scene::loadOBJModel(string fileName)
 void Scene::loadPrimModel() {
 
 	PrimMeshModel* model = new PrimMeshModel();
+
+	bindAttributesToFlatShader(model);
+
 	models.push_back(model);
 	activateLastModel();
 }
@@ -409,4 +415,19 @@ void Scene::addPointSource(PointSource point_source) {
 }
 
 //====
+//==========
+
+
+//===OpenGL===
+
+void Scene::bindAttributesToFlatShader(MeshModel* model) {
+	GLuint vertex_loc = glGetAttribLocation(programs[active_shading_method], "v_position");
+	glEnableVertexAttribArray(vertex_loc);
+	glVertexAttribPointer(vertex_loc, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+	GLuint f_normal_loc = glGetAttribLocation(programs[active_shading_method], "f_normal");
+	glEnableVertexAttribArray(f_normal_loc);
+	glVertexAttribPointer(f_normal_loc, 4, GL_FLOAT, GL_TRUE, 0, (GLvoid*)(2 * model->faces_count * 3 * sizeof(vec4)));
+}
+
 //==========

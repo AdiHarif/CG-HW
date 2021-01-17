@@ -326,13 +326,7 @@ void MeshModel::deactivate() {
 }
 
 void MeshModel::draw(mat4 tpc, GLuint program) {
-	GLuint vertex_loc = glGetAttribLocation(program, "v_position");
-	glEnableVertexAttribArray(vertex_loc);
-	glVertexAttribPointer(vertex_loc, 4, GL_FLOAT, GL_FALSE, 0, 0);
-
-	GLuint f_normal_loc = glGetAttribLocation(program, "f_normal");
-	glEnableVertexAttribArray(f_normal_loc);
-	glVertexAttribPointer(f_normal_loc, 4, GL_FLOAT, GL_TRUE, 0, (GLvoid*)(2 * faces_count * 3 * sizeof(vec4)));
+	
 
 
 	mat4 vt = tpc * tw * tm;

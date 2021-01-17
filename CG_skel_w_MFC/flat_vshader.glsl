@@ -25,7 +25,7 @@ void main()
 	vec4 face_ambient_color = vec4(1, 0, 0.2, 1);
 	vec4 face_diffuse_color = vec4(0.2, 0, 0.5, 1);
 	
-	vec4 light_dir = vec4(1, 1, 1, 1);
+	vec4 light_dir = vec4(0, 0, 0, 1);
 	vec4 light_color = vec4(0.1, 0.1, 0.2, 1);	
 	//-------------
 	
