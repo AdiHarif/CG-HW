@@ -25,7 +25,6 @@ typedef enum {
 class MeshModel : public Model
 {
 protected :
-	MeshModel() {}
 
 	/*vector<Face> faces;
 	vector<Vertex> vertices;
