@@ -468,6 +468,7 @@ void special(int key, int x, int y) {
 		scene->togglePolyMode();
 		break;
 	case GLUT_KEY_F2:
+		scene->toggleShadingMethod();
 		break;
 	case GLUT_KEY_F3:
 		scene->toggleBB();
@@ -483,9 +484,6 @@ void special(int key, int x, int y) {
 		break;
 	case GLUT_KEY_F7:
 		scene->toggleLights();
-		break;
-	case GLUT_KEY_F8:
-		scene->toggleShadingMethod();
 		break;
 	}
 	scene->draw();
@@ -659,6 +657,7 @@ int my_main(int argc, char** argv)
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 	glutCreateWindow("I AM GLUT");
 	glEnable(GL_DEPTH_TEST);
+	//GL_DEPTH_MASK - write/dont write to z-buffer
 	glewExperimental = GL_TRUE;
 	glewInit();
 	GLenum err = glewInit();

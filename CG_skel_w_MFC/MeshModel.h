@@ -5,7 +5,7 @@
 #include <string>
 #include "Color.h"
 
-#define BUFFERS_COUNT 2
+#define BUFFERS_COUNT 4
 
 using namespace std;
 
@@ -19,7 +19,9 @@ typedef struct s_draw_pref {
 
 typedef enum {
 	BT_VERTICES = 0,
-	BT_NORMALS = 1
+	BT_VERTEX_NORMALS = 1,
+	BT_FACE_NORMALS = 2,
+	BT_TEXTURES = 3
 } BufferType;
 
 class MeshModel : public Model

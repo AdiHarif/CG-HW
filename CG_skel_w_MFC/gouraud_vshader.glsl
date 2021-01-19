@@ -1,6 +1,5 @@
 #version 150
 
-
 in vec4 v_position;
 in vec4 v_normal;
 
@@ -53,11 +52,11 @@ void main()
 	r = normalize(r);
 	dir_to_camera.w = 0;
 	dir_to_camera = normalize(dir_to_camera);
-	float tmp = (r * dir_to_camera);
+	float tmp = dot(r, dir_to_camera);
 	factor = pow(max(0, tmp),1/shininess);
-	specular_color += (face_specular_color * light_color_2) * factor;
+	final_specular_color += (face_specular_color * light_color_2) * factor;
 
 	
 	color = face_emit_color + final_ambient_color + final_diffuse_color + final_specular_color;
-	color.w = 0;
+	color.w = 1;
 }

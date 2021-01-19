@@ -125,6 +125,7 @@ public:
 	//==========
 
 	//===OpenGL===
-	void bindAttributesToFlatShader(MeshModel* model);
+	void Scene::bindAttributesToProgram(MeshModel* model, GLuint program);
+	//void bindAttributesToGouraudShader(MeshModel* model);
 	//==========
 };

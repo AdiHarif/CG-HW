@@ -13,8 +13,9 @@ uniform mat4 n_transform;
 void main()
 {
     gl_Position = v_transform * v_position;
-
-    vec4 tr_f_normal = normalize(n_transform * f_normal);
+	vec4 f_normal_tmp = vec4(f_normal.xyz, 0);
+    vec4 tr_f_normal = normalize(n_transform * f_normal_tmp);
+	//vec4 tr_f_normal = normalize(n_transform * f_normal);
 
     vec4 final_ambient_color = vec4(0,0,0,0);
 	vec4 final_diffuse_color = vec4(0,0,0,0);

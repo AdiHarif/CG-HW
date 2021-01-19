@@ -54,6 +54,7 @@ void Scene::draw(){
 	Camera* active_camera = getActiveCamera();
 	mat4 tpc = active_camera->tp * active_camera->tc;
 	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
+		bindAttributesToProgram((MeshModel*)*i, active_program);
 		(*i)->draw(tpc, active_program);
 	}
 
@@ -68,14 +69,12 @@ void Scene::draw(){
 void Scene::loadOBJModel(string fileName)
 {
 	MeshModel *model = new MeshModel(fileName);
-	bindAttributesToFlatShader(model);
 	models.push_back(model);
 	activateLastModel();
 }
 
 void Scene::loadPrimModel() {
 	PrimMeshModel* model = new PrimMeshModel();
-	bindAttributesToFlatShader(model);
 	models.push_back(model);
 	activateLastModel();
 }
@@ -289,7 +288,7 @@ void Scene::toggleLights() {
 }
 
 void Scene::toggleShadingMethod() {
-	active_shading_method = ShadingMethod((active_shading_method + 1) % 3);
+	active_shading_method = ShadingMethod((active_shading_method + 1) % 2);
 	glUseProgram(programs[active_shading_method]);
 }
 
@@ -418,14 +417,27 @@ void Scene::addPointSource(PointSource point_source) {
 
 //===OpenGL===
 
-void Scene::bindAttributesToFlatShader(MeshModel* model) {
-	GLuint vertex_loc = glGetAttribLocation(programs[active_shading_method], "v_position");
+void Scene::bindAttributesToProgram(MeshModel* model, GLuint program) {
+	glBindVertexArray(model->vao);
+	glBindBuffer(GL_ARRAY_BUFFER, model->vbos[BT_VERTICES]);
+	GLuint vertex_loc = glGetAttribLocation(program, "v_position");
 	glEnableVertexAttribArray(vertex_loc);
 	glVertexAttribPointer(vertex_loc, 4, GL_FLOAT, GL_FALSE, 0, 0);
 
-	GLuint f_normal_loc = glGetAttribLocation(programs[active_shading_method], "f_normal");
+	glBindBuffer(GL_ARRAY_BUFFER, model->vbos[BT_VERTEX_NORMALS]);
+	GLuint v_normal_loc = glGetAttribLocation(programs[program], "v_normal");
+	glEnableVertexAttribArray(v_normal_loc);
+	glVertexAttribPointer(v_normal_loc, 4, GL_FLOAT, GL_TRUE, 0, 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, model->vbos[BT_FACE_NORMALS]);
+	GLuint f_normal_loc = glGetAttribLocation(program, "f_normal");
 	glEnableVertexAttribArray(f_normal_loc);
-	glVertexAttribPointer(f_normal_loc, 4, GL_FLOAT, GL_TRUE, 0, (GLvoid*)(2 * model->faces_count * 3 * sizeof(vec4)));
+	glVertexAttribPointer(f_normal_loc, 4, GL_FLOAT, GL_TRUE, 0, 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, model->vbos[BT_TEXTURES]);
+	GLuint texture_loc = glGetAttribLocation(programs[program], "texture");
+	glEnableVertexAttribArray(texture_loc);
+	glVertexAttribPointer(texture_loc, 4, GL_FLOAT, GL_TRUE, 0, 0);
 }
 
 //==========
