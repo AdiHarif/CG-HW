@@ -53,10 +53,21 @@ void Scene::draw(){
 
 	Camera* active_camera = getActiveCamera();
 	mat4 tpc = active_camera->tp * active_camera->tc;
+	//base color:
 	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
 		bindAttributesToProgram((MeshModel*)*i, active_program);
 		(*i)->draw(tpc, active_program);
 	}
+
+	//lighting:
+
+	//parallel lights:
+	//for (vector<ParallelSource>::iterator i = parallel_sources.begin(); i != parallel_sources.end(); i++) {
+	//	for (vector<Model*>::iterator j = models.begin(); j != models.end(); j++) {
+	//		bindAttributesToProgram((MeshModel*)*j, active_program);
+	//		(*j)->draw(tpc, active_program);
+	//	}
+	//}
 
 	glutSwapBuffers();
 }
