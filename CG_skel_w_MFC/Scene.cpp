@@ -419,25 +419,17 @@ void Scene::addPointSource(PointSource point_source) {
 
 void Scene::bindAttributesToProgram(MeshModel* model, GLuint program) {
 	glBindVertexArray(model->vao);
-	glBindBuffer(GL_ARRAY_BUFFER, model->vbos[BT_VERTICES]);
-	GLuint vertex_loc = glGetAttribLocation(program, "v_position");
-	glEnableVertexAttribArray(vertex_loc);
-	glVertexAttribPointer(vertex_loc, 4, GL_FLOAT, GL_FALSE, 0, 0);
+	bindAttributeToProgram(model, program, model->vbos[BT_VERTICES], "v_position", GL_FALSE);
+	bindAttributeToProgram(model, program, model->vbos[BT_VERTEX_NORMALS], "v_normal", GL_TRUE);
+	bindAttributeToProgram(model, program, model->vbos[BT_FACE_NORMALS], "f_normal", GL_TRUE);
+	bindAttributeToProgram(model, program, model->vbos[BT_TEXTURES], "texture", GL_FALSE);
+}
 
-	glBindBuffer(GL_ARRAY_BUFFER, model->vbos[BT_VERTEX_NORMALS]);
-	GLuint v_normal_loc = glGetAttribLocation(program, "v_normal");
-	glEnableVertexAttribArray(v_normal_loc);
-	glVertexAttribPointer(v_normal_loc, 4, GL_FLOAT, GL_TRUE, 0, 0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, model->vbos[BT_FACE_NORMALS]);
-	GLuint f_normal_loc = glGetAttribLocation(program, "f_normal");
-	glEnableVertexAttribArray(f_normal_loc);
-	glVertexAttribPointer(f_normal_loc, 4, GL_FLOAT, GL_TRUE, 0, 0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, model->vbos[BT_TEXTURES]);
-	GLuint texture_loc = glGetAttribLocation(program, "texture");
-	glEnableVertexAttribArray(texture_loc);
-	glVertexAttribPointer(texture_loc, 4, GL_FLOAT, GL_TRUE, 0, 0);
+void Scene::bindAttributeToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized) {
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	GLuint loc = glGetAttribLocation(program, variable_name);
+	glEnableVertexAttribArray(loc);
+	glVertexAttribPointer(loc, 4, GL_FLOAT, is_normalized, 0, 0);
 }
 
 //==========

@@ -126,6 +126,7 @@ public:
 
 	//===OpenGL===
 	void Scene::bindAttributesToProgram(MeshModel* model, GLuint program);
+	void Scene::bindAttributeToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized);
 	//void bindAttributesToGouraudShader(MeshModel* model);
 	//==========
 };
