@@ -425,7 +425,7 @@ void Scene::bindAttributesToProgram(MeshModel* model, GLuint program) {
 	glVertexAttribPointer(vertex_loc, 4, GL_FLOAT, GL_FALSE, 0, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, model->vbos[BT_VERTEX_NORMALS]);
-	GLuint v_normal_loc = glGetAttribLocation(programs[program], "v_normal");
+	GLuint v_normal_loc = glGetAttribLocation(program, "v_normal");
 	glEnableVertexAttribArray(v_normal_loc);
 	glVertexAttribPointer(v_normal_loc, 4, GL_FLOAT, GL_TRUE, 0, 0);
 
@@ -435,7 +435,7 @@ void Scene::bindAttributesToProgram(MeshModel* model, GLuint program) {
 	glVertexAttribPointer(f_normal_loc, 4, GL_FLOAT, GL_TRUE, 0, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, model->vbos[BT_TEXTURES]);
-	GLuint texture_loc = glGetAttribLocation(programs[program], "texture");
+	GLuint texture_loc = glGetAttribLocation(program, "texture");
 	glEnableVertexAttribArray(texture_loc);
 	glVertexAttribPointer(texture_loc, 4, GL_FLOAT, GL_TRUE, 0, 0);
 }
