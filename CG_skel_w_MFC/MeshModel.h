@@ -76,7 +76,7 @@ public:
 	void activate();
 	void deactivate();
 
-	void draw(mat4 tpc, GLuint program);
+	void draw();
 
 	friend class Scene;
 };

@@ -376,17 +376,7 @@ void MeshModel::deactivate() {
 	mesh_color = vertex_normals_color = face_normals_color = bb_color = INACTIVE_GRAY;
 }
 
-void MeshModel::draw(mat4 tpc, GLuint program) {
-	mat4 vt = tpc * tw * tm;
-	mat4 nt = ntw * ntm;
-
-	glBindVertexArray(vao);
-	GLuint vt_loc = glGetUniformLocation(program, "v_transform");
-	glUniformMatrix4fv(vt_loc, 1, GL_TRUE, vt);
-
-	GLuint nt_loc = glGetUniformLocation(program, "n_transform");
-	glUniformMatrix4fv(nt_loc, 1, GL_TRUE, nt);
-
+void MeshModel::draw() {
 	switch (draw_pref.poly_mode) {
 	case DrawPref::VERTICES_ONLY: {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);

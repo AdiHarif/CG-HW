@@ -28,7 +28,7 @@ void main()
 	vec4 face_diffuse_color = vec4(0, 0.5, 0, 1);
 	
 	vec4 face_to_light_dir = vec4(0, -1, 0, 1); //vector from face to light
-	vec4 light_color = vec4(0, 0.6, 0, 1);
+	vec4 light_color = vec4(0, 1, 0, 1);
 	//-------------
 	
 	//calculate ambient:

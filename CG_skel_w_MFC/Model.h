@@ -33,6 +33,6 @@ public:
 	GLfloat getShininess() { return shininess; }
 	void setShininess(GLfloat s) { shininess = s; }
 
-	virtual void draw(mat4 camera_transform, GLuint program) = 0;
+	virtual void draw() = 0;
 
 };
