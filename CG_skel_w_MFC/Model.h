@@ -4,10 +4,10 @@
 
 class Model {
 protected:
+	Color emit_color = { 0.0, 0.0, 0.1 };
 	Color ambient_color = PURPLE;
 	Color diffuse_color = WHITE;
 	Color specular_color = YELLOW;
-	Color emit_color = { 0.0, 0.0, 0.1 };
 
 	//GLfloat specular_reflection;
 	//GLfloat diffuse_reflection;
@@ -33,6 +33,7 @@ public:
 	GLfloat getShininess() { return shininess; }
 	void setShininess(GLfloat s) { shininess = s; }
 
-	virtual void draw(mat4 camera_transform, GLuint program) = 0;
+	virtual void draw() = 0;
 
+	friend class Scene;
 };

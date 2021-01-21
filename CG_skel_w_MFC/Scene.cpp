@@ -18,6 +18,9 @@ Camera* Scene::getActiveCamera() {
 //===C'tors / Destructors===
 
 Scene::Scene() {
+
+	glBlendFunc(GL_ONE, GL_ONE);
+
 	active_model = NO_MODELS_ACTIVE;
 
 	active_camera = -1;
@@ -25,14 +28,16 @@ Scene::Scene() {
 	addCamera(def_cam);
 
 	ambient_light_color = { 0.1, 0.1, 0.1 };
-	parallel_sources.push_back(ParallelSource("Parallel Light 0", vec3(0.0, 0.0, -1.0), { 0.3, 0.1, 0.1 }));
+	parallel_sources.push_back(ParallelSource("Parallel Light 0", vec3(0.0, 0.0, -1.0), { 0.1, 0.1, 0.1 }));
 	point_sources.push_back(PointSource("Point Light 0", vec3(1.5, 1.5, 1.5), { 1, 1, 1 }));
 
-	programs[FLAT_SHADING] = InitShader("flat_vshader.glsl", "flat_fshader.glsl");
-	programs[GOURAUD_SHADING] = InitShader("gouraud_vshader.glsl", "gouraud_fshader.glsl");
+	ambient_programs[AMBIENT] = InitShader("ambient_vshader.glsl", "ambient_fshader.glsl");
+	active_ambient_method = AMBIENT;
+
+	shading_programs[FLAT_SHADING] = InitShader("flat_vshader.glsl", "flat_fshader.glsl");
+	shading_programs[GOURAUD_SHADING] = InitShader("gouraud_vshader.glsl", "gouraud_fshader.glsl");
 	//TODO: add initializing of other shaders
 	active_shading_method = FLAT_SHADING;
-	glUseProgram(programs[active_shading_method]);
 }
 
 Scene::~Scene() {
@@ -46,17 +51,33 @@ Scene::~Scene() {
 //===Drawing Functions===
 
 void Scene::draw(){
-	GLuint active_program = programs[active_shading_method];
+	GLuint active_program = shading_programs[active_shading_method];
 
 	glClearColor(0.2, 0.2, 0.2, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	Camera* active_camera = getActiveCamera();
-	mat4 tpc = active_camera->tp * active_camera->tc;
-	//base color:
 	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
-		bindAttributesToProgram((MeshModel*)*i, active_program);
-		(*i)->draw(tpc, active_program);
+		
+		setupAmbientProgram((MeshModel*)*i);
+		(*i)->draw();
+
+		//here would be the for loop going through lights
+
+		glEnable(GL_BLEND);
+		glDepthFunc(GL_EQUAL);
+
+		for (vector<ParallelSource>::iterator j = parallel_sources.begin(); j != parallel_sources.end(); j++) {
+			setupShadingProgram((MeshModel*)*i, &(ParallelSource)*j);
+			(*i)->draw();
+		}
+		for (vector<PointSource>::iterator j = point_sources.begin(); j != point_sources.end(); j++) {
+			setupShadingProgram((MeshModel*)*i, &(PointSource)*j);
+			(*i)->draw();
+		}
+
+
+		glDisable(GL_BLEND);
+		glDepthFunc(GL_LESS);
 	}
 
 	//lighting:
@@ -299,8 +320,8 @@ void Scene::toggleLights() {
 }
 
 void Scene::toggleShadingMethod() {
-	active_shading_method = ShadingMethod((active_shading_method + 1) % 2);
-	glUseProgram(programs[active_shading_method]);
+	active_shading_method = ShadingMethod((active_shading_method + 1) % 2);//SHADING_METHODS_COUNT);
+	//glUseProgram(programs[active_shading_method]);
 }
 
 //==========
@@ -428,15 +449,105 @@ void Scene::addPointSource(PointSource point_source) {
 
 //===OpenGL===
 
-void Scene::bindAttributesToProgram(MeshModel* model, GLuint program) {
-	glBindVertexArray(model->vao);
-	bindAttributeToProgram(model, program, model->vbos[BT_VERTICES], "v_position", GL_FALSE);
-	bindAttributeToProgram(model, program, model->vbos[BT_VERTEX_NORMALS], "v_normal", GL_TRUE);
-	bindAttributeToProgram(model, program, model->vbos[BT_FACE_NORMALS], "f_normal", GL_TRUE);
-	bindAttributeToProgram(model, program, model->vbos[BT_TEXTURES], "texture", GL_FALSE);
+void Scene::setupAmbientProgram(MeshModel* m) {
+
+	glBindVertexArray(m->vao);
+	GLuint program = ambient_programs[active_ambient_method];
+	glUseProgram(program);
+
+	Camera* c = cameras[active_camera];
+
+	mat4 vt = c->tp * c->tc * m->tw * m->tm;
+
+	GLuint vt_loc = glGetUniformLocation(program, "v_transform");
+	glUniformMatrix4fv(vt_loc, 1, GL_TRUE, vt);
+
+	switch (active_ambient_method) {
+	case AMBIENT:
+		bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
+		break;
+	case TEXTURE:
+		//TODO: implement
+		break;
+	}
 }
 
-void Scene::bindAttributeToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized) {
+void Scene::setupShadingProgram(MeshModel* m, Light* l) { // TODO: add face colors
+
+	glBindVertexArray(m->vao);
+	GLuint program = shading_programs[active_shading_method];
+	glUseProgram(program);
+
+	Camera* c = cameras[active_camera];
+
+	mat4 vt = c->tp * c->tc * m->tw * m->tm;
+	mat4 nt = m->ntw * m->ntm;
+
+	GLuint vt_loc = glGetUniformLocation(program, "v_transform");
+	glUniformMatrix4fv(vt_loc, 1, GL_TRUE, vt);
+
+	GLuint nt_loc = glGetUniformLocation(program, "n_transform");
+	glUniformMatrix4fv(nt_loc, 1, GL_TRUE, nt);
+
+	vec4 light_color = vec4(l->getColor().r, l->getColor().g, l->getColor().b, 1);
+	GLuint light_color_loc = glGetUniformLocation(program, "light_color");
+	glUniform4fv(light_color_loc, 1, light_color);
+
+	PointSource* poi_s = dynamic_cast<PointSource*>(l);
+	if (poi_s) {
+		GLuint light_pos_loc = glGetUniformLocation(program, "light_pos");
+		glUniform4fv(light_pos_loc, 1, vec4(poi_s->getPosition(), 1));
+
+		GLuint is_point_source_loc = glGetUniformLocation(program, "is_point_source");
+		glUniform1i(is_point_source_loc, GL_TRUE);
+	}
+
+	ParallelSource* par_s = dynamic_cast<ParallelSource*>(l);
+	if (par_s) {
+		GLuint light_dir_loc = glGetUniformLocation(program, "light_dir");
+		glUniform4fv(light_dir_loc, 1, vec4(par_s->getDirection(), 1));
+
+		GLuint is_point_source_loc = glGetUniformLocation(program, "is_point_source");
+		glUniform1i(is_point_source_loc, GL_FALSE);
+	}
+
+	GLuint camera_pos_loc = glGetUniformLocation(program, "camera_pos");
+	glUniform4fv(camera_pos_loc, 1, c->position);
+
+	vec4 model_diffuse_color = vec4(m->diffuse_color.r, m->diffuse_color.g, m->diffuse_color.b, 1);
+	GLuint model_diffuse_color_loc = glGetUniformLocation(program, "model_diffuse_color");
+	glUniform4fv(model_diffuse_color_loc, 1, model_diffuse_color);
+
+	vec4 model_specular_color = vec4(m->specular_color.r, m->specular_color.g, m->specular_color.b, 1);
+	GLuint model_specular_color_loc = glGetUniformLocation(program, "model_specular_color");
+	glUniform4fv(model_specular_color_loc, 1, model_specular_color);
+
+	GLuint shininess_loc = glGetUniformLocation(program, "shininess");
+	glUniform1f(shininess_loc, m->shininess);
+
+	switch (active_shading_method) {
+	case FLAT_SHADING:
+		bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
+		bindBufferToProgram(m, program, m->vbos[BT_FACE_NORMALS], "f_normal", GL_TRUE);
+		break;
+	case GOURAUD_SHADING:
+		//TODO: implement
+		break;
+	case PHONG_SHADING:
+		//TODO: implement
+		break;
+	}
+}
+
+//void Scene::bindAttributesToProgram(MeshModel* model, GLuint program) {
+//	glBindVertexArray(model->vao);
+//	bindAttributeToProgram(model, program, model->vbos[BT_VERTICES], "v_position", GL_FALSE);
+//	bindAttributeToProgram(model, program, model->vbos[BT_VERTEX_NORMALS], "v_normal", GL_TRUE);
+//	bindAttributeToProgram(model, program, model->vbos[BT_FACE_NORMALS], "f_normal", GL_TRUE);
+//	bindAttributeToProgram(model, program, model->vbos[BT_TEXTURES], "texture", GL_FALSE);
+//}
+
+void Scene::bindBufferToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized) {
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	GLuint loc = glGetAttribLocation(program, variable_name);
 	glEnableVertexAttribArray(loc);

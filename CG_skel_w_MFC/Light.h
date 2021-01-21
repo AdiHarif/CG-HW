@@ -30,6 +30,7 @@ public:
 
 
 	friend ParallelSource operator*(mat4 m, ParallelSource light);
+	friend class Scene;
 };
 
 class PointSource : public Light {
@@ -43,4 +44,5 @@ public:
 	vec3 getDirectionToPoint(Vertex to);
 
 	friend PointSource operator*(mat4 m, PointSource light);
+	friend class Scene;
 };

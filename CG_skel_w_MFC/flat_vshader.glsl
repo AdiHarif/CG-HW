@@ -4,21 +4,22 @@
 in vec4 v_position;
 in vec4 f_normal;
 
-in vec4 face_diffuse_color;
-in vec4 face_specular_color;
-in float shininess;
 
-in vec4 light_color;
-in vec4 light_pos;
-in vec4 light_dir;
-in vec4 camera_pos;
+uniform vec4 model_diffuse_color;
+uniform vec4 model_specular_color;
+uniform float shininess;
 
-in bool is_point_source;
-
-out vec4 color;
+uniform vec4 light_color;
+uniform vec4 light_pos;
+uniform vec4 light_dir;
+uniform vec4 camera_pos;
+uniform bool is_point_source;
 
 uniform mat4 v_transform;
 uniform mat4 n_transform;
+
+
+out vec4 color;
 
 void main()
 {	
@@ -26,33 +27,38 @@ void main()
 	vec4 f_normal = vec4(f_normal.xyz, 0);
     vec4 tr_f_normal = normalize(n_transform * f_normal);
 
+	vec4 actual_light_dir;
 
-	//caculate light dir:
+	//caculate actual light dir:
 	if(is_point_source){
-		light_dir = light_pos - gl_Position;
+		actual_light_dir = light_pos - gl_Position;
+	}
+	else{
+		actual_light_dir = light_dir;
 	}
 
+	actual_light_dir.w = 0;
 
 	//calculate diffuse:
-	float factor = clamp(dot(normalize(tr_f_normal), normalize(face_to_light_dir)), 0, 1);
-	vec4 diffuse_color = (face_diffuse_color * light_color)*factor;
+	float diffuse_factor = clamp(dot(normalize(tr_f_normal), normalize(actual_light_dir)), 0, 1);
+	vec4 diffuse_color = (model_diffuse_color * light_color)*diffuse_factor;
 
 
 	//calculate dir to camera:
 	vec4 dir_to_camera = camera_pos - gl_Position;
 
 	//calculate specular:
-	vec4 l = -normalize(light_dir);
+	vec4 l = -normalize(actual_light_dir);
 	l.w = 0;
 	vec4 n = f_normal;
-	vec4 r = 2 * (l * n) * n - l;
+	vec4 r = 2 * dot(l, n) * n - l;
 	r.w = 0;
 	r = normalize(r);
 	dir_to_camera.w = 0;
 	dir_to_camera = normalize(dir_to_camera);
-	float tmp = (r * dir_to_camera);
-	float factor = pow(max(0, tmp),1/shininess);
-	specular_color = (face_specular_color * light_color) * factor;
+	float tmp = dot(r, dir_to_camera);
+	float specular_factor = pow(max(0, tmp),1/shininess);
+	vec4 specular_color = (model_specular_color * light_color) * specular_factor;
 	
 
 	color = diffuse_color + specular_color;

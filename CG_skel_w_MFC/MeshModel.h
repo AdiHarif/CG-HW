@@ -18,10 +18,10 @@ typedef struct s_draw_pref {
 
 
 typedef enum {
-	BT_VERTICES = 0,
-	BT_VERTEX_NORMALS = 1,
-	BT_FACE_NORMALS = 2,
-	BT_TEXTURES = 3
+	BT_VERTICES,
+	BT_VERTEX_NORMALS,
+	BT_FACE_NORMALS,
+	BT_TEXTURES
 } BufferType;
 
 class MeshModel : public Model
@@ -76,7 +76,7 @@ public:
 	void activate();
 	void deactivate();
 
-	void draw(mat4 tpc, GLuint program);
+	void draw();
 
 	friend class Scene;
 };

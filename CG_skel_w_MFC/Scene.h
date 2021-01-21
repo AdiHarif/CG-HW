@@ -13,19 +13,30 @@
 #define ALL_MODELS_ACTIVE -1
 #define NO_MODELS_ACTIVE -2
 
+#define AMBIENT_METHODS_COUNT 2
+#define SHADING_METHODS_COUNT 3
+
 using namespace std;
 
 typedef enum {
-	FLAT_SHADING = 0,
-	GOURAUD_SHADING = 1,
-	PHONG_SHADING = 2,
+	AMBIENT,
+	TEXTURE
+} AmbientMethod;
+
+typedef enum {
+	FLAT_SHADING,
+	GOURAUD_SHADING,
+	PHONG_SHADING
 } ShadingMethod;
 
 class Scene {
 	
+
+	AmbientMethod active_ambient_method;
 	ShadingMethod active_shading_method;
 
-	GLuint programs[3];
+	GLuint ambient_programs[AMBIENT_METHODS_COUNT];
+	GLuint shading_programs[SHADING_METHODS_COUNT];
 	
 	vector<Model*> models;
 	int active_model;
@@ -125,8 +136,12 @@ public:
 	//==========
 
 	//===OpenGL===
-	void Scene::bindAttributesToProgram(MeshModel* model, GLuint program);
-	void Scene::bindAttributeToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized);
+	//void Scene::bindAttributesToProgram(MeshModel* model, GLuint program);
+	void setupAmbientProgram(MeshModel* model);
+	void setupShadingProgram(MeshModel* model, Light* l);
+	void bindBufferToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized);
+	//void bindAttributeToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized);
+
 	//void bindAttributesToGouraudShader(MeshModel* model);
 	//==========
 };
