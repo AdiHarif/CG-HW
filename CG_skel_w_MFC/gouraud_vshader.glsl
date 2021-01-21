@@ -1,62 +1,66 @@
 #version 150
 
+
 in vec4 v_position;
 in vec4 v_normal;
 
-out vec4 color;
+
+uniform vec4 model_diffuse_color;
+uniform vec4 model_specular_color;
+uniform float shininess;
+
+uniform vec4 light_color;
+uniform vec4 light_pos;
+uniform vec4 light_dir;
+uniform vec4 camera_pos;
+uniform bool is_point_source;
 
 uniform mat4 v_transform;
 uniform mat4 n_transform;
 
 
+out vec4 color;
+
 void main()
 {
     gl_Position = v_transform * v_position;
-
+	vec4 v_normal = vec4(v_normal.xyz, 0);
     vec4 tr_v_normal = normalize(n_transform * v_normal);
 
-    vec4 final_ambient_color = vec4(0,0,0,0);
-	vec4 final_diffuse_color = vec4(0,0,0,0);
-	vec4 final_specular_color = vec4(0,0,0,0);
+	vec4 actual_light_dir;
 
-	//delete these later, add them as input
-	//-------------
-	vec4 scene_ambient_color = vec4(0, 0, 0, 1);
-	vec4 face_emit_color = vec4(0, 0, 0, 1);
-	vec4 face_ambient_color = vec4(0, 0, 0, 1);
-	vec4 face_diffuse_color = vec4(0, 0.5, 0, 1);
-	vec4 face_specular_color = vec4(0.5, 0.5, 0, 1);
-	
-	vec4 light_dir_1 = vec4(0, 1, 0, 1);
-	vec4 light_color_1 = vec4(0, 0.6, 0, 1);
-	vec4 light_pos_2 = vec4(1, 0, 0, 1);
-	vec4 light_color_2 = vec4(0, 0.6, 0, 1);
-	vec4 dir_to_camera = vec4(0, 0, 1, 0);
-	float shininess = 0.3;
-	//-------------
-	
-	//calculate ambient:
-	final_ambient_color += scene_ambient_color * face_ambient_color;
+	//caculate actual light dir:
+	if(is_point_source){
+		actual_light_dir = light_pos - gl_Position;
+	}
+	else{
+		actual_light_dir = light_dir;
+	}
 
-	
+	actual_light_dir.w = 0;
+
 	//calculate diffuse:
-	float factor = clamp(dot(normalize(tr_v_normal), normalize(light_dir_1)), 0, 1);
-	final_diffuse_color += (face_diffuse_color * light_color_1)*factor;
-	
-	
+	float diffuse_factor = clamp(dot(normalize(tr_v_normal), normalize(actual_light_dir)), 0, 1);
+	vec4 diffuse_color = (model_diffuse_color * light_color)*diffuse_factor;
+
+
+	//calculate dir to camera:
+	vec4 dir_to_camera = camera_pos - gl_Position;
+
 	//calculate specular:
-	vec4 l = -normalize(gl_Position - light_pos_2);
+	vec4 l = normalize(actual_light_dir);
 	l.w = 0;
-	vec4 r = 2 * (l * tr_v_normal) * tr_v_normal - l;
+	vec4 n = v_normal;
+	vec4 r = 2 * dot(l, n) * n - l;
 	r.w = 0;
 	r = normalize(r);
 	dir_to_camera.w = 0;
 	dir_to_camera = normalize(dir_to_camera);
 	float tmp = dot(r, dir_to_camera);
-	factor = pow(max(0, tmp),1/shininess);
-	final_specular_color += (face_specular_color * light_color_2) * factor;
-
+	float specular_factor = pow(max(0, tmp),1/shininess);
+	vec4 specular_color = (model_specular_color * light_color) * specular_factor;
 	
-	color = face_emit_color + final_ambient_color + final_diffuse_color + final_specular_color;
+
+	color = diffuse_color + specular_color;
 	color.w = 1;
 }

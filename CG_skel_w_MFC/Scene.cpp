@@ -28,7 +28,7 @@ Scene::Scene() {
 	addCamera(def_cam);
 
 	ambient_light_color = { 0.1, 0.1, 0.1 };
-	parallel_sources.push_back(ParallelSource("Parallel Light 0", vec3(0.0, 0.0, -1.0), { 0.1, 0.1, 0.1 }));
+	parallel_sources.push_back(ParallelSource("Parallel Light 0", vec3(0.0, 1.0, 0.0), { 0.4, 0, 0 }));
 	point_sources.push_back(PointSource("Point Light 0", vec3(1.5, 1.5, 1.5), { 1, 1, 1 }));
 
 	ambient_programs[AMBIENT] = InitShader("ambient_vshader.glsl", "ambient_fshader.glsl");
@@ -531,7 +531,8 @@ void Scene::setupShadingProgram(MeshModel* m, Light* l) { // TODO: add face colo
 		bindBufferToProgram(m, program, m->vbos[BT_FACE_NORMALS], "f_normal", GL_TRUE);
 		break;
 	case GOURAUD_SHADING:
-		//TODO: implement
+		bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
+		bindBufferToProgram(m, program, m->vbos[BT_VERTEX_NORMALS], "v_normal", GL_TRUE);
 		break;
 	case PHONG_SHADING:
 		//TODO: implement

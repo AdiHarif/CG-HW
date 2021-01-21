@@ -7,7 +7,7 @@ protected:
 	Color emit_color = { 0.0, 0.0, 0.1 };
 	Color ambient_color = PURPLE;
 	Color diffuse_color = WHITE;
-	Color specular_color = YELLOW;
+	Color specular_color = WHITE;
 
 	//GLfloat specular_reflection;
 	//GLfloat diffuse_reflection;

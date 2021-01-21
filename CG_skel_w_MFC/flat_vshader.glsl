@@ -22,7 +22,7 @@ uniform mat4 n_transform;
 out vec4 color;
 
 void main()
-{	
+{
     gl_Position = v_transform * v_position;
 	vec4 f_normal = vec4(f_normal.xyz, 0);
     vec4 tr_f_normal = normalize(n_transform * f_normal);
@@ -47,19 +47,22 @@ void main()
 	//calculate dir to camera:
 	vec4 dir_to_camera = camera_pos - gl_Position;
 
-	//calculate specular:
-	vec4 l = -normalize(actual_light_dir);
-	l.w = 0;
-	vec4 n = f_normal;
-	vec4 r = 2 * dot(l, n) * n - l;
-	r.w = 0;
-	r = normalize(r);
-	dir_to_camera.w = 0;
-	dir_to_camera = normalize(dir_to_camera);
-	float tmp = dot(r, dir_to_camera);
-	float specular_factor = pow(max(0, tmp),1/shininess);
-	vec4 specular_color = (model_specular_color * light_color) * specular_factor;
-	
+	vec4 specular_color = vec4(0, 0, 0, 1);
+
+	if(is_point_source){
+		//calculate specular:
+		vec4 l = normalize(actual_light_dir);
+		l.w = 0;
+		vec4 n = f_normal;
+		vec4 r = 2 * dot(l, n) * n - l;
+		r.w = 0;
+		r = normalize(r);
+		dir_to_camera.w = 0;
+		dir_to_camera = normalize(dir_to_camera);
+		float tmp = dot(r, dir_to_camera);
+		float specular_factor = pow(max(0, tmp),1/shininess);
+		specular_color = (model_specular_color * light_color) * specular_factor;
+	}
 
 	color = diffuse_color + specular_color;
 	color.w = 1;
