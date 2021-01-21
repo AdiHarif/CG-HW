@@ -68,6 +68,7 @@ public:
 
 	//===Models Interface===
 	void loadOBJModel(string fileName);
+	void loadTexture(string fileName);
 	void loadPrimModel();
 	void loadNonUniform();
 	void removeSelection();
@@ -92,6 +93,7 @@ public:
 	void toggleCameras();
 	void toggleLights();
 	void toggleShadingMethod();
+	void toggleAmbientMethod();
 	//==========
 
 	//===Cameras Interface===

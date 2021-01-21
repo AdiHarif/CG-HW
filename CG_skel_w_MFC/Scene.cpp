@@ -29,10 +29,11 @@ Scene::Scene() {
 
 	ambient_light_color = { 0.1, 0.1, 0.1 };
 	parallel_sources.push_back(ParallelSource("Parallel Light 0", vec3(0.0, 1.0, 0.0), { 0.4, 0, 0 }));
-	point_sources.push_back(PointSource("Point Light 0", vec3(1.5, 1.5, 1.5), { 1, 1, 1 }));
+	point_sources.push_back(PointSource("Point Light 0", vec3(4, 4, 4), { 1, 1, 1 }));
 	//point_sources.push_back(PointSource("Point Light 1", vec3(-1, 0, 0), { 0, 0, 1 }));
 
 	ambient_programs[AMBIENT] = InitShader("ambient_vshader.glsl", "ambient_fshader.glsl");
+	ambient_programs[TEXTURE] = InitShader("texture_vshader.glsl", "texture_fshader.glsl");
 	active_ambient_method = AMBIENT;
 
 	shading_programs[FLAT_SHADING] = InitShader("flat_vshader.glsl", "flat_fshader.glsl");
@@ -105,6 +106,14 @@ void Scene::loadOBJModel(string fileName)
 	MeshModel *model = new MeshModel(fileName);
 	models.push_back(model);
 	activateLastModel();
+}
+
+void Scene::loadTexture(string fileName) {
+	if (active_model == NO_MODELS_ACTIVE)	return;
+	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
+		MeshModel* m = dynamic_cast<MeshModel*>(*i);
+		m->setTexture(fileName.c_str());
+	}
 }
 
 void Scene::loadPrimModel() {
@@ -326,6 +335,10 @@ void Scene::toggleShadingMethod() {
 	//glUseProgram(programs[active_shading_method]);
 }
 
+void Scene::toggleAmbientMethod() {
+	active_ambient_method = AmbientMethod((active_ambient_method + 1) % AMBIENT_METHODS_COUNT);
+}
+
 //==========
 
 
@@ -464,12 +477,16 @@ void Scene::setupAmbientProgram(MeshModel* m) {
 	GLuint vt_loc = glGetUniformLocation(program, "v_transform");
 	glUniformMatrix4fv(vt_loc, 1, GL_TRUE, vt);
 
+	GLuint model_texture_loc = glGetUniformLocation(program, "modelTexture");
+	glUniform1i(model_texture_loc, 0);
+
+
 	switch (active_ambient_method) {
 	case AMBIENT:
 		bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
 		break;
 	case TEXTURE:
-		//TODO: implement
+		glBindTexture(GL_TEXTURE_2D, m->vto);
 		break;
 	}
 }

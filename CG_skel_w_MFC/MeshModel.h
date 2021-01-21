@@ -4,6 +4,7 @@
 #include "mat.h"
 #include <string>
 #include "Color.h"
+#include "stb_image.h"
 
 #define BUFFERS_COUNT 4
 
@@ -48,8 +49,8 @@ protected :
 	DrawPref draw_pref;
 
 	GLuint vao;
-
 	GLuint vbos[BUFFERS_COUNT];
+	GLuint vto;
 
 	int faces_count;
 
@@ -57,6 +58,7 @@ public:
 	explicit MeshModel(string fileName = "");
 	~MeshModel(void);
 	void loadFile(string fileName);
+	void setTexture(const char* file_name);
 	void initBoundingBox(vec4 min, vec4 max);
 
 	void translate(vec4, bool f_world_frame = true);

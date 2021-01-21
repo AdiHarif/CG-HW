@@ -30,9 +30,10 @@
 #define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
 
 #define MODEL_MENU_OPEN_FILE 1
-#define MODEL_MENU_ADD_PRIMITIVE 2
-#define MODEL_MENU_ADD_NON_UNIFORM 3
-#define MODEL_MENU_TRANSFORM_ACTIVE_MODEL 4
+#define MODEL_MENU_OPEN_TEXTURE 2
+#define MODEL_MENU_ADD_PRIMITIVE 3
+#define MODEL_MENU_ADD_NON_UNIFORM 4
+#define MODEL_MENU_TRANSFORM_ACTIVE_MODEL 5
 #define CAMERA_MENU_ADD_CAMERA 1
 #define CAMERA_MENU_EDIT_ACTIVE_CAMERA 2
 #define LIGHT_MENU_ADD_LIGHT 1
@@ -485,6 +486,9 @@ void special(int key, int x, int y) {
 	case GLUT_KEY_F7:
 		scene->toggleLights();
 		break;
+	case GLUT_KEY_F8:
+		scene->toggleAmbientMethod();
+		break;
 	}
 	scene->draw();
 }
@@ -519,6 +523,13 @@ void modelsMenuCB(int id) {
 		{
 			std::string s((LPCTSTR)dlg.GetPathName());
 			scene->loadOBJModel((LPCTSTR)dlg.GetPathName());
+		}
+		break;
+	case MODEL_MENU_OPEN_TEXTURE:
+		if (dlg.DoModal() == IDOK)
+		{
+			std::string s((LPCTSTR)dlg.GetPathName());
+			scene->loadTexture((LPCTSTR)dlg.GetPathName());
 		}
 		break;
 	case MODEL_MENU_ADD_PRIMITIVE:
@@ -621,6 +632,7 @@ void initMenu()
 {
 	int modelsMenu = glutCreateMenu(modelsMenuCB);
 	glutAddMenuEntry("Load Model From a File", MODEL_MENU_OPEN_FILE);
+	glutAddMenuEntry("Load Texture From a File", MODEL_MENU_OPEN_TEXTURE);
 	glutAddMenuEntry("Add Primitive: Cube", MODEL_MENU_ADD_PRIMITIVE);
 	glutAddMenuEntry("Add Primitive: Non-Uniform Weird Dice", MODEL_MENU_ADD_NON_UNIFORM);
 	glutAddMenuEntry("Transform Active Model", MODEL_MENU_TRANSFORM_ACTIVE_MODEL);
