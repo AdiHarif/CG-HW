@@ -30,6 +30,7 @@ Scene::Scene() {
 	ambient_light_color = { 0.1, 0.1, 0.1 };
 	parallel_sources.push_back(ParallelSource("Parallel Light 0", vec3(0.0, 1.0, 0.0), { 0.4, 0, 0 }));
 	point_sources.push_back(PointSource("Point Light 0", vec3(1.5, 1.5, 1.5), { 1, 1, 1 }));
+	//point_sources.push_back(PointSource("Point Light 1", vec3(-1, 0, 0), { 0, 0, 1 }));
 
 	ambient_programs[AMBIENT] = InitShader("ambient_vshader.glsl", "ambient_fshader.glsl");
 	active_ambient_method = AMBIENT;
@@ -525,13 +526,14 @@ void Scene::setupShadingProgram(MeshModel* m, Light* l) { // TODO: add face colo
 	GLuint shininess_loc = glGetUniformLocation(program, "shininess");
 	glUniform1f(shininess_loc, m->shininess);
 
+
+	bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
+
 	switch (active_shading_method) {
 	case FLAT_SHADING:
-		bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
 		bindBufferToProgram(m, program, m->vbos[BT_FACE_NORMALS], "f_normal", GL_TRUE);
 		break;
 	case GOURAUD_SHADING:
-		bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
 		bindBufferToProgram(m, program, m->vbos[BT_VERTEX_NORMALS], "v_normal", GL_TRUE);
 		break;
 	case PHONG_SHADING:

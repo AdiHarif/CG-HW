@@ -151,9 +151,9 @@ void MeshModel::loadFile(string fileName)
 		vertex_positions_buff[(3 * i) + 1] = vertices[faces[i].vertices[1] - 1];
 		vertex_positions_buff[(3 * i) + 2] = vertices[faces[i].vertices[2] - 1];
 
-		vertex_normals_buff[3 * i] = vertex_normals[faces[i].vertices[0] - 1];
-		vertex_normals_buff[(3 * i) + 1] = vertex_normals[faces[i].vertices[1] - 1];
-		vertex_normals_buff[(3 * i) + 2] = vertex_normals[faces[i].vertices[2] - 1];
+		vertex_normals_buff[3 * i] = vertex_normals[faces[i].vertex_normals[0] - 1];
+		vertex_normals_buff[(3 * i) + 1] = vertex_normals[faces[i].vertex_normals[1] - 1];
+		vertex_normals_buff[(3 * i) + 2] = vertex_normals[faces[i].vertex_normals[2] - 1];
 
 		face_normals_buff[3 * i] = face_normals[faces[i].normal];
 		face_normals_buff[(3 * i) + 1] = face_normals[faces[i].normal];
@@ -173,27 +173,32 @@ void MeshModel::loadFile(string fileName)
 	//glBufferSubData(GL_ARRAY_BUFFER, vertex_positions_tot_size + vertex_normals_tot_size, face_normals_tot_size, face_normals_buff);
 	//glBufferSubData(GL_TEXTURE_BUFFER, vertex_positions_tot_size + vertex_normals_tot_size, face_normals_tot_size, vertex_textures_buff);
 
-	//glBindBuffer(GL_ARRAY_BUFFER, vbos[BT_NORMALS]);
-	//gl
-	glGenBuffers(1, &vbos[BT_VERTICES]);
-	glBindBuffer(GL_ARRAY_BUFFER, vbos[BT_VERTICES]);
-	glBufferData(GL_ARRAY_BUFFER, vertex_positions_tot_size, 
-		vertex_positions_buff, GL_STATIC_DRAW);
 
-	glGenBuffers(1, &vbos[BT_VERTEX_NORMALS]);
-	glBindBuffer(GL_ARRAY_BUFFER, vbos[BT_VERTEX_NORMALS]);
-	glBufferData(GL_ARRAY_BUFFER, vertex_normals_tot_size,
-		vertex_normals_buff, GL_STATIC_DRAW);
+	//glGenBuffers(1, &vbos[BT_VERTICES]);
+	//glBindBuffer(GL_ARRAY_BUFFER, vbos[BT_VERTICES]);
+	//glBufferData(GL_ARRAY_BUFFER, vertex_positions_tot_size, 
+	//	vertex_positions_buff, GL_STATIC_DRAW);
 
-	glGenBuffers(1, &vbos[BT_FACE_NORMALS]);
-	glBindBuffer(GL_ARRAY_BUFFER, vbos[BT_FACE_NORMALS]);
-	glBufferData(GL_ARRAY_BUFFER, face_normals_tot_size,
-		face_normals_buff, GL_STATIC_DRAW);
+	//glGenBuffers(1, &vbos[BT_VERTEX_NORMALS]);
+	//glBindBuffer(GL_ARRAY_BUFFER, vbos[BT_VERTEX_NORMALS]);
+	//glBufferData(GL_ARRAY_BUFFER, vertex_normals_tot_size,
+	//	vertex_normals_buff, GL_STATIC_DRAW);
 
-	glGenBuffers(1, &vbos[BT_TEXTURES]);
-	glBindBuffer(GL_ARRAY_BUFFER, vbos[BT_TEXTURES]);
-	glBufferData(GL_ARRAY_BUFFER, vertex_textures_tot_size,
-		vertex_textures_buff, GL_STATIC_DRAW);
+	//glGenBuffers(1, &vbos[BT_FACE_NORMALS]);
+	//glBindBuffer(GL_ARRAY_BUFFER, vbos[BT_FACE_NORMALS]);
+	//glBufferData(GL_ARRAY_BUFFER, face_normals_tot_size,
+	//	face_normals_buff, GL_STATIC_DRAW);
+
+	//glGenBuffers(1, &vbos[BT_TEXTURES]);
+	//glBindBuffer(GL_ARRAY_BUFFER, vbos[BT_TEXTURES]);
+	//glBufferData(GL_ARRAY_BUFFER, vertex_textures_tot_size,
+	//	vertex_textures_buff, GL_STATIC_DRAW);
+
+	genVec4ArrayBuffer(BT_VERTICES, vertex_positions_tot_size, vertex_positions_buff);
+	genVec4ArrayBuffer(BT_VERTEX_NORMALS, vertex_normals_tot_size, vertex_normals_buff);
+	genVec4ArrayBuffer(BT_FACE_NORMALS, face_normals_tot_size, face_normals_buff);
+	genVec2ArrayBuffer(BT_TEXTURES, vertex_textures_tot_size, vertex_textures_buff);
+
 
 	//if (has_normals)
 	//{
@@ -394,4 +399,16 @@ void MeshModel::draw() {
 	glDrawArrays(GL_TRIANGLES, 0, faces_count * 3);
 	//glDrawArrays(GL_LINES, faces.size() * 3, faces.size() * 3);
 	glFlush();
+}
+
+void MeshModel::genVec4ArrayBuffer(BufferType bt, int tot_size, vec4* buffer) {
+	glGenBuffers(1, &vbos[bt]);
+	glBindBuffer(GL_ARRAY_BUFFER, vbos[bt]);
+	glBufferData(GL_ARRAY_BUFFER, tot_size,	buffer, GL_STATIC_DRAW);
+}
+
+void MeshModel::genVec2ArrayBuffer(BufferType bt, int tot_size, vec2* buffer) {
+	glGenBuffers(1, &vbos[bt]);
+	glBindBuffer(GL_ARRAY_BUFFER, vbos[bt]);
+	glBufferData(GL_ARRAY_BUFFER, tot_size, buffer, GL_STATIC_DRAW);
 }

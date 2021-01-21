@@ -78,5 +78,7 @@ public:
 
 	void draw();
 
+	void genVec4ArrayBuffer(BufferType bt, int tot_size, vec4* buffer);
+	void genVec2ArrayBuffer(BufferType bt, int tot_size, vec2* buffer);
 	friend class Scene;
 };
