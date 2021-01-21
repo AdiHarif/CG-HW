@@ -48,10 +48,9 @@ void MeshModel::loadFile(string fileName)
 	vector<Face> faces;
 	vector<Vertex> vertices;
 	vector<Normal> vertex_normals;
-	vector<Normal> vertex_textures;
 	vector<Normal> face_normals;
 	vector<Edge> bb_edges;
-	vector<vec2> textures;
+	vector<vec2> vetrex_textures;
 
 
 	ifstream ifile(fileName.c_str());
@@ -87,7 +86,9 @@ void MeshModel::loadFile(string fileName)
 			vertex_normals.push_back(vec4fFromStream(issLine));
 		}
 		else if (lineType == "vt") {
-			textures.push_back(vec2fFromStream(issLine));
+			vec2 tmp = vec2fFromStream(issLine);
+			tmp.y *= -1;
+			vetrex_textures.push_back(tmp);
 		}
 		else if (lineType == "#" || lineType == "")
 		{
@@ -135,7 +136,6 @@ void MeshModel::loadFile(string fileName)
 		faces[i].emit_color = emit_color;
 	}
 
-
 	int vertex_positions_tot_size = faces.size() * 3 * sizeof(vec4);
 	int vertex_normals_tot_size = vertex_positions_tot_size;
 	int face_normals_tot_size = vertex_positions_tot_size;
@@ -159,40 +159,12 @@ void MeshModel::loadFile(string fileName)
 		face_normals_buff[(3 * i) + 1] = face_normals[faces[i].normal];
 		face_normals_buff[(3 * i) + 2] = face_normals[faces[i].normal];
 
-		if (textures.size() > 0) {
-			vertex_textures_buff[3 * i] = textures[faces[i].textures[0] - 1];
-			vertex_textures_buff[(3 * i) + 1] = textures[faces[i].textures[1] - 1];
-			vertex_textures_buff[(3 * i) + 2] = textures[faces[i].textures[2] - 1];
+		if (vetrex_textures.size() > 0) {
+			vertex_textures_buff[3 * i] = vetrex_textures[faces[i].textures[0] - 1];
+			vertex_textures_buff[(3 * i) + 1] = vetrex_textures[faces[i].textures[1] - 1];
+			vertex_textures_buff[(3 * i) + 2] = vetrex_textures[faces[i].textures[2] - 1];
 		}
 	}
-
-	//glBindBuffer(GL_ARRAY_BUFFER, vbos[BT_VERTICES]);
-	//glBufferData(GL_ARRAY_BUFFER, vertex_positions_tot_size + vertex_normals_tot_size + face_normals_tot_size + vertex_textures_tot_size, NULL, GL_STATIC_DRAW);
-	//glBufferSubData(GL_ARRAY_BUFFER, 0, vertex_positions_tot_size, vertex_positions_buff);
-	//glBufferSubData(GL_ARRAY_BUFFER, vertex_positions_tot_size, vertex_normals_tot_size, vertex_normals_buff);
-	//glBufferSubData(GL_ARRAY_BUFFER, vertex_positions_tot_size + vertex_normals_tot_size, face_normals_tot_size, face_normals_buff);
-	//glBufferSubData(GL_TEXTURE_BUFFER, vertex_positions_tot_size + vertex_normals_tot_size, face_normals_tot_size, vertex_textures_buff);
-
-
-	//glGenBuffers(1, &vbos[BT_VERTICES]);
-	//glBindBuffer(GL_ARRAY_BUFFER, vbos[BT_VERTICES]);
-	//glBufferData(GL_ARRAY_BUFFER, vertex_positions_tot_size, 
-	//	vertex_positions_buff, GL_STATIC_DRAW);
-
-	//glGenBuffers(1, &vbos[BT_VERTEX_NORMALS]);
-	//glBindBuffer(GL_ARRAY_BUFFER, vbos[BT_VERTEX_NORMALS]);
-	//glBufferData(GL_ARRAY_BUFFER, vertex_normals_tot_size,
-	//	vertex_normals_buff, GL_STATIC_DRAW);
-
-	//glGenBuffers(1, &vbos[BT_FACE_NORMALS]);
-	//glBindBuffer(GL_ARRAY_BUFFER, vbos[BT_FACE_NORMALS]);
-	//glBufferData(GL_ARRAY_BUFFER, face_normals_tot_size,
-	//	face_normals_buff, GL_STATIC_DRAW);
-
-	//glGenBuffers(1, &vbos[BT_TEXTURES]);
-	//glBindBuffer(GL_ARRAY_BUFFER, vbos[BT_TEXTURES]);
-	//glBufferData(GL_ARRAY_BUFFER, vertex_textures_tot_size,
-	//	vertex_textures_buff, GL_STATIC_DRAW);
 
 	genVec4ArrayBuffer(BT_VERTICES, vertex_positions_tot_size, vertex_positions_buff);
 	genVec4ArrayBuffer(BT_VERTEX_NORMALS, vertex_normals_tot_size, vertex_normals_buff);
