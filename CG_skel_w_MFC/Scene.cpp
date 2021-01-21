@@ -37,6 +37,7 @@ Scene::Scene() {
 
 	shading_programs[FLAT_SHADING] = InitShader("flat_vshader.glsl", "flat_fshader.glsl");
 	shading_programs[GOURAUD_SHADING] = InitShader("gouraud_vshader.glsl", "gouraud_fshader.glsl");
+	shading_programs[PHONG_SHADING] = InitShader("phong_vshader.glsl", "phong_fshader.glsl");
 	//TODO: add initializing of other shaders
 	active_shading_method = FLAT_SHADING;
 }
@@ -321,7 +322,7 @@ void Scene::toggleLights() {
 }
 
 void Scene::toggleShadingMethod() {
-	active_shading_method = ShadingMethod((active_shading_method + 1) % 2);//SHADING_METHODS_COUNT);
+	active_shading_method = ShadingMethod((active_shading_method + 1) % SHADING_METHODS_COUNT);
 	//glUseProgram(programs[active_shading_method]);
 }
 
@@ -537,7 +538,7 @@ void Scene::setupShadingProgram(MeshModel* m, Light* l) { // TODO: add face colo
 		bindBufferToProgram(m, program, m->vbos[BT_VERTEX_NORMALS], "v_normal", GL_TRUE);
 		break;
 	case PHONG_SHADING:
-		//TODO: implement
+		bindBufferToProgram(m, program, m->vbos[BT_VERTEX_NORMALS], "v_normal", GL_TRUE);
 		break;
 	}
 }
