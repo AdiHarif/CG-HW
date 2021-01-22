@@ -77,7 +77,6 @@ void MeshModel::loadFile(string fileName)
 			max.y = (std::max)(max.y, cur_v.y);
 			max.z = (std::max)(max.z, cur_v.z);
 			vertices.push_back(cur_v);
-			
 		}
 		else if (lineType == "f"){ 
 			faces.push_back(issLine);
@@ -306,6 +305,28 @@ vec4 MeshModel::getPosition(){
 //	return &faces;
 //}
 
+void MeshModel::setTexture(const char* file_name) {
+	glActiveTexture(GL_TEXTURE0);
+	glGenTextures(1, &vto);
+	glBindTexture(GL_TEXTURE_2D, vto);
+	// set the texture wrapping/filtering options (on the currently bound texture object)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	// load and generate the texture
+	int width, height, nrChannels;
+	unsigned char* data = stbi_load(file_name, &width, &height, &nrChannels, 0);
+	if (data) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else {
+		std::cout << "Failed to load texture" << std::endl;
+	}
+	stbi_image_free(data);
+}
+
 void MeshModel::initBoundingBox(vec4 min, vec4 max) {
 	//vector<Vertex> bb_vertices;
 	////bottom face:
@@ -369,7 +390,6 @@ void MeshModel::draw() {
 	}
 	}
 	glDrawArrays(GL_TRIANGLES, 0, faces_count * 3);
-	//glDrawArrays(GL_LINES, faces.size() * 3, faces.size() * 3);
 	glFlush();
 }
 
@@ -383,4 +403,9 @@ void MeshModel::genVec2ArrayBuffer(BufferType bt, int tot_size, vec2* buffer) {
 	glGenBuffers(1, &vbos[bt]);
 	glBindBuffer(GL_ARRAY_BUFFER, vbos[bt]);
 	glBufferData(GL_ARRAY_BUFFER, tot_size, buffer, GL_STATIC_DRAW);
+}
+
+void MeshModel::updateHSVColor() {
+	hsv_color.r += (1.0f / 360);
+	if (hsv_color.r > 1)	hsv_color.r = 0;
 }

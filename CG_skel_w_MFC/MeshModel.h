@@ -4,6 +4,7 @@
 #include "mat.h"
 #include <string>
 #include "Color.h"
+#include "stb_image.h"
 
 #define BUFFERS_COUNT 4
 
@@ -48,14 +49,15 @@ protected :
 	DrawPref draw_pref;
 
 	GLuint vao;
-
 	GLuint vbos[BUFFERS_COUNT];
+	GLuint vto;
 
 	int faces_count;
 
 public:
 	explicit MeshModel(string fileName = "");
 	~MeshModel(void);
+	void setTexture(const char* file_name);
 	void loadFile(string fileName);
 	void initBoundingBox(vec4 min, vec4 max);
 
@@ -80,5 +82,7 @@ public:
 
 	void genVec4ArrayBuffer(BufferType bt, int tot_size, vec4* buffer);
 	void genVec2ArrayBuffer(BufferType bt, int tot_size, vec2* buffer);
+
+	void updateHSVColor();
 	friend class Scene;
 };

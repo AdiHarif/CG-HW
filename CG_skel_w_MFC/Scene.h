@@ -13,15 +13,20 @@
 #define ALL_MODELS_ACTIVE -1
 #define NO_MODELS_ACTIVE -2
 
-#define AMBIENT_METHODS_COUNT 2
+#define AMBIENT_METHODS_COUNT 4
 #define SHADING_METHODS_COUNT 3
 #define SPECIAL_PROGRAMS_COUNT 2
+
+#define COLOR_ANIMATIONS_METHODS_COUNT 2
+#define VERTEX_ANIMATIONS_METHODS_COUNT 1
 
 using namespace std;
 
 typedef enum {
 	AMBIENT,
-	TEXTURE
+	TEXTURE,
+	PLANE_TEXTURE,
+	SPHERE_TEXTURE
 } AmbientMethod;
 
 typedef enum {
@@ -35,15 +40,27 @@ typedef enum {
 	TOON
 } SpecialShaders;
 
-class Scene {
-	
+typedef enum {
+	SMOOTH,
+	WAVE
+} ColorAnimationMethod;
 
+typedef enum {
+	RANDOM_DIRECTION
+} VertexAnimationMethod;
+
+class Scene {
 	AmbientMethod active_ambient_method;
 	ShadingMethod active_shading_method;
+	ColorAnimationMethod active_color_animation_method;
+	VertexAnimationMethod active_vertex_animation_method;
 
 	GLuint ambient_programs[AMBIENT_METHODS_COUNT];
 	GLuint shading_programs[SHADING_METHODS_COUNT];
 	GLuint special_programs[SPECIAL_PROGRAMS_COUNT];
+
+	GLuint color_animation_programs[COLOR_ANIMATIONS_METHODS_COUNT];
+	GLuint vertex_animation_programs[VERTEX_ANIMATIONS_METHODS_COUNT];
 
 
 	vector<Model*> models;
@@ -60,6 +77,9 @@ class Scene {
 	bool f_draw_lights = false;
 
 	bool f_toon_shading = true;
+
+	bool is_color_animation_active = false;
+	bool is_vertex_animation_active = false;
 
 public:
 	//===C'tors / Destructors===
@@ -78,6 +98,7 @@ public:
 
 	//===Models Interface===
 	void loadOBJModel(string fileName);
+	void loadTexture(string fileName);
 	void loadPrimModel();
 	void loadNonUniform();
 	void removeSelection();
@@ -102,6 +123,8 @@ public:
 	void toggleCameras();
 	void toggleLights();
 	void toggleShadingMethod();
+	void toggleAmbientMethod();
+	void toggleIsAnimationActive();
 	//==========
 
 	//===Cameras Interface===
@@ -147,12 +170,25 @@ public:
 
 	//===OpenGL===
 	//void Scene::bindAttributesToProgram(MeshModel* model, GLuint program);
+
 	void setupAmbientProgram(MeshModel* model);
 	void setupShadingProgram(MeshModel* model, Light* l);
 	void setupSpecialProgram(MeshModel* model, SpecialShaders shader);
+	void setupColorAnimationProgram(MeshModel* m);
+
 	void bindBufferToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized);
 	//void bindAttributeToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized);
 
 	//void bindAttributesToGouraudShader(MeshModel* model);
 	//==========
+
+	//===Animations===
+	bool getIsColorAnimatinActive();
+	void toggleIsColorAnimatinActive();
+	bool getIsVertexAnimationActive();
+	void toggleIsVertexAnimatinActive();
+
+	void updateActiveModelsHSVColor();
+	//==========
+
 };

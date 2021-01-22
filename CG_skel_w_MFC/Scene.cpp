@@ -29,19 +29,24 @@ Scene::Scene() {
 
 	ambient_light_color = { 0.1, 0.1, 0.1 };
 	parallel_sources.push_back(ParallelSource("Parallel Light 0", vec3(0.0, 1.0, 0.0), { 0.4, 0, 0 }));
-	point_sources.push_back(PointSource("Point Light 0", vec3(1.5, 1.5, 1.5), { 1, 1, 1 }));
+	point_sources.push_back(PointSource("Point Light 0", vec3(4, 4, 4), { 0.3, 0.3, 0.3 }));
 	//point_sources.push_back(PointSource("Point Light 1", vec3(-1, 0, 0), { 0, 0, 1 }));
 
 	ambient_programs[AMBIENT] = InitShader("ambient_vshader.glsl", "ambient_fshader.glsl");
+	ambient_programs[TEXTURE] = InitShader("texture_vshader.glsl", "texture_fshader.glsl");
+	ambient_programs[PLANE_TEXTURE] = InitShader("plane_texture_projection_vshader.glsl", "plane_texture_projection_fshader.glsl");
+	ambient_programs[SPHERE_TEXTURE] = InitShader("sphere_texture_projection_vshader.glsl", "sphere_texture_projection_fshader.glsl");
 	active_ambient_method = AMBIENT;
 
 	shading_programs[FLAT_SHADING] = InitShader("flat_vshader.glsl", "flat_fshader.glsl");
 	shading_programs[GOURAUD_SHADING] = InitShader("gouraud_vshader.glsl", "gouraud_fshader.glsl");
 	shading_programs[PHONG_SHADING] = InitShader("phong_vshader.glsl", "phong_fshader.glsl");
-	//TODO: add initializing of other shaders
 	active_shading_method = FLAT_SHADING;
 
 	special_programs[SILHOUETTE] = InitShader("silhouette_vshader.glsl", "silhouette_fshader.glsl");
+
+	color_animation_programs[SMOOTH] = InitShader("color_animation_smooth_vshader.glsl", "color_animation_smooth_fshader.glsl");
+	active_color_animation_method = SMOOTH;
 }
 
 Scene::~Scene() {
@@ -67,11 +72,14 @@ void Scene::draw(){
 			setupSpecialProgram(m, SILHOUETTE);
 			m->draw();
 		}
-
-		setupAmbientProgram((MeshModel*)*i);
+		
+		if (is_color_animation_active) {
+			setupColorAnimationProgram((MeshModel*)*i);
+		}
+		else {
+			setupAmbientProgram((MeshModel*)*i);
+		}
 		(*i)->draw();
-
-		//here would be the for loop going through lights
 
 		glEnable(GL_BLEND);
 		glDepthFunc(GL_EQUAL);
@@ -113,6 +121,14 @@ void Scene::loadOBJModel(string fileName)
 	MeshModel *model = new MeshModel(fileName);
 	models.push_back(model);
 	activateLastModel();
+}
+
+void Scene::loadTexture(string fileName) {
+	if (active_model == NO_MODELS_ACTIVE)	return;
+	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
+		MeshModel* m = dynamic_cast<MeshModel*>(*i);
+		m->setTexture(fileName.c_str());
+	}
 }
 
 void Scene::loadPrimModel() {
@@ -334,6 +350,18 @@ void Scene::toggleShadingMethod() {
 	//glUseProgram(programs[active_shading_method]);
 }
 
+void Scene::toggleAmbientMethod() {
+	active_ambient_method = AmbientMethod((active_ambient_method + 1) % AMBIENT_METHODS_COUNT);
+}
+
+void Scene::toggleIsColorAnimatinActive() {
+	is_color_animation_active = !is_color_animation_active;
+}
+
+void Scene::toggleIsVertexAnimatinActive() {
+	is_vertex_animation_active = !is_vertex_animation_active;
+}
+
 //==========
 
 
@@ -460,7 +488,6 @@ void Scene::addPointSource(PointSource point_source) {
 //===OpenGL===
 
 void Scene::setupAmbientProgram(MeshModel* m) {
-
 	glBindVertexArray(m->vao);
 	GLuint program = ambient_programs[active_ambient_method];
 	glUseProgram(program);
@@ -472,18 +499,67 @@ void Scene::setupAmbientProgram(MeshModel* m) {
 	GLuint vt_loc = glGetUniformLocation(program, "v_transform");
 	glUniformMatrix4fv(vt_loc, 1, GL_TRUE, vt);
 
+	bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
+	GLuint model_texture_loc;
+
 	switch (active_ambient_method) {
 	case AMBIENT:
-		bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
 		break;
-	case TEXTURE:
-		//TODO: implement
+	case TEXTURE: {
+		model_texture_loc = glGetUniformLocation(program, "modelTexture");
+		glUniform1i(model_texture_loc, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, m->vbos[BT_TEXTURES]);
+		GLuint tex_coord_loc = glGetAttribLocation(program, "tex_coord");
+		glEnableVertexAttribArray(tex_coord_loc);
+		glVertexAttribPointer(tex_coord_loc, 2, GL_FLOAT, GL_TRUE, 0, 0);
+
+		glBindTexture(GL_TEXTURE_2D, m->vto);
 		break;
+	}
+	case PLANE_TEXTURE: {
+		model_texture_loc = glGetUniformLocation(program, "modelTexture");
+		glUniform1i(model_texture_loc, 0);
+		
+		glBindTexture(GL_TEXTURE_2D, m->vto);
+		break;
+	}
+	case SPHERE_TEXTURE: {
+		model_texture_loc = glGetUniformLocation(program, "modelTexture");
+		glUniform1i(model_texture_loc, 0);
+
+		glBindTexture(GL_TEXTURE_2D, m->vto);
+		break;
+	}
 	}
 }
 
-void Scene::setupShadingProgram(MeshModel* m, Light* l) { // TODO: add face colors
+void Scene::setupColorAnimationProgram(MeshModel* m) {
+	glBindVertexArray(m->vao);
+	GLuint program = color_animation_programs[active_color_animation_method];
+	glUseProgram(program);
 
+	Camera* c = cameras[active_camera];
+
+	mat4 vt = c->tp * c->tc * m->tw * m->tm;
+
+	GLuint vt_loc = glGetUniformLocation(program, "v_transform");
+	glUniformMatrix4fv(vt_loc, 1, GL_TRUE, vt);
+	
+	GLuint hsv_color_loc = glGetUniformLocation(program, "hsv_color");
+	glUniform3f(hsv_color_loc, m->hsv_color.r, m->hsv_color.g, m->hsv_color.b);
+
+	bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
+
+	switch (active_ambient_method) {
+	case SMOOTH: {
+		//everything already bound
+		break;
+	}
+	}
+}
+
+void Scene::setupShadingProgram(MeshModel* m, Light* l) {
 	glBindVertexArray(m->vao);
 	GLuint program = shading_programs[active_shading_method];
 	glUseProgram(program);
@@ -584,19 +660,32 @@ void Scene::setupSpecialProgram(MeshModel* m, SpecialShaders shader) {
 	}
 }
 
-//void Scene::bindAttributesToProgram(MeshModel* model, GLuint program) {
-//	glBindVertexArray(model->vao);
-//	bindAttributeToProgram(model, program, model->vbos[BT_VERTICES], "v_position", GL_FALSE);
-//	bindAttributeToProgram(model, program, model->vbos[BT_VERTEX_NORMALS], "v_normal", GL_TRUE);
-//	bindAttributeToProgram(model, program, model->vbos[BT_FACE_NORMALS], "f_normal", GL_TRUE);
-//	bindAttributeToProgram(model, program, model->vbos[BT_TEXTURES], "texture", GL_FALSE);
-//}
 
 void Scene::bindBufferToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized) {
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	GLuint loc = glGetAttribLocation(program, variable_name);
 	glEnableVertexAttribArray(loc);
 	glVertexAttribPointer(loc, 4, GL_FLOAT, is_normalized, 0, 0);
+}
+
+//==========
+
+
+//===Animations===
+
+bool Scene::getIsColorAnimatinActive() {
+	return is_color_animation_active;
+}
+
+bool Scene::getIsVertexAnimationActive() {
+	return is_vertex_animation_active;
+}
+
+void Scene::updateActiveModelsHSVColor() {
+	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
+		MeshModel* m = dynamic_cast<MeshModel*>(*i);
+		m->updateHSVColor();
+	}
 }
 
 //==========
