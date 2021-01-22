@@ -57,8 +57,8 @@ protected :
 public:
 	explicit MeshModel(string fileName = "");
 	~MeshModel(void);
-	void loadFile(string fileName);
 	void setTexture(const char* file_name);
+	void loadFile(string fileName);
 	void initBoundingBox(vec4 min, vec4 max);
 
 	void translate(vec4, bool f_world_frame = true);
