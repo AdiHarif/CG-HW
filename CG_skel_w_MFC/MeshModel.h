@@ -84,5 +84,6 @@ public:
 	void genVec2ArrayBuffer(BufferType bt, int tot_size, vec2* buffer);
 
 	void updateHSVColor();
+	void updateWaveThreshold();
 	friend class Scene;
 };

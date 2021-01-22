@@ -324,10 +324,17 @@ void changeAllSteps(float step_change) {
 }
 
 void animateSmoothColors(int x) {
-	if (!scene->getIsColorAnimatinActive())	return;
-	scene->updateActiveModelsHSVColor();
+	if (!scene->getIsColorAnimationActive())	return;
+	scene->updateAllModelsHSVColor();
 	glutPostRedisplay();
 	glutTimerFunc(20, animateSmoothColors, x);
+}
+
+void animateWaveColors(int x) {
+	if (!scene->getIsColorAnimationActive())	return;
+	scene->updateAllModelsWaveThreshold();
+	glutPostRedisplay();
+	glutTimerFunc(20, animateWaveColors, x);
 }
 
 //==========
@@ -496,9 +503,29 @@ void special(int key, int x, int y) {
 		scene->toggleAmbientMethod();
 		break;
 	case GLUT_KEY_F9:
-		scene->toggleIsColorAnimatinActive();
-		if (scene->getIsColorAnimatinActive()) {
-			glutTimerFunc(20, animateSmoothColors, 0);
+		scene->toggleIsColorAnimationActive();
+		if (scene->getIsColorAnimationActive()) {
+			switch (scene->getActiveColorAnimationMethod()) {
+			case SMOOTH:
+				glutTimerFunc(20, animateSmoothColors, 0);
+				break;
+			case WAVE:
+				glutTimerFunc(20, animateWaveColors, 0);
+				break;
+			}
+		}
+		break;
+	case GLUT_KEY_F10:
+		scene->toggleColorAnimationMethod();
+		if (scene->getIsColorAnimationActive()) {
+			switch (scene->getActiveColorAnimationMethod()) {
+			case SMOOTH:
+				glutTimerFunc(20, animateSmoothColors, 0);
+				break;
+			case WAVE:
+				glutTimerFunc(20, animateWaveColors, 0);
+				break;
+			}
 		}
 		break;
 	}

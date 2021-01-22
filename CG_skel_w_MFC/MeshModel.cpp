@@ -409,3 +409,12 @@ void MeshModel::updateHSVColor() {
 	hsv_color.r += (1.0f / 360);
 	if (hsv_color.r > 1)	hsv_color.r = 0;
 }
+
+void MeshModel::updateWaveThreshold() {
+	wave_threshold += WAVE_THRESHOLD_STEP;
+	if (wave_threshold > 1) {
+		wave_color_1 = wave_color_0;
+		wave_color_0 = Color::getRandomColor();
+		wave_threshold = 0;
+	}
+}

@@ -44,6 +44,7 @@ Scene::Scene() {
 	active_shading_method = FLAT_SHADING;
 
 	color_animation_programs[SMOOTH] = InitShader("color_animation_smooth_vshader.glsl", "color_animation_smooth_fshader.glsl");
+	color_animation_programs[WAVE] = InitShader("color_animation_wave_vshader.glsl", "color_animation_wave_fshader.glsl");
 	active_color_animation_method = SMOOTH;
 }
 
@@ -64,24 +65,32 @@ void Scene::draw(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
-		
-		if (is_color_animation_active) {
-			setupColorAnimationProgram((MeshModel*)*i);
+		MeshModel* m = (MeshModel*)*i;
+
+		if (!is_color_animation_active && !is_vertex_animation_active) {
+			setupAmbientProgram(m);
+			(*i)->draw();
 		}
 		else {
-			setupAmbientProgram((MeshModel*)*i);
+			if (is_color_animation_active) {
+				setupColorAnimationProgram(m);
+				(*i)->draw();
+			}
+			if (is_vertex_animation_active) {
+				setupVertexAnimationProgram(m);
+				(*i)->draw();
+			}
 		}
-		(*i)->draw();
 
 		glEnable(GL_BLEND);
 		glDepthFunc(GL_EQUAL);
 
 		for (vector<ParallelSource>::iterator j = parallel_sources.begin(); j != parallel_sources.end(); j++) {
-			setupShadingProgram((MeshModel*)*i, &(ParallelSource)*j);
+			setupShadingProgram(m, &(ParallelSource)*j);
 			(*i)->draw();
 		}
 		for (vector<PointSource>::iterator j = point_sources.begin(); j != point_sources.end(); j++) {
-			setupShadingProgram((MeshModel*)*i, &(PointSource)*j);
+			setupShadingProgram(m, &(PointSource)*j);
 			(*i)->draw();
 		}
 
@@ -346,11 +355,17 @@ void Scene::toggleAmbientMethod() {
 	active_ambient_method = AmbientMethod((active_ambient_method + 1) % AMBIENT_METHODS_COUNT);
 }
 
-void Scene::toggleIsColorAnimatinActive() {
-	is_color_animation_active = !is_color_animation_active;
+void Scene::toggleColorAnimationMethod() {
+	active_color_animation_method = ColorAnimationMethod((active_color_animation_method + 1) % COLOR_ANIMATIONS_METHODS_COUNT);
 }
 
-void Scene::toggleIsVertexAnimatinActive() {
+
+void Scene::toggleIsColorAnimationActive() {
+	is_color_animation_active = !is_color_animation_active;
+
+}
+
+void Scene::toggleIsVertexAnimationActive() {
 	is_vertex_animation_active = !is_vertex_animation_active;
 }
 
@@ -538,17 +553,31 @@ void Scene::setupColorAnimationProgram(MeshModel* m) {
 	GLuint vt_loc = glGetUniformLocation(program, "v_transform");
 	glUniformMatrix4fv(vt_loc, 1, GL_TRUE, vt);
 	
-	GLuint hsv_color_loc = glGetUniformLocation(program, "hsv_color");
-	glUniform3f(hsv_color_loc, m->hsv_color.r, m->hsv_color.g, m->hsv_color.b);
-
 	bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
 
-	switch (active_ambient_method) {
+	switch (active_color_animation_method) {
 	case SMOOTH: {
-		//everything already bound
+		GLuint hsv_color_loc = glGetUniformLocation(program, "hsv_color");
+		glUniform3f(hsv_color_loc, m->hsv_color.r, m->hsv_color.g, m->hsv_color.b);
+		break;
+	}
+	case WAVE: {
+		cout << m->wave_color_0.r << endl;
+		GLuint color0_loc = glGetUniformLocation(program, "color0");
+		glUniform3f(color0_loc, m->wave_color_0.r, m->wave_color_0.g, m->wave_color_0.b);
+
+		GLuint color1_loc = glGetUniformLocation(program, "color1");
+		glUniform3f(color1_loc, m->wave_color_1.r, m->wave_color_1.g, m->wave_color_1.b);
+
+		GLuint wave_threshold_loc = glGetUniformLocation(program, "wave_threshold");
+		glUniform1f(wave_threshold_loc, m->wave_threshold);
 		break;
 	}
 	}
+}
+
+void Scene::setupVertexAnimationProgram(MeshModel* m) {
+
 }
 
 void Scene::setupShadingProgram(MeshModel* m, Light* l) {
@@ -631,7 +660,7 @@ void Scene::bindBufferToProgram(MeshModel* model, GLuint program, GLuint vbo, GL
 
 //===Animations===
 
-bool Scene::getIsColorAnimatinActive() {
+bool Scene::getIsColorAnimationActive() {
 	return is_color_animation_active;
 }
 
@@ -639,10 +668,21 @@ bool Scene::getIsVertexAnimationActive() {
 	return is_vertex_animation_active;
 }
 
-void Scene::updateActiveModelsHSVColor() {
+ColorAnimationMethod Scene::getActiveColorAnimationMethod() {
+	return active_color_animation_method;
+}
+
+void Scene::updateAllModelsHSVColor() {
 	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
 		MeshModel* m = dynamic_cast<MeshModel*>(*i);
 		m->updateHSVColor();
+	}
+}
+
+void Scene::updateAllModelsWaveThreshold() {
+	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
+		MeshModel* m = dynamic_cast<MeshModel*>(*i);
+		m->updateWaveThreshold();
 	}
 }
 

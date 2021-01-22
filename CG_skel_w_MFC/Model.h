@@ -2,6 +2,8 @@
 
 #include "Color.h"
 
+#define WAVE_THRESHOLD_STEP 0.01
+
 class Model {
 protected:
 	Color emit_color = { 0.0, 0.0, 0.1 };
@@ -9,6 +11,11 @@ protected:
 	Color diffuse_color = WHITE;
 	Color specular_color = WHITE;
 	Color hsv_color = { 0.0, 0.8, 0.8 };
+
+	Color wave_color_0 = Color::getRandomColor();
+	Color wave_color_1 = Color::getRandomColor();
+	float wave_threshold = 0;
+
 
 	GLfloat shininess = 0.1;
 

@@ -112,7 +112,10 @@ public:
 	void toggleLights();
 	void toggleShadingMethod();
 	void toggleAmbientMethod();
-	void toggleIsAnimationActive();
+	void toggleColorAnimationMethod();
+	void toggleIsColorAnimationActive();
+	void toggleIsVertexAnimationActive();
+
 	//==========
 
 	//===Cameras Interface===
@@ -160,6 +163,7 @@ public:
 	//void Scene::bindAttributesToProgram(MeshModel* model, GLuint program);
 	void setupAmbientProgram(MeshModel* m);
 	void setupColorAnimationProgram(MeshModel* m);
+	void setupVertexAnimationProgram(MeshModel* m);
 	void setupShadingProgram(MeshModel* m, Light* l);
 	void bindBufferToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized);
 	//void bindAttributeToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized);
@@ -168,12 +172,12 @@ public:
 	//==========
 
 	//===Animations===
-	bool getIsColorAnimatinActive();
-	void toggleIsColorAnimatinActive();
+	bool getIsColorAnimationActive();
 	bool getIsVertexAnimationActive();
-	void toggleIsVertexAnimatinActive();
+	ColorAnimationMethod getActiveColorAnimationMethod();
 
-	void updateActiveModelsHSVColor();
+	void updateAllModelsHSVColor();
+	void updateAllModelsWaveThreshold();
 	//==========
 
 };
