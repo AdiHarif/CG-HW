@@ -15,7 +15,8 @@
 
 #define AMBIENT_METHODS_COUNT 4
 #define SHADING_METHODS_COUNT 3
-#define ANIMATIONS_METHODS_COUNT 1
+#define COLOR_ANIMATIONS_METHODS_COUNT 2
+#define VERTEX_ANIMATIONS_METHODS_COUNT 1
 
 using namespace std;
 
@@ -33,19 +34,24 @@ typedef enum {
 } ShadingMethod;
 
 typedef enum {
-	SMOOTH_COLOR_CHANGE,
-	WAVE_COLOR_CHANGE,
-	VERTEX_MOVEMENT
-} AnimationMethod;
+	SMOOTH,
+	WAVE
+} ColorAnimationMethod;
+
+typedef enum {
+	RANDOM_DIRECTION
+} VertexAnimationMethod;
 
 class Scene {
 	AmbientMethod active_ambient_method;
 	ShadingMethod active_shading_method;
-	AnimationMethod active_animation_method;
+	ColorAnimationMethod active_color_animation_method;
+	VertexAnimationMethod active_vertex_animation_method;
 
 	GLuint ambient_programs[AMBIENT_METHODS_COUNT];
 	GLuint shading_programs[SHADING_METHODS_COUNT];
-	GLuint animation_programs[ANIMATIONS_METHODS_COUNT];
+	GLuint color_animation_programs[COLOR_ANIMATIONS_METHODS_COUNT];
+	GLuint vertex_animation_programs[VERTEX_ANIMATIONS_METHODS_COUNT];
 
 	vector<Model*> models;
 	int active_model;
@@ -59,6 +65,9 @@ class Scene {
 
 	bool f_draw_cameras = false;
 	bool f_draw_lights = false;
+
+	bool is_color_animation_active = false;
+	bool is_vertex_animation_active = false;
 
 public:
 	//===C'tors / Destructors===
@@ -150,7 +159,7 @@ public:
 	//===OpenGL===
 	//void Scene::bindAttributesToProgram(MeshModel* model, GLuint program);
 	void setupAmbientProgram(MeshModel* m);
-	void setupAnimationProgram(MeshModel* m);
+	void setupColorAnimationProgram(MeshModel* m);
 	void setupShadingProgram(MeshModel* m, Light* l);
 	void bindBufferToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized);
 	//void bindAttributeToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized);
@@ -158,7 +167,13 @@ public:
 	//void bindAttributesToGouraudShader(MeshModel* model);
 	//==========
 
-	bool is_animation_active = false;
+	//===Animations===
+	bool getIsColorAnimatinActive();
+	void toggleIsColorAnimatinActive();
+	bool getIsVertexAnimationActive();
+	void toggleIsVertexAnimatinActive();
+
 	void updateActiveModelsHSVColor();
+	//==========
 
 };

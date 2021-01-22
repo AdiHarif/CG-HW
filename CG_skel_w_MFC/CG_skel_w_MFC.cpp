@@ -324,7 +324,7 @@ void changeAllSteps(float step_change) {
 }
 
 void animateSmoothColors(int x) {
-	if (!scene->is_animation_active)	return;
+	if (!scene->getIsColorAnimatinActive())	return;
 	scene->updateActiveModelsHSVColor();
 	glutPostRedisplay();
 	glutTimerFunc(20, animateSmoothColors, x);
@@ -496,8 +496,8 @@ void special(int key, int x, int y) {
 		scene->toggleAmbientMethod();
 		break;
 	case GLUT_KEY_F9:
-		scene->toggleIsAnimationActive();
-		if (scene->is_animation_active) {
+		scene->toggleIsColorAnimatinActive();
+		if (scene->getIsColorAnimatinActive()) {
 			glutTimerFunc(20, animateSmoothColors, 0);
 		}
 		break;

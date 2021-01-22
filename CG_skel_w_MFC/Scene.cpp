@@ -43,8 +43,8 @@ Scene::Scene() {
 	shading_programs[PHONG_SHADING] = InitShader("phong_vshader.glsl", "phong_fshader.glsl");
 	active_shading_method = FLAT_SHADING;
 
-	animation_programs[SMOOTH_COLOR_CHANGE] = InitShader("color_animation_vshader.glsl", "color_animation_fshader.glsl");
-	active_animation_method = SMOOTH_COLOR_CHANGE;
+	color_animation_programs[SMOOTH] = InitShader("color_animation_smooth_vshader.glsl", "color_animation_smooth_fshader.glsl");
+	active_color_animation_method = SMOOTH;
 }
 
 Scene::~Scene() {
@@ -65,8 +65,8 @@ void Scene::draw(){
 
 	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
 		
-		if (is_animation_active) {
-			setupAnimationProgram((MeshModel*)*i);
+		if (is_color_animation_active) {
+			setupColorAnimationProgram((MeshModel*)*i);
 		}
 		else {
 			setupAmbientProgram((MeshModel*)*i);
@@ -346,8 +346,12 @@ void Scene::toggleAmbientMethod() {
 	active_ambient_method = AmbientMethod((active_ambient_method + 1) % AMBIENT_METHODS_COUNT);
 }
 
-void Scene::toggleIsAnimationActive() {
-	is_animation_active = !is_animation_active;
+void Scene::toggleIsColorAnimatinActive() {
+	is_color_animation_active = !is_color_animation_active;
+}
+
+void Scene::toggleIsVertexAnimatinActive() {
+	is_vertex_animation_active = !is_vertex_animation_active;
 }
 
 //==========
@@ -522,9 +526,9 @@ void Scene::setupAmbientProgram(MeshModel* m) {
 	}
 }
 
-void Scene::setupAnimationProgram(MeshModel* m) {
+void Scene::setupColorAnimationProgram(MeshModel* m) {
 	glBindVertexArray(m->vao);
-	GLuint program = animation_programs[active_animation_method];
+	GLuint program = color_animation_programs[active_color_animation_method];
 	glUseProgram(program);
 
 	Camera* c = cameras[active_camera];
@@ -540,15 +544,14 @@ void Scene::setupAnimationProgram(MeshModel* m) {
 	bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
 
 	switch (active_ambient_method) {
-	case SMOOTH_COLOR_CHANGE: {
-
+	case SMOOTH: {
+		//everything already bound
 		break;
 	}
 	}
 }
 
-void Scene::setupShadingProgram(MeshModel* m, Light* l) { // TODO: add face colors
-
+void Scene::setupShadingProgram(MeshModel* m, Light* l) {
 	glBindVertexArray(m->vao);
 	GLuint program = shading_programs[active_shading_method];
 	glUseProgram(program);
@@ -616,14 +619,6 @@ void Scene::setupShadingProgram(MeshModel* m, Light* l) { // TODO: add face colo
 	}
 }
 
-//void Scene::bindAttributesToProgram(MeshModel* model, GLuint program) {
-//	glBindVertexArray(model->vao);
-//	bindAttributeToProgram(model, program, model->vbos[BT_VERTICES], "v_position", GL_FALSE);
-//	bindAttributeToProgram(model, program, model->vbos[BT_VERTEX_NORMALS], "v_normal", GL_TRUE);
-//	bindAttributeToProgram(model, program, model->vbos[BT_FACE_NORMALS], "f_normal", GL_TRUE);
-//	bindAttributeToProgram(model, program, model->vbos[BT_TEXTURES], "texture", GL_FALSE);
-//}
-
 void Scene::bindBufferToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized) {
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	GLuint loc = glGetAttribLocation(program, variable_name);
@@ -635,6 +630,14 @@ void Scene::bindBufferToProgram(MeshModel* model, GLuint program, GLuint vbo, GL
 
 
 //===Animations===
+
+bool Scene::getIsColorAnimatinActive() {
+	return is_color_animation_active;
+}
+
+bool Scene::getIsVertexAnimationActive() {
+	return is_vertex_animation_active;
+}
 
 void Scene::updateActiveModelsHSVColor() {
 	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
