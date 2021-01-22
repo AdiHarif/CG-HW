@@ -77,7 +77,6 @@ void MeshModel::loadFile(string fileName)
 			max.y = (std::max)(max.y, cur_v.y);
 			max.z = (std::max)(max.z, cur_v.z);
 			vertices.push_back(cur_v);
-			
 		}
 		else if (lineType == "f"){ 
 			faces.push_back(issLine);

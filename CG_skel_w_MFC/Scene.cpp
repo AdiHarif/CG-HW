@@ -477,15 +477,20 @@ void Scene::setupAmbientProgram(MeshModel* m) {
 	GLuint vt_loc = glGetUniformLocation(program, "v_transform");
 	glUniformMatrix4fv(vt_loc, 1, GL_TRUE, vt);
 
-	GLuint model_texture_loc = glGetUniformLocation(program, "modelTexture");
-	glUniform1i(model_texture_loc, 0);
-
+	bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
 
 	switch (active_ambient_method) {
 	case AMBIENT:
-		bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
 		break;
 	case TEXTURE:
+		GLuint model_texture_loc = glGetUniformLocation(program, "modelTexture");
+		glUniform1i(model_texture_loc, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, m->vbos[BT_TEXTURES]);
+		GLuint tex_coord_loc = glGetAttribLocation(program, "tex_coord");
+		glEnableVertexAttribArray(tex_coord_loc);
+		glVertexAttribPointer(tex_coord_loc, 2, GL_FLOAT, GL_TRUE, 0, 0);
+
 		glBindTexture(GL_TEXTURE_2D, m->vto);
 		break;
 	}
