@@ -40,6 +40,8 @@ Scene::Scene() {
 	shading_programs[PHONG_SHADING] = InitShader("phong_vshader.glsl", "phong_fshader.glsl");
 	//TODO: add initializing of other shaders
 	active_shading_method = FLAT_SHADING;
+
+	special_programs[SILHOUETTE] = InitShader("silhouette_vshader.glsl", "silhouette_fshader.glsl");
 }
 
 Scene::~Scene() {
@@ -59,7 +61,13 @@ void Scene::draw(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
-		
+
+		MeshModel* m = dynamic_cast<MeshModel*> ((*i));
+		if (f_toon_shading && m->draw_pref.poly_mode == DrawPref::PolyMode::FILLED) {
+			setupSpecialProgram(m, SILHOUETTE);
+			m->draw();
+		}
+
 		setupAmbientProgram((MeshModel*)*i);
 		(*i)->draw();
 
@@ -539,6 +547,39 @@ void Scene::setupShadingProgram(MeshModel* m, Light* l) { // TODO: add face colo
 		break;
 	case PHONG_SHADING:
 		bindBufferToProgram(m, program, m->vbos[BT_VERTEX_NORMALS], "v_normal", GL_TRUE);
+		break;
+	}
+}
+
+
+void Scene::setupSpecialProgram(MeshModel* m, SpecialShaders shader) {
+
+
+	glBindVertexArray(m->vao);
+	GLuint program = special_programs[shader];
+	glUseProgram(program);
+
+	Camera* c = cameras[active_camera];
+
+	mat4 twm = m->tw * m->tm;
+	mat4 tpc = c->tp * c->tc;
+	mat4 twm_n = m->ntw * m->ntm;
+
+	GLuint twm_loc = glGetUniformLocation(program, "twm");
+	glUniformMatrix4fv(twm_loc, 1, GL_TRUE, twm);
+
+	GLuint tpc_loc = glGetUniformLocation(program, "tpc");
+	glUniformMatrix4fv(tpc_loc, 1, GL_TRUE, tpc);
+
+	GLuint twm_n_loc = glGetUniformLocation(program, "twm_n");
+	glUniformMatrix4fv(twm_n_loc, 1, GL_TRUE, twm_n);
+
+	switch (shader) {
+	case SILHOUETTE:
+		bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
+		bindBufferToProgram(m, program, m->vbos[BT_VERTEX_NORMALS], "v_normal", GL_TRUE);
+		break;
+	case TOON:
 		break;
 	}
 }

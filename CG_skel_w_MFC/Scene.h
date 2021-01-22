@@ -15,6 +15,7 @@
 
 #define AMBIENT_METHODS_COUNT 2
 #define SHADING_METHODS_COUNT 3
+#define SPECIAL_PROGRAMS_COUNT 2
 
 using namespace std;
 
@@ -29,6 +30,11 @@ typedef enum {
 	PHONG_SHADING
 } ShadingMethod;
 
+typedef enum {
+	SILHOUETTE,
+	TOON
+} SpecialShaders;
+
 class Scene {
 	
 
@@ -37,7 +43,9 @@ class Scene {
 
 	GLuint ambient_programs[AMBIENT_METHODS_COUNT];
 	GLuint shading_programs[SHADING_METHODS_COUNT];
-	
+	GLuint special_programs[SPECIAL_PROGRAMS_COUNT];
+
+
 	vector<Model*> models;
 	int active_model;
 
@@ -50,6 +58,8 @@ class Scene {
 
 	bool f_draw_cameras = false;
 	bool f_draw_lights = false;
+
+	bool f_toon_shading = true;
 
 public:
 	//===C'tors / Destructors===
@@ -139,6 +149,7 @@ public:
 	//void Scene::bindAttributesToProgram(MeshModel* model, GLuint program);
 	void setupAmbientProgram(MeshModel* model);
 	void setupShadingProgram(MeshModel* model, Light* l);
+	void setupSpecialProgram(MeshModel* model, SpecialShaders shader);
 	void bindBufferToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized);
 	//void bindAttributeToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized);
 
