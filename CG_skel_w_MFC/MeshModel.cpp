@@ -415,6 +415,6 @@ void MeshModel::updateWaveThreshold() {
 	if (wave_threshold > 1) {
 		wave_color_1 = wave_color_0;
 		wave_color_0 = Color::getRandomColor();
-		wave_threshold = 0;
+		wave_threshold = -1;
 	}
 }

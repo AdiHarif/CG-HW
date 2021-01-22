@@ -562,7 +562,6 @@ void Scene::setupColorAnimationProgram(MeshModel* m) {
 		break;
 	}
 	case WAVE: {
-		cout << m->wave_color_0.r << endl;
 		GLuint color0_loc = glGetUniformLocation(program, "color0");
 		glUniform3f(color0_loc, m->wave_color_0.r, m->wave_color_0.g, m->wave_color_0.b);
 

@@ -3,8 +3,6 @@
 
 in vec4 v_position;
 
-uniform float min_x;
-uniform float max_x;
 uniform float wave_threshold;
 uniform vec3 color0;
 uniform vec3 color1;

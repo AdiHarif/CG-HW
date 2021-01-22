@@ -14,7 +14,7 @@ protected:
 
 	Color wave_color_0 = Color::getRandomColor();
 	Color wave_color_1 = Color::getRandomColor();
-	float wave_threshold = 0;
+	float wave_threshold = -1;
 
 
 	GLfloat shininess = 0.1;
