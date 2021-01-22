@@ -14,8 +14,8 @@
 #define NO_MODELS_ACTIVE -2
 
 #define AMBIENT_METHODS_COUNT 4
-#define SHADING_METHODS_COUNT 3
-#define SPECIAL_PROGRAMS_COUNT 2
+#define SHADING_METHODS_COUNT 4
+#define SPECIAL_PROGRAMS_COUNT 1
 
 #define COLOR_ANIMATIONS_METHODS_COUNT 2
 #define VERTEX_ANIMATIONS_METHODS_COUNT 1
@@ -32,12 +32,12 @@ typedef enum {
 typedef enum {
 	FLAT_SHADING,
 	GOURAUD_SHADING,
-	PHONG_SHADING
+	PHONG_SHADING,
+	TOON_SHADING
 } ShadingMethod;
 
 typedef enum {
-	SILHOUETTE,
-	TOON
+	SILHOUETTE
 } SpecialShaders;
 
 typedef enum {
@@ -75,8 +75,6 @@ class Scene {
 
 	bool f_draw_cameras = false;
 	bool f_draw_lights = false;
-
-	bool f_toon_shading = true;
 
 	bool is_color_animation_active = false;
 	bool is_vertex_animation_active = false;

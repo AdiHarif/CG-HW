@@ -41,6 +41,7 @@ Scene::Scene() {
 	shading_programs[FLAT_SHADING] = InitShader("flat_vshader.glsl", "flat_fshader.glsl");
 	shading_programs[GOURAUD_SHADING] = InitShader("gouraud_vshader.glsl", "gouraud_fshader.glsl");
 	shading_programs[PHONG_SHADING] = InitShader("phong_vshader.glsl", "phong_fshader.glsl");
+	shading_programs[TOON_SHADING] = InitShader("phong_vshader.glsl", "toon_fshader.glsl");
 	active_shading_method = FLAT_SHADING;
 
 	special_programs[SILHOUETTE] = InitShader("silhouette_vshader.glsl", "silhouette_fshader.glsl");
@@ -60,7 +61,6 @@ Scene::~Scene() {
 //===Drawing Functions===
 
 void Scene::draw(){
-	GLuint active_program = shading_programs[active_shading_method];
 
 	glClearColor(0.2, 0.2, 0.2, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -68,7 +68,7 @@ void Scene::draw(){
 	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
 
 		MeshModel* m = dynamic_cast<MeshModel*> ((*i));
-		if (f_toon_shading && m->draw_pref.poly_mode == DrawPref::PolyMode::FILLED) {
+		if (active_shading_method == TOON_SHADING && m->draw_pref.poly_mode == DrawPref::PolyMode::FILLED) {
 			setupSpecialProgram(m, SILHOUETTE);
 			m->draw();
 		}
@@ -622,6 +622,7 @@ void Scene::setupShadingProgram(MeshModel* m, Light* l) {
 		bindBufferToProgram(m, program, m->vbos[BT_VERTEX_NORMALS], "v_normal", GL_TRUE);
 		break;
 	case PHONG_SHADING:
+	case TOON_SHADING:
 		bindBufferToProgram(m, program, m->vbos[BT_VERTEX_NORMALS], "v_normal", GL_TRUE);
 		break;
 	}
@@ -654,8 +655,6 @@ void Scene::setupSpecialProgram(MeshModel* m, SpecialShaders shader) {
 	case SILHOUETTE:
 		bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
 		bindBufferToProgram(m, program, m->vbos[BT_VERTEX_NORMALS], "v_normal", GL_TRUE);
-		break;
-	case TOON:
 		break;
 	}
 }
