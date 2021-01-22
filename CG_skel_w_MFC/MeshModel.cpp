@@ -404,3 +404,8 @@ void MeshModel::genVec2ArrayBuffer(BufferType bt, int tot_size, vec2* buffer) {
 	glBindBuffer(GL_ARRAY_BUFFER, vbos[bt]);
 	glBufferData(GL_ARRAY_BUFFER, tot_size, buffer, GL_STATIC_DRAW);
 }
+
+void MeshModel::updateHSVColor() {
+	hsv_color.r += (1.0f / 360);
+	if (hsv_color.r > 1)	hsv_color.r = 0;
+}

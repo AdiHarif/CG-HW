@@ -8,10 +8,8 @@ protected:
 	Color ambient_color = PURPLE;
 	Color diffuse_color = WHITE;
 	Color specular_color = WHITE;
+	Color hsv_color = { 0.0, 0.8, 0.8 };
 
-	//GLfloat specular_reflection;
-	//GLfloat diffuse_reflection;
-	//GLfloat ambient_reflection = 1;
 	GLfloat shininess = 0.1;
 
 	virtual ~Model() {}

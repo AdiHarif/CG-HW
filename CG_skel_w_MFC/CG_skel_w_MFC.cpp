@@ -323,13 +323,19 @@ void changeAllSteps(float step_change) {
 	translation_step *= step_change;
 }
 
+void animateSmoothColors(int x) {
+	if (!scene->is_animation_active)	return;
+	scene->updateActiveModelsHSVColor();
+	glutPostRedisplay();
+	glutTimerFunc(20, animateSmoothColors, x);
+}
+
 //==========
 
 // Callbacks
 
-void display(void)
-{
-
+void display(void) {
+	scene->draw();
 }
 
 void reshape(int width, int height)
@@ -488,6 +494,12 @@ void special(int key, int x, int y) {
 		break;
 	case GLUT_KEY_F8:
 		scene->toggleAmbientMethod();
+		break;
+	case GLUT_KEY_F9:
+		scene->toggleIsAnimationActive();
+		if (scene->is_animation_active) {
+			glutTimerFunc(20, animateSmoothColors, 0);
+		}
 		break;
 	}
 	scene->draw();

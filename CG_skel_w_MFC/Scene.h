@@ -13,14 +13,17 @@
 #define ALL_MODELS_ACTIVE -1
 #define NO_MODELS_ACTIVE -2
 
-#define AMBIENT_METHODS_COUNT 2
+#define AMBIENT_METHODS_COUNT 4
 #define SHADING_METHODS_COUNT 3
+#define ANIMATIONS_METHODS_COUNT 1
 
 using namespace std;
 
 typedef enum {
 	AMBIENT,
-	TEXTURE
+	TEXTURE,
+	PLANE_TEXTURE,
+	SPHERE_TEXTURE
 } AmbientMethod;
 
 typedef enum {
@@ -29,15 +32,21 @@ typedef enum {
 	PHONG_SHADING
 } ShadingMethod;
 
-class Scene {
-	
+typedef enum {
+	SMOOTH_COLOR_CHANGE,
+	WAVE_COLOR_CHANGE,
+	VERTEX_MOVEMENT
+} AnimationMethod;
 
+class Scene {
 	AmbientMethod active_ambient_method;
 	ShadingMethod active_shading_method;
+	AnimationMethod active_animation_method;
 
 	GLuint ambient_programs[AMBIENT_METHODS_COUNT];
 	GLuint shading_programs[SHADING_METHODS_COUNT];
-	
+	GLuint animation_programs[ANIMATIONS_METHODS_COUNT];
+
 	vector<Model*> models;
 	int active_model;
 
@@ -94,6 +103,7 @@ public:
 	void toggleLights();
 	void toggleShadingMethod();
 	void toggleAmbientMethod();
+	void toggleIsAnimationActive();
 	//==========
 
 	//===Cameras Interface===
@@ -139,11 +149,16 @@ public:
 
 	//===OpenGL===
 	//void Scene::bindAttributesToProgram(MeshModel* model, GLuint program);
-	void setupAmbientProgram(MeshModel* model);
-	void setupShadingProgram(MeshModel* model, Light* l);
+	void setupAmbientProgram(MeshModel* m);
+	void setupAnimationProgram(MeshModel* m);
+	void setupShadingProgram(MeshModel* m, Light* l);
 	void bindBufferToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized);
 	//void bindAttributeToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized);
 
 	//void bindAttributesToGouraudShader(MeshModel* model);
 	//==========
+
+	bool is_animation_active = false;
+	void updateActiveModelsHSVColor();
+
 };

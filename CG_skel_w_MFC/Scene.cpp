@@ -29,18 +29,22 @@ Scene::Scene() {
 
 	ambient_light_color = { 0.1, 0.1, 0.1 };
 	parallel_sources.push_back(ParallelSource("Parallel Light 0", vec3(0.0, 1.0, 0.0), { 0.4, 0, 0 }));
-	point_sources.push_back(PointSource("Point Light 0", vec3(4, 4, 4), { 1, 1, 1 }));
+	point_sources.push_back(PointSource("Point Light 0", vec3(4, 4, 4), { 0.3, 0.3, 0.3 }));
 	//point_sources.push_back(PointSource("Point Light 1", vec3(-1, 0, 0), { 0, 0, 1 }));
 
 	ambient_programs[AMBIENT] = InitShader("ambient_vshader.glsl", "ambient_fshader.glsl");
 	ambient_programs[TEXTURE] = InitShader("texture_vshader.glsl", "texture_fshader.glsl");
+	ambient_programs[PLANE_TEXTURE] = InitShader("plane_texture_projection_vshader.glsl", "plane_texture_projection_fshader.glsl");
+	ambient_programs[SPHERE_TEXTURE] = InitShader("sphere_texture_projection_vshader.glsl", "sphere_texture_projection_fshader.glsl");
 	active_ambient_method = AMBIENT;
 
 	shading_programs[FLAT_SHADING] = InitShader("flat_vshader.glsl", "flat_fshader.glsl");
 	shading_programs[GOURAUD_SHADING] = InitShader("gouraud_vshader.glsl", "gouraud_fshader.glsl");
 	shading_programs[PHONG_SHADING] = InitShader("phong_vshader.glsl", "phong_fshader.glsl");
-	//TODO: add initializing of other shaders
 	active_shading_method = FLAT_SHADING;
+
+	animation_programs[SMOOTH_COLOR_CHANGE] = InitShader("color_animation_vshader.glsl", "color_animation_fshader.glsl");
+	active_animation_method = SMOOTH_COLOR_CHANGE;
 }
 
 Scene::~Scene() {
@@ -61,10 +65,13 @@ void Scene::draw(){
 
 	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
 		
-		setupAmbientProgram((MeshModel*)*i);
+		if (is_animation_active) {
+			setupAnimationProgram((MeshModel*)*i);
+		}
+		else {
+			setupAmbientProgram((MeshModel*)*i);
+		}
 		(*i)->draw();
-
-		//here would be the for loop going through lights
 
 		glEnable(GL_BLEND);
 		glDepthFunc(GL_EQUAL);
@@ -339,6 +346,10 @@ void Scene::toggleAmbientMethod() {
 	active_ambient_method = AmbientMethod((active_ambient_method + 1) % AMBIENT_METHODS_COUNT);
 }
 
+void Scene::toggleIsAnimationActive() {
+	is_animation_active = !is_animation_active;
+}
+
 //==========
 
 
@@ -465,7 +476,6 @@ void Scene::addPointSource(PointSource point_source) {
 //===OpenGL===
 
 void Scene::setupAmbientProgram(MeshModel* m) {
-
 	glBindVertexArray(m->vao);
 	GLuint program = ambient_programs[active_ambient_method];
 	glUseProgram(program);
@@ -478,12 +488,13 @@ void Scene::setupAmbientProgram(MeshModel* m) {
 	glUniformMatrix4fv(vt_loc, 1, GL_TRUE, vt);
 
 	bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
+	GLuint model_texture_loc;
 
 	switch (active_ambient_method) {
 	case AMBIENT:
 		break;
-	case TEXTURE:
-		GLuint model_texture_loc = glGetUniformLocation(program, "modelTexture");
+	case TEXTURE: {
+		model_texture_loc = glGetUniformLocation(program, "modelTexture");
 		glUniform1i(model_texture_loc, 0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, m->vbos[BT_TEXTURES]);
@@ -493,6 +504,46 @@ void Scene::setupAmbientProgram(MeshModel* m) {
 
 		glBindTexture(GL_TEXTURE_2D, m->vto);
 		break;
+	}
+	case PLANE_TEXTURE: {
+		model_texture_loc = glGetUniformLocation(program, "modelTexture");
+		glUniform1i(model_texture_loc, 0);
+		
+		glBindTexture(GL_TEXTURE_2D, m->vto);
+		break;
+	}
+	case SPHERE_TEXTURE: {
+		model_texture_loc = glGetUniformLocation(program, "modelTexture");
+		glUniform1i(model_texture_loc, 0);
+
+		glBindTexture(GL_TEXTURE_2D, m->vto);
+		break;
+	}
+	}
+}
+
+void Scene::setupAnimationProgram(MeshModel* m) {
+	glBindVertexArray(m->vao);
+	GLuint program = animation_programs[active_animation_method];
+	glUseProgram(program);
+
+	Camera* c = cameras[active_camera];
+
+	mat4 vt = c->tp * c->tc * m->tw * m->tm;
+
+	GLuint vt_loc = glGetUniformLocation(program, "v_transform");
+	glUniformMatrix4fv(vt_loc, 1, GL_TRUE, vt);
+	
+	GLuint hsv_color_loc = glGetUniformLocation(program, "hsv_color");
+	glUniform3f(hsv_color_loc, m->hsv_color.r, m->hsv_color.g, m->hsv_color.b);
+
+	bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
+
+	switch (active_ambient_method) {
+	case SMOOTH_COLOR_CHANGE: {
+
+		break;
+	}
 	}
 }
 
@@ -578,6 +629,18 @@ void Scene::bindBufferToProgram(MeshModel* model, GLuint program, GLuint vbo, GL
 	GLuint loc = glGetAttribLocation(program, variable_name);
 	glEnableVertexAttribArray(loc);
 	glVertexAttribPointer(loc, 4, GL_FLOAT, is_normalized, 0, 0);
+}
+
+//==========
+
+
+//===Animations===
+
+void Scene::updateActiveModelsHSVColor() {
+	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
+		MeshModel* m = dynamic_cast<MeshModel*>(*i);
+		m->updateHSVColor();
+	}
 }
 
 //==========
