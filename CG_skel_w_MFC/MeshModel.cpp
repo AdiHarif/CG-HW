@@ -146,6 +146,10 @@ void MeshModel::loadFile(string fileName)
 	vec2* vertex_textures_buff = new vec2[faces.size() * 3];
 	vec4* t_axes_buff = new vec4[faces.size() * 3];
 	vec4* b_axes_buff = new vec4[faces.size() * 3];
+	vec4* vertex_pairs_buff = new vec4[faces.size() * 3 * 2];
+	vec4* vertex_normal_pairs_buff = new vec4[faces.size() * 3 * 2];
+	vec4* center_pairs_buff = new vec4[faces.size() * 2];
+	vec4* face_normals_pairs_buff = new vec4[faces.size() * 2];
 
 	for (int i = 0; i < faces.size(); i++) {
 		vertex_positions_buff[3 * i] = vertices[faces[i].vertices[0] - 1];
@@ -159,6 +163,20 @@ void MeshModel::loadFile(string fileName)
 		face_normals_buff[3 * i] = face_normals[faces[i].normal];
 		face_normals_buff[(3 * i) + 1] = face_normals[faces[i].normal];
 		face_normals_buff[(3 * i) + 2] = face_normals[faces[i].normal];
+
+		for (int j = 0; j < 3; j++) {
+			vertex_pairs_buff[(i * 6) + (j * 2)] = vertex_pairs_buff[(i * 6) + (j * 2) + 1] = vertex_positions_buff[(3 * i) + j];
+			vertex_normal_pairs_buff[(i * 6) + (j * 2)] = vec4(0, 0, 0, 0);
+			vertex_normal_pairs_buff[(i * 6) + (j * 2) + 1] = vertex_normals_buff[(3 * i) + j];
+		}
+
+		center_pairs_buff[i * 2] = center_pairs_buff[(i * 2) + 1] = (
+			vertex_positions_buff[3 * i] + vertex_positions_buff[(3 * i) + 1] + vertex_positions_buff[(3 * i)+2]
+			) / 3;
+
+		face_normals_pairs_buff[i * 2] = vec4(0,0,0,0);
+		//face_normals_pairs_buff[(i * 2)+1] = vec4(0,0,0,0);
+		face_normals_pairs_buff[(i * 2)+1] = face_normals_buff[3 * i];
 
 		if (vetrex_textures.size() > 0) {
 			vertex_textures_buff[3 * i] = vetrex_textures[faces[i].textures[0] - 1];
@@ -192,7 +210,6 @@ void MeshModel::loadFile(string fileName)
 				b_axes_buff[(i * 3) + j] = b_axis;
 			}
 
-
 		}
 
 	}
@@ -203,6 +220,10 @@ void MeshModel::loadFile(string fileName)
 	genVec2ArrayBuffer(BT_TEXTURES, vertex_textures_tot_size, vertex_textures_buff);
 	genVec4ArrayBuffer(BT_T_AXES, face_normals_tot_size, t_axes_buff);
 	genVec4ArrayBuffer(BT_B_AXES, face_normals_tot_size, b_axes_buff);
+	genVec4ArrayBuffer(BT_VERTEX_PAIRS, faces.size() * 6 * sizeof(vec4), vertex_pairs_buff);
+	genVec4ArrayBuffer(BT_VERTEX_NORMAL_PAIRS, faces.size() * 6 * sizeof(vec4), vertex_normal_pairs_buff);
+	genVec4ArrayBuffer(BT_CENTER_PAIRS, faces.size() * 2 * sizeof(vec4), center_pairs_buff);
+	genVec4ArrayBuffer(BT_FACE_NORMALS_PAIRS, faces.size() * 2 * sizeof(vec4), face_normals_pairs_buff);
 
 
 	//if (has_normals)
@@ -230,6 +251,10 @@ void MeshModel::loadFile(string fileName)
 	delete[] vertex_textures_buff;
 	delete[] t_axes_buff;
 	delete[] b_axes_buff;
+	delete[]  vertex_pairs_buff;
+	delete[]  vertex_normal_pairs_buff;
+	delete[]  center_pairs_buff;
+	delete[]  face_normals_pairs_buff;
 
 	faces_count = faces.size();
 }
@@ -454,6 +479,45 @@ void MeshModel::draw() {
 	}
 	glDrawArrays(GL_TRIANGLES, 0, faces_count * 3);
 	glFlush();
+}
+
+void MeshModel::drawNormals(GLuint program) {
+	if (draw_pref.f_draw_vertex_normals) {
+
+		glBindBuffer(GL_ARRAY_BUFFER, vbos[BT_VERTEX_PAIRS]);
+		GLuint loc = glGetAttribLocation(program, "position");
+		glEnableVertexAttribArray(loc);
+		glVertexAttribPointer(loc, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, vbos[BT_VERTEX_NORMAL_PAIRS]);
+		loc = glGetAttribLocation(program, "normal");
+		glEnableVertexAttribArray(loc);
+		glVertexAttribPointer(loc, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+		loc = glGetUniformLocation(program, "color");
+		glUniform4fv(loc, 1, vec4(1,0,1,1));
+
+		glDrawArrays(GL_LINES, 0, faces_count * 6);
+		glFlush();
+	}
+	if (draw_pref.f_draw_faces_normals) {
+
+		glBindBuffer(GL_ARRAY_BUFFER, vbos[BT_CENTER_PAIRS]);
+		GLuint loc = glGetAttribLocation(program, "position");
+		glEnableVertexAttribArray(loc);
+		glVertexAttribPointer(loc, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, vbos[BT_FACE_NORMALS_PAIRS]);
+		loc = glGetAttribLocation(program, "normal");
+		glEnableVertexAttribArray(loc);
+		glVertexAttribPointer(loc, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+		loc = glGetUniformLocation(program, "color");
+		glUniform4fv(loc, 1, vec4(1, 0, 0, 1));
+
+		glDrawArrays(GL_LINES, 0, faces_count * 2);
+		glFlush();
+	}
 }
 
 void MeshModel::genVec4ArrayBuffer(BufferType bt, int tot_size, vec4* buffer) {

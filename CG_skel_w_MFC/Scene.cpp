@@ -48,6 +48,7 @@ Scene::Scene() {
 	active_shading_method = FLAT_SHADING;
 
 	special_programs[SILHOUETTE] = InitShader("silhouette_vshader.glsl", "silhouette_fshader.glsl");
+	special_programs[NORMAL] = InitShader("normal_vshader.glsl", "normal_fshader.glsl");
 
 	color_animation_programs[SMOOTH] = InitShader("color_animation_smooth_vshader.glsl", "color_animation_smooth_fshader.glsl");
 	color_animation_programs[WAVE] = InitShader("color_animation_wave_vshader.glsl", "color_animation_wave_fshader.glsl");
@@ -124,6 +125,9 @@ void Scene::draw(){
 
 		glDisable(GL_BLEND);
 		glDepthFunc(GL_LESS);
+
+		setupSpecialProgram(m, NORMAL);
+		m->drawNormals(special_programs[NORMAL]);
 	}
 
 	glutSwapBuffers();
@@ -699,6 +703,8 @@ void Scene::setupSpecialProgram(MeshModel* m, SpecialShaders shader) {
 	case SILHOUETTE:
 		bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
 		bindBufferToProgram(m, program, m->vbos[BT_VERTEX_NORMALS], "v_normal", GL_TRUE);
+		break;
+	case NORMAL:
 		break;
 	}
 }
