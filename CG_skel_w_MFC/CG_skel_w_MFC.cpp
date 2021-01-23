@@ -31,9 +31,10 @@
 
 #define MODEL_MENU_OPEN_FILE 1
 #define MODEL_MENU_OPEN_TEXTURE 2
-#define MODEL_MENU_ADD_PRIMITIVE 3
-#define MODEL_MENU_ADD_NON_UNIFORM 4
-#define MODEL_MENU_TRANSFORM_ACTIVE_MODEL 5
+#define MODEL_MENU_OPEN_NORMAL_MAP 3
+#define MODEL_MENU_ADD_PRIMITIVE 4
+#define MODEL_MENU_ADD_NON_UNIFORM 5
+#define MODEL_MENU_TRANSFORM_ACTIVE_MODEL 6
 #define CAMERA_MENU_ADD_CAMERA 1
 #define CAMERA_MENU_EDIT_ACTIVE_CAMERA 2
 #define LIGHT_MENU_ADD_LIGHT 1
@@ -595,6 +596,13 @@ void modelsMenuCB(int id) {
 			scene->loadTexture((LPCTSTR)dlg.GetPathName());
 		}
 		break;
+	case MODEL_MENU_OPEN_NORMAL_MAP:
+		if (dlg.DoModal() == IDOK)
+		{
+			std::string s((LPCTSTR)dlg.GetPathName());
+			scene->loadNormalMap((LPCTSTR)dlg.GetPathName());
+		}
+		break;
 	case MODEL_MENU_ADD_PRIMITIVE:
 		scene->loadPrimModel();
 		break;
@@ -696,6 +704,7 @@ void initMenu()
 	int modelsMenu = glutCreateMenu(modelsMenuCB);
 	glutAddMenuEntry("Load Model From a File", MODEL_MENU_OPEN_FILE);
 	glutAddMenuEntry("Load Texture From a File", MODEL_MENU_OPEN_TEXTURE);
+	glutAddMenuEntry("Load Normal Map From a File", MODEL_MENU_OPEN_NORMAL_MAP);
 	glutAddMenuEntry("Add Primitive: Cube", MODEL_MENU_ADD_PRIMITIVE);
 	glutAddMenuEntry("Add Primitive: Non-Uniform Weird Dice", MODEL_MENU_ADD_NON_UNIFORM);
 	glutAddMenuEntry("Transform Active Model", MODEL_MENU_TRANSFORM_ACTIVE_MODEL);

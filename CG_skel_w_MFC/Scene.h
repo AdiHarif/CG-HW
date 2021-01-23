@@ -15,7 +15,7 @@
 #define NO_MODELS_ACTIVE -2
 
 #define AMBIENT_METHODS_COUNT 4
-#define SHADING_METHODS_COUNT 4
+#define SHADING_METHODS_COUNT 5
 #define SPECIAL_PROGRAMS_COUNT 1
 
 #define COLOR_ANIMATIONS_METHODS_COUNT 2
@@ -34,6 +34,7 @@ typedef enum {
 	FLAT_SHADING,
 	GOURAUD_SHADING,
 	PHONG_SHADING,
+	NORMAL_MAP_SHADING,
 	TOON_SHADING
 } ShadingMethod;
 
@@ -103,6 +104,7 @@ public:
 	//===Models Interface===
 	void loadOBJModel(string fileName);
 	void loadTexture(string fileName);
+	void loadNormalMap(string fileName);
 	void loadPrimModel();
 	void loadNonUniform();
 	void removeSelection();
