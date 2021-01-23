@@ -4,6 +4,8 @@
 
 #define WAVE_THRESHOLD_STEP 0.01
 #define VERTEX_ANIMATION_X_STEP 0.02
+#define VERTEX_ANIMATION_X_MIN 0
+#define VERTEX_ANIMATION_X_MAX 1
 #define NUM_OF_VERTEX_ANIMATION_DIRECTIONS 2
 
 typedef enum {
@@ -48,8 +50,8 @@ public:
 	GLfloat getShininess() { return shininess; }
 	void setShininess(GLfloat s) { shininess = s; }
 
-	GLfloat easeInCubic(GLfloat x) { return x * x * x; }
-	GLfloat easeOutCubic(GLfloat x) { return 1 - pow(1 - x, 3); }
+	GLfloat easeInCubic(GLfloat x) { return -x * x * x; }
+	GLfloat easeOutCubic(GLfloat x) { return -2*(1 - pow(1 - x, 3)); }
 
 
 

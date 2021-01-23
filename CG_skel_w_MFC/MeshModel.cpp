@@ -347,6 +347,10 @@ void MeshModel::initBoundingBox(vec4 min, vec4 max) {
 	//}
 }
 
+void MeshModel::setPolyMode(DrawPref::PolyMode poly_mode) {
+	draw_pref.poly_mode = poly_mode;
+}
+
 void MeshModel::togglePolyMode() {
 	draw_pref.poly_mode = DrawPref::PolyMode((draw_pref.poly_mode + 1) % 3);
 }
@@ -423,22 +427,22 @@ void MeshModel::updateVertexAnimationT() {
 	if (current_vertex_animation_dir == VA_IN) {
 		if(vertex_animation_x!=0)	vertex_animation_t = easeInCubic(vertex_animation_x);
 		vertex_animation_x -= VERTEX_ANIMATION_X_STEP;
-		if (vertex_animation_x < 0) {
-			vertex_animation_x = 0;
+		if (vertex_animation_x < VERTEX_ANIMATION_X_MIN) {
+			vertex_animation_x = VERTEX_ANIMATION_X_MIN;
 			current_vertex_animation_dir = VA_OUT;
 		}
 	}
 	else {
 		if (vertex_animation_x != 0)	vertex_animation_t = easeOutCubic(vertex_animation_x);
-		vertex_animation_x += VERTEX_ANIMATION_X_STEP;
-		if (vertex_animation_x > 1) {
-			vertex_animation_x = 1;
+		vertex_animation_x += 2*VERTEX_ANIMATION_X_STEP;
+		if (vertex_animation_x > VERTEX_ANIMATION_X_MAX) {
+			vertex_animation_x = VERTEX_ANIMATION_X_MAX;
 			current_vertex_animation_dir = VA_IN;
 		}
 	}
 }
 
 void MeshModel::resetVertexAnimationT() {
-	vertex_animation_x = 1;
+	vertex_animation_x = VERTEX_ANIMATION_X_MAX;
 	vertex_animation_t = 0;
 }

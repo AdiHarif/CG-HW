@@ -341,7 +341,7 @@ void animateSuperNova(int x) {
 	if (!scene->getIsVertexAnimationActive())	return;
 	scene->updateAllModelsVertexAnimationT();
 	glutPostRedisplay();
-	glutTimerFunc(20, animateSuperNova, x);
+	glutTimerFunc(50, animateSuperNova, x);
 }
 
 //==========

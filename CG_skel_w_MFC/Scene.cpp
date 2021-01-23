@@ -72,6 +72,12 @@ void Scene::draw(){
 	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
 
 		MeshModel* m = dynamic_cast<MeshModel*> ((*i));
+		if (f_vertex_animation_active) {
+			setupVertexAnimationProgram(m);
+			m->draw();
+			continue;
+		}
+
 		if (active_shading_method == TOON_SHADING && m->draw_pref.poly_mode == DrawPref::PolyMode::FILLED) {
 			setupSpecialProgram(m, SILHOUETTE);
 			m->draw();
@@ -84,11 +90,6 @@ void Scene::draw(){
 		else {
 			setupColorAnimationProgram(m);
 			m->draw();		
-		}
-
-		if (f_vertex_animation_active) {
-			setupVertexAnimationProgram(m);
-			m->draw();
 		}
 
 		glEnable(GL_BLEND);
@@ -574,9 +575,9 @@ void Scene::setupColorAnimationProgram(MeshModel* m) {
 }
 
 void Scene::setupVertexAnimationProgram(MeshModel* m) {
-	cout << "x: " << m->vertex_animation_x << ", t: " << m->vertex_animation_t << endl;
+	//cout << "x: " << m->vertex_animation_x << ", t: " << m->vertex_animation_t << endl;
 	glBindVertexArray(m->vao);
-	GLuint program = color_animation_programs[active_color_animation_method];
+	GLuint program = vertex_animation_programs[active_vertex_animation_method];
 	glUseProgram(program);
 
 	Camera* c = cameras[active_camera];
@@ -590,8 +591,11 @@ void Scene::setupVertexAnimationProgram(MeshModel* m) {
 
 	switch (active_vertex_animation_method) {
 	case SUPER_NOVA:
+		cout << m->vertex_animation_t << endl;
 		GLuint vertex_animation_t_loc = glGetUniformLocation(program, "vertex_animation_t");
 		glUniform1f(vertex_animation_t_loc, m->vertex_animation_t);
+
+		m->setPolyMode(DrawPref::PolyMode::VERTICES_ONLY);
 		break;
 	}
 }

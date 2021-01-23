@@ -69,7 +69,8 @@ public:
 
 	vec4 getPosition();
 	//vector<Face>* getFaces();
-	
+	void setPolyMode(DrawPref::PolyMode poly_mode);
+
 	void togglePolyMode();
 	void toggleBB();
 	void toggleVertexNormals();
