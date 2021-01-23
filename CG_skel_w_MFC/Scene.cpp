@@ -18,12 +18,19 @@ Camera* Scene::getActiveCamera() {
 //===C'tors / Destructors===
 
 Scene::Scene() {
-
 	glBlendFunc(GL_ONE, GL_ONE);
 
 	active_model = NO_MODELS_ACTIVE;
 
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	glGenBuffers(1, &cameras_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, cameras_vbo);
+
 	active_camera = -1;
+	Camera* tmp = new Camera(vec4(2.0, 0.0, 0.0));
+	addCamera(tmp);
 	Camera* def_cam = new Camera(vec4(0.0, 0.0, 10.0));
 	addCamera(def_cam);
 
@@ -31,6 +38,8 @@ Scene::Scene() {
 	parallel_sources.push_back(ParallelSource("Parallel Light 0", vec3(0.0, 1.0, 0.0), { 0.4, 0, 0 }));
 	point_sources.push_back(PointSource("Point Light 0", vec3(4, 4, 4), { 0.3, 0.3, 0.3 }));
 	//point_sources.push_back(PointSource("Point Light 1", vec3(-1, 0, 0), { 0, 0, 1 }));
+
+
 
 	skybox = new Skybox();
 
@@ -58,6 +67,9 @@ Scene::Scene() {
 
 	environment_mapping_program = InitShader("environment_mapping_vshader.glsl", "environment_mapping_fshader.glsl");
 	skybox->program = InitShader("skybox_vshader.glsl", "skybox_fshader.glsl");
+
+	cameras_drawing_program = InitShader("cameras_vshader.glsl", "cameras_fshader.glsl");
+	
 }
 
 Scene::~Scene() {
@@ -127,9 +139,42 @@ void Scene::draw(){
 
 		glDisable(GL_BLEND);
 		glDepthFunc(GL_LESS);
+	}
 
-		//draw cameras:
+	//draw cameras:
+	if (f_draw_cameras) {
+		for (int i = 0; i < cameras.size(); i++) {
+			cameras_positions[i] = cameras[i]->position;
+		}
 
+		glBindBuffer(GL_ARRAY_BUFFER, cameras_vbo);
+		glBufferData(GL_ARRAY_BUFFER, cameras.size() * sizeof(vec4), cameras_positions, GL_STATIC_DRAW);
+
+		glEnable(GL_POINT_SMOOTH);
+		glPointSize(5);
+
+		for (vector<Camera*>::iterator j = cameras.begin(); j != cameras.end(); j++) {
+			glBindVertexArray(vao);
+			GLuint program = cameras_drawing_program;
+			glUseProgram(program);
+
+			glBindBuffer(GL_ARRAY_BUFFER, cameras_vbo);
+			GLuint loc = glGetAttribLocation(program, "v_position");
+			glEnableVertexAttribArray(loc);
+			glVertexAttribPointer(loc, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+			Camera* c = cameras[active_camera];
+
+			mat4 vt = c->tp * c->tc;
+
+			GLuint vt_loc = glGetUniformLocation(program, "v_transform");
+			glUniformMatrix4fv(vt_loc, 1, GL_TRUE, vt);
+			glDrawArrays(GL_POINTS, 0, cameras.size());
+			glFlush();
+
+		}
+		glPointSize(1);
+		glDisable(GL_POINT_SMOOTH);
 	}
 
 	glutSwapBuffers();
@@ -412,6 +457,13 @@ void Scene::toggleIsEnvironmentMappingActive() {
 void Scene::addCamera(Camera* camera) {
 	cameras.push_back(camera);
 	activateLastCamera();
+
+	for (int i = 0; i < cameras.size(); i++) {
+		cameras_positions[i] = cameras[i]->position;
+	}
+	
+	glBindBuffer(GL_ARRAY_BUFFER, cameras_vbo);
+	glBufferData(GL_ARRAY_BUFFER, cameras.size()*sizeof(vec4), cameras_positions, GL_STATIC_DRAW);
 }
 
 void Scene::activateNextCamera() {
@@ -831,10 +883,6 @@ void Scene::setupEnvironmentMappingProgram(MeshModel* m) {
 	bindBufferToProgram(m, program, m->vbos[BT_VERTEX_NORMALS], "v_normal", GL_TRUE);
 
 	bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
-}
-
-void Scene::drawCameras() {
-
 }
 
 void Scene::bindBufferToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized) {

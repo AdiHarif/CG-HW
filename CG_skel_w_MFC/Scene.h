@@ -21,6 +21,8 @@
 #define COLOR_ANIMATIONS_METHODS_COUNT 2
 #define VERTEX_ANIMATIONS_METHODS_COUNT 1
 
+#define MAX_CAMERAS 20
+
 using namespace std;
 
 typedef enum {
@@ -67,6 +69,11 @@ class Scene {
 	GLuint vertex_animation_programs[VERTEX_ANIMATIONS_METHODS_COUNT];
 
 	GLuint environment_mapping_program;
+	GLuint cameras_drawing_program;
+
+	GLuint vao;
+	GLuint cameras_vbo;
+	vec4 cameras_positions[MAX_CAMERAS];
 
 	vector<Model*> models;
 	int active_model;
@@ -80,10 +87,8 @@ class Scene {
 
 	bool f_draw_cameras = false;
 	bool f_draw_lights = false;
-
 	bool f_color_animation_active = false;
 	bool f_vertex_animation_active = false;
-
 	bool f_environment_mapping_active = false;
 
 public:
@@ -188,7 +193,6 @@ public:
 	void setupVertexAnimationProgram(MeshModel* m);
 	void drawSkybox(MeshModel* m);
 	void setupEnvironmentMappingProgram(MeshModel* m);
-	void drawCameras();
 	void bindBufferToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized);
 	//void bindAttributeToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized);
 
