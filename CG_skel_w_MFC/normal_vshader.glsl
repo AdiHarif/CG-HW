@@ -16,15 +16,15 @@ void main()
 	}
 	else{
 		vec4 wr_position = (twm*position);
-		wr_position = wr_position/wr_position.w;
+		//wr_position = wr_position/wr_position.w;
 
 		vec4 wr_normal = (twm_n*normal);
-		wr_normal = wr_normal/wr_normal.w;
-		wr_normal.w = 0;
+		//wr_normal = wr_normal/wr_normal.w;
+		//wr_normal.w = 0;
 		wr_normal = -normalize(wr_normal)*0.1;
-		wr_normal.w = 1;
+		//wr_normal.w = 1;
 		
 		gl_Position = tpc * (wr_position + wr_normal);
-		gl_Position = gl_Position/gl_Position.w;
+		//gl_Position = gl_Position/gl_Position.w;
 	}
 }

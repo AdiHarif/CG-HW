@@ -12,11 +12,12 @@ out vec3 color;
 
 void main()
 {
+    vec4 pos_before_tr = v_position;
     vec4 position = v_transform * v_position;
     position.w = 1;
     gl_Position = position;
     
-    if(position.x < wave_threshold){
+    if(pos_before_tr.x < wave_threshold){
         color = color0;
     }
     else{
