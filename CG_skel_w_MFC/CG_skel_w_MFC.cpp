@@ -337,6 +337,13 @@ void animateWaveColors(int x) {
 	glutTimerFunc(20, animateWaveColors, x);
 }
 
+void animateSuperNova(int x) {
+	if (!scene->getIsVertexAnimationActive())	return;
+	scene->updateAllModelsWaveThreshold();
+	glutPostRedisplay();
+	glutTimerFunc(20, animateSuperNova, x);
+}
+
 //==========
 
 // Callbacks
@@ -518,16 +525,26 @@ void special(int key, int x, int y) {
 	case GLUT_KEY_F10:
 		scene->toggleColorAnimationMethod();
 		if (scene->getIsColorAnimationActive()) {
-			switch (scene->getActiveColorAnimationMethod()) {
-			case SMOOTH:
+			switch (scene->getActiveVertexAnimationMethod()) {
+			case SUPER_NOVA:
 				glutTimerFunc(20, animateSmoothColors, 0);
-				break;
-			case WAVE:
-				glutTimerFunc(20, animateWaveColors, 0);
 				break;
 			}
 		}
 		break;
+	case GLUT_KEY_F11:
+		scene->toggleIsVertexAnimationActive();
+		if (scene->getIsVertexAnimationActive()) {
+			switch (scene->getActiveVertexAnimationMethod()) {
+			case SMOOTH:
+				glutTimerFunc(20, animateSmoothColors, 0);
+				break;
+			case WAVE:
+				glutTimerFunc(20, animateSuperNova, 0);
+				break;
+			}
+			break;
+		}
 	}
 	scene->draw();
 }

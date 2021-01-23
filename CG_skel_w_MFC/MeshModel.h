@@ -85,5 +85,6 @@ public:
 
 	void updateHSVColor();
 	void updateWaveThreshold();
+	void updateVertexAnimationT();
 	friend class Scene;
 };

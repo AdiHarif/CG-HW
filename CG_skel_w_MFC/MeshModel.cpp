@@ -418,3 +418,22 @@ void MeshModel::updateWaveThreshold() {
 		wave_threshold = -1;
 	}
 }
+
+void MeshModel::updateVertexAnimationT() {
+	if (current_vertex_animation_dir == VA_IN) {
+		vertex_animation_t = easeInCubic(vertex_animation_x);
+		vertex_animation_x -= VERTEX_ANIMATION_X_STEP;
+		if (vertex_animation_x < 0) {
+			vertex_animation_x = 0;
+			current_vertex_animation_dir = VA_OUT;
+		}
+	}
+	else {
+		vertex_animation_t = easeOutCubic(vertex_animation_x);
+		vertex_animation_x += VERTEX_ANIMATION_X_STEP;
+		if (vertex_animation_x > 1) {
+			vertex_animation_x = 1;
+			current_vertex_animation_dir = VA_IN;
+		}
+	}
+}

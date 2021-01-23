@@ -49,6 +49,9 @@ Scene::Scene() {
 	color_animation_programs[SMOOTH] = InitShader("color_animation_smooth_vshader.glsl", "color_animation_smooth_fshader.glsl");
 	color_animation_programs[WAVE] = InitShader("color_animation_wave_vshader.glsl", "color_animation_wave_fshader.glsl");
 	active_color_animation_method = SMOOTH;
+
+	vertex_animation_programs[SUPER_NOVA] = InitShader("vertex_animation_vshader.glsl", "vertex_animation_fshader.glsl");
+	active_vertex_animation_method = SUPER_NOVA;
 }
 
 Scene::~Scene() {
@@ -74,16 +77,16 @@ void Scene::draw(){
 			m->draw();
 		}
 		
-		if (!is_color_animation_active && !is_vertex_animation_active) {
+		if (!f_color_animation_active && !f_vertex_animation_active) {
 			setupAmbientProgram(m);
 			m->draw();
 		}
 		else {
-			if (is_color_animation_active) {
+			if (f_color_animation_active) {
 				setupColorAnimationProgram(m);
 				m->draw();
 			}
-			if (is_vertex_animation_active) {
+			if (f_vertex_animation_active) {
 				setupVertexAnimationProgram(m);
 				m->draw();
 			}
@@ -368,12 +371,12 @@ void Scene::toggleColorAnimationMethod() {
 
 
 void Scene::toggleIsColorAnimationActive() {
-	is_color_animation_active = !is_color_animation_active;
+	f_color_animation_active = !f_color_animation_active;
 
 }
 
 void Scene::toggleIsVertexAnimationActive() {
-	is_vertex_animation_active = !is_vertex_animation_active;
+	f_vertex_animation_active = !f_vertex_animation_active;
 }
 
 //==========
@@ -583,7 +586,25 @@ void Scene::setupColorAnimationProgram(MeshModel* m) {
 }
 
 void Scene::setupVertexAnimationProgram(MeshModel* m) {
+	glBindVertexArray(m->vao);
+	GLuint program = color_animation_programs[active_color_animation_method];
+	glUseProgram(program);
 
+	Camera* c = cameras[active_camera];
+
+	mat4 vt = c->tp * c->tc * m->tw * m->tm;
+
+	GLuint vt_loc = glGetUniformLocation(program, "v_transform");
+	glUniformMatrix4fv(vt_loc, 1, GL_TRUE, vt);
+
+	bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
+
+	switch (active_vertex_animation_method) {
+	case SUPER_NOVA:
+		GLuint vertex_animation_t_loc = glGetUniformLocation(program, "vertex_animation_t");
+		glUniform1f(vertex_animation_t_loc, m->vertex_animation_t);
+		break;
+	}
 }
 
 void Scene::setupShadingProgram(MeshModel* m, Light* l) {
@@ -657,8 +678,6 @@ void Scene::setupShadingProgram(MeshModel* m, Light* l) {
 
 
 void Scene::setupSpecialProgram(MeshModel* m, SpecialShaders shader) {
-
-
 	glBindVertexArray(m->vao);
 	GLuint program = special_programs[shader];
 	glUseProgram(program);
@@ -700,15 +719,19 @@ void Scene::bindBufferToProgram(MeshModel* model, GLuint program, GLuint vbo, GL
 //===Animations===
 
 bool Scene::getIsColorAnimationActive() {
-	return is_color_animation_active;
+	return f_color_animation_active;
 }
 
 bool Scene::getIsVertexAnimationActive() {
-	return is_vertex_animation_active;
+	return f_vertex_animation_active;
 }
 
 ColorAnimationMethod Scene::getActiveColorAnimationMethod() {
 	return active_color_animation_method;
+}
+
+VertexAnimationMethod Scene::getActiveVertexAnimationMethod() {
+	return active_vertex_animation_method;
 }
 
 void Scene::updateAllModelsHSVColor() {
@@ -722,6 +745,13 @@ void Scene::updateAllModelsWaveThreshold() {
 	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
 		MeshModel* m = dynamic_cast<MeshModel*>(*i);
 		m->updateWaveThreshold();
+	}
+}
+
+void Scene::updateAllModelsVertexAnimationT() {
+	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
+		MeshModel* m = dynamic_cast<MeshModel*>(*i);
+		m->updateVertexAnimationT();
 	}
 }
 

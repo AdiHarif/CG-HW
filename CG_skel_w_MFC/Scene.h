@@ -46,7 +46,7 @@ typedef enum {
 } ColorAnimationMethod;
 
 typedef enum {
-	RANDOM_DIRECTION
+	SUPER_NOVA
 } VertexAnimationMethod;
 
 class Scene {
@@ -76,8 +76,8 @@ class Scene {
 	bool f_draw_cameras = false;
 	bool f_draw_lights = false;
 
-	bool is_color_animation_active = false;
-	bool is_vertex_animation_active = false;
+	bool f_color_animation_active = false;
+	bool f_vertex_animation_active = false;
 
 public:
 	//===C'tors / Destructors===
@@ -187,9 +187,11 @@ public:
 	bool getIsColorAnimationActive();
 	bool getIsVertexAnimationActive();
 	ColorAnimationMethod getActiveColorAnimationMethod();
+	VertexAnimationMethod getActiveVertexAnimationMethod();
 
 	void updateAllModelsHSVColor();
 	void updateAllModelsWaveThreshold();
+	void updateAllModelsVertexAnimationT();
 	//==========
 
 };
