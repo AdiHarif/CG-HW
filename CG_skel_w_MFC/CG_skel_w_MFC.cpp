@@ -364,7 +364,7 @@ void keyboard(unsigned char key, int x, int y)
 		exit(EXIT_SUCCESS);
 		break;
 
-		//rotate:
+	//rotate:
 	case 'A':
 	case 'a':
 		scene->translateSelection(vec4(-translation_step, 0, 0));
@@ -548,6 +548,10 @@ void special(int key, int x, int y) {
 		else {
 			scene->resetAllModelsVertexAnimationT();
 		}
+		break;
+	case GLUT_KEY_HOME:
+		scene->toggleIsEnvironmentMappingActive();
+		break;
 	}
 	scene->draw();
 }
