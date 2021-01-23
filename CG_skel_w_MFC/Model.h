@@ -25,7 +25,7 @@ protected:
 	Color wave_color_1 = Color::getRandomColor();
 	float wave_threshold = -1;
 
-	float vertex_animation_x = 0;
+	float vertex_animation_x = 1;
 	float vertex_animation_t = 0;
 	VertexAnimationDirection current_vertex_animation_dir = VA_IN;
 

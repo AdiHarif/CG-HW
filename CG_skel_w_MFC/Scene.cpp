@@ -77,19 +77,18 @@ void Scene::draw(){
 			m->draw();
 		}
 		
-		if (!f_color_animation_active && !f_vertex_animation_active) {
+		if (!f_color_animation_active) {
 			setupAmbientProgram(m);
 			m->draw();
 		}
 		else {
-			if (f_color_animation_active) {
-				setupColorAnimationProgram(m);
-				m->draw();
-			}
-			if (f_vertex_animation_active) {
-				setupVertexAnimationProgram(m);
-				m->draw();
-			}
+			setupColorAnimationProgram(m);
+			m->draw();		
+		}
+
+		if (f_vertex_animation_active) {
+			setupVertexAnimationProgram(m);
+			m->draw();
 		}
 
 		glEnable(GL_BLEND);
@@ -104,20 +103,9 @@ void Scene::draw(){
 			m->draw();
 		}
 
-
 		glDisable(GL_BLEND);
 		glDepthFunc(GL_LESS);
 	}
-
-	//lighting:
-
-	//parallel lights:
-	//for (vector<ParallelSource>::iterator i = parallel_sources.begin(); i != parallel_sources.end(); i++) {
-	//	for (vector<Model*>::iterator j = models.begin(); j != models.end(); j++) {
-	//		bindAttributesToProgram((MeshModel*)*j, active_program);
-	//		(*j)->draw(tpc, active_program);
-	//	}
-	//}
 
 	glutSwapBuffers();
 }
@@ -586,6 +574,7 @@ void Scene::setupColorAnimationProgram(MeshModel* m) {
 }
 
 void Scene::setupVertexAnimationProgram(MeshModel* m) {
+	cout << "x: " << m->vertex_animation_x << ", t: " << m->vertex_animation_t << endl;
 	glBindVertexArray(m->vao);
 	GLuint program = color_animation_programs[active_color_animation_method];
 	glUseProgram(program);
@@ -755,4 +744,10 @@ void Scene::updateAllModelsVertexAnimationT() {
 	}
 }
 
+void Scene::resetAllModelsVertexAnimationT() {
+	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
+		MeshModel* m = dynamic_cast<MeshModel*>(*i);
+		m->resetVertexAnimationT();
+	}
+}
 //==========

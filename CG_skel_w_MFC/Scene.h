@@ -192,6 +192,7 @@ public:
 	void updateAllModelsHSVColor();
 	void updateAllModelsWaveThreshold();
 	void updateAllModelsVertexAnimationT();
+	void resetAllModelsVertexAnimationT();
 	//==========
 
 };
