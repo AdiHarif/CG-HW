@@ -144,6 +144,8 @@ void MeshModel::loadFile(string fileName)
 	vec4* vertex_normals_buff = new vec4[faces.size() * 3];
 	vec4* face_normals_buff = new vec4[faces.size() * 3];
 	vec2* vertex_textures_buff = new vec2[faces.size() * 3];
+	vec4* t_axes_buff = new vec4[faces.size() * 3];
+	vec4* b_axes_buff = new vec4[faces.size() * 3];
 
 	for (int i = 0; i < faces.size(); i++) {
 		vertex_positions_buff[3 * i] = vertices[faces[i].vertices[0] - 1];
@@ -162,13 +164,45 @@ void MeshModel::loadFile(string fileName)
 			vertex_textures_buff[3 * i] = vetrex_textures[faces[i].textures[0] - 1];
 			vertex_textures_buff[(3 * i) + 1] = vetrex_textures[faces[i].textures[1] - 1];
 			vertex_textures_buff[(3 * i) + 2] = vetrex_textures[faces[i].textures[2] - 1];
+
+			vec4 e1 = vertex_positions_buff[(3 * i) + 2] - vertex_positions_buff[3 * i];
+			vec4 e2 = vertex_positions_buff[(3 * i) + 1] - vertex_positions_buff[3 * i];
+
+			vec2 delta_tex1 = vertex_textures_buff[(3 * i) + 2] - vertex_textures_buff[3 * i];
+			vec2 delta_tex2 = vertex_textures_buff[(3 * i) + 1] - vertex_textures_buff[3 * i];
+
+			float det = (delta_tex1.x * delta_tex2.y) - (delta_tex2.x * delta_tex1.y);
+			mat2 tbn_i = (1 / det) * mat2(delta_tex2.y, -delta_tex2.x, -delta_tex1.y, delta_tex1.x);
+
+			vec4 t_axis;
+			vec4 b_axis;
+
+			for (int j = 0; j < 3; j++) {
+				vec2 tmp = tbn_i * vec2(e1[j], e2[j]);
+				t_axis[j] = tmp[0];
+				b_axis[j] = tmp[1];
+			}
+			b_axis.w = t_axis.w = 0;
+
+			t_axis = normalize(t_axis);
+			b_axis = normalize(b_axis);
+
+			for (int j = 0; j < 3; j++) {
+				t_axes_buff[(i * 3) + j] = t_axis;
+				b_axes_buff[(i * 3) + j] = b_axis;
+			}
+
+
 		}
+
 	}
 
 	genVec4ArrayBuffer(BT_VERTICES, vertex_positions_tot_size, vertex_positions_buff);
 	genVec4ArrayBuffer(BT_VERTEX_NORMALS, vertex_normals_tot_size, vertex_normals_buff);
 	genVec4ArrayBuffer(BT_FACE_NORMALS, face_normals_tot_size, face_normals_buff);
 	genVec2ArrayBuffer(BT_TEXTURES, vertex_textures_tot_size, vertex_textures_buff);
+	genVec4ArrayBuffer(BT_T_AXES, face_normals_tot_size, t_axes_buff);
+	genVec4ArrayBuffer(BT_B_AXES, face_normals_tot_size, b_axes_buff);
 
 
 	//if (has_normals)
@@ -193,6 +227,9 @@ void MeshModel::loadFile(string fileName)
 	delete[] vertex_positions_buff;
 	delete[] vertex_normals_buff;
 	delete[] face_normals_buff;
+	delete[] vertex_textures_buff;
+	delete[] t_axes_buff;
+	delete[] b_axes_buff;
 
 	faces_count = faces.size();
 }
@@ -307,8 +344,30 @@ vec4 MeshModel::getPosition(){
 
 void MeshModel::setTexture(const char* file_name) {
 	glActiveTexture(GL_TEXTURE0);
-	glGenTextures(1, &vto);
-	glBindTexture(GL_TEXTURE_2D, vto);
+	glGenTextures(1, &vtos[TEXTURE_VTO]);
+	glBindTexture(GL_TEXTURE_2D, vtos[TEXTURE_VTO]);
+	// set the texture wrapping/filtering options (on the currently bound texture object)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	// load and generate the texture
+	int width, height, nrChannels;
+	unsigned char* data = stbi_load(file_name, &width, &height, &nrChannels, 0);
+	if (data) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else {
+		std::cout << "Failed to load texture" << std::endl;
+	}
+	stbi_image_free(data);
+}
+
+void MeshModel::setNormalMap(const char* file_name) {
+	glActiveTexture(GL_TEXTURE1);
+	glGenTextures(1, &vtos[NORMAL_MAP_VTO]);
+	glBindTexture(GL_TEXTURE_2D, vtos[NORMAL_MAP_VTO]);
 	// set the texture wrapping/filtering options (on the currently bound texture object)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);

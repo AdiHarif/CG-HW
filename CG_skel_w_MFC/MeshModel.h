@@ -6,7 +6,11 @@
 #include "Color.h"
 #include "stb_image.h"
 
-#define BUFFERS_COUNT 4
+#define BUFFERS_COUNT 6
+#define TEXTURE_BUFFERS_COUNT 2
+
+#define TEXTURE_VTO 0
+#define NORMAL_MAP_VTO 1
 
 using namespace std;
 
@@ -22,8 +26,12 @@ typedef enum {
 	BT_VERTICES,
 	BT_VERTEX_NORMALS,
 	BT_FACE_NORMALS,
-	BT_TEXTURES
+	BT_TEXTURES,
+	BT_T_AXES,
+	BT_B_AXES
 } BufferType;
+
+
 
 class MeshModel : public Model
 {
@@ -50,7 +58,7 @@ protected :
 
 	GLuint vao;
 	GLuint vbos[BUFFERS_COUNT];
-	GLuint vto;
+	GLuint vtos[TEXTURE_BUFFERS_COUNT];
 
 	int faces_count;
 
@@ -58,6 +66,7 @@ public:
 	explicit MeshModel(string fileName = "");
 	~MeshModel(void);
 	void setTexture(const char* file_name);
+	void setNormalMap(const char* file_name);
 	void loadFile(string fileName);
 	void initBoundingBox(vec4 min, vec4 max);
 

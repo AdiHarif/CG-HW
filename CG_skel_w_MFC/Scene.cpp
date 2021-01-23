@@ -29,7 +29,7 @@ Scene::Scene() {
 
 	ambient_light_color = { 0.1, 0.1, 0.1 };
 	parallel_sources.push_back(ParallelSource("Parallel Light 0", vec3(0.0, 1.0, 0.0), { 0.4, 0, 0 }));
-	point_sources.push_back(PointSource("Point Light 0", vec3(4, 4, 4), { 0.3, 0.3, 0.3 }));
+	//point_sources.push_back(PointSource("Point Light 0", vec3(4, 4, 4), { 0.3, 0.3, 0.3 }));
 	//point_sources.push_back(PointSource("Point Light 1", vec3(-1, 0, 0), { 0, 0, 1 }));
 
 	ambient_programs[AMBIENT] = InitShader("ambient_vshader.glsl", "ambient_fshader.glsl");
@@ -41,6 +41,7 @@ Scene::Scene() {
 	shading_programs[FLAT_SHADING] = InitShader("flat_vshader.glsl", "flat_fshader.glsl");
 	shading_programs[GOURAUD_SHADING] = InitShader("gouraud_vshader.glsl", "gouraud_fshader.glsl");
 	shading_programs[PHONG_SHADING] = InitShader("phong_vshader.glsl", "phong_fshader.glsl");
+	shading_programs[NORMAL_MAP_SHADING] = InitShader("normal_map_vshader.glsl", "normal_map_fshader.glsl");
 	shading_programs[TOON_SHADING] = InitShader("phong_vshader.glsl", "toon_fshader.glsl");
 	active_shading_method = FLAT_SHADING;
 
@@ -128,6 +129,14 @@ void Scene::loadTexture(string fileName) {
 	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
 		MeshModel* m = dynamic_cast<MeshModel*>(*i);
 		m->setTexture(fileName.c_str());
+	}
+}
+
+void Scene::loadNormalMap(string fileName) {
+	if (active_model == NO_MODELS_ACTIVE)	return;
+	for (vector<Model*>::iterator i = models.begin(); i != models.end(); i++) {
+		MeshModel* m = dynamic_cast<MeshModel*>(*i);
+		m->setNormalMap(fileName.c_str());
 	}
 }
 
@@ -520,21 +529,21 @@ void Scene::setupAmbientProgram(MeshModel* m) {
 		glEnableVertexAttribArray(tex_coord_loc);
 		glVertexAttribPointer(tex_coord_loc, 2, GL_FLOAT, GL_TRUE, 0, 0);
 
-		glBindTexture(GL_TEXTURE_2D, m->vto);
+		glBindTexture(GL_TEXTURE_2D, m->vtos[TEXTURE_VTO]);
 		break;
 	}
 	case PLANE_TEXTURE: {
 		model_texture_loc = glGetUniformLocation(program, "modelTexture");
 		glUniform1i(model_texture_loc, 0);
 		
-		glBindTexture(GL_TEXTURE_2D, m->vto);
+		glBindTexture(GL_TEXTURE_2D, m->vtos[TEXTURE_VTO]);
 		break;
 	}
 	case SPHERE_TEXTURE: {
 		model_texture_loc = glGetUniformLocation(program, "modelTexture");
 		glUniform1i(model_texture_loc, 0);
 
-		glBindTexture(GL_TEXTURE_2D, m->vto);
+		glBindTexture(GL_TEXTURE_2D, m->vtos[TEXTURE_VTO]);
 		break;
 	}
 	}
@@ -606,6 +615,10 @@ void Scene::setupShadingProgram(MeshModel* m, Light* l) {
 
 	Camera* c = cameras[active_camera];
 
+	mat4 twm = m->tw * m->tm;
+	mat4 tpc = c->tp * c->tc;
+	mat4 twm_n = m->ntw * m->ntm;
+
 	mat4 vt = c->tp * c->tc * m->tw * m->tm;
 	mat4 nt = m->ntw * m->ntm;
 
@@ -654,6 +667,8 @@ void Scene::setupShadingProgram(MeshModel* m, Light* l) {
 
 	bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
 
+	GLuint normal_map_loc;
+
 	switch (active_shading_method) {
 	case FLAT_SHADING:
 		bindBufferToProgram(m, program, m->vbos[BT_FACE_NORMALS], "f_normal", GL_TRUE);
@@ -664,6 +679,35 @@ void Scene::setupShadingProgram(MeshModel* m, Light* l) {
 	case PHONG_SHADING:
 	case TOON_SHADING:
 		bindBufferToProgram(m, program, m->vbos[BT_VERTEX_NORMALS], "v_normal", GL_TRUE);
+		break;
+	case NORMAL_MAP_SHADING:
+
+		glBindBuffer(GL_ARRAY_BUFFER, m->vbos[BT_TEXTURES]);
+		GLuint tex_coord_loc = glGetAttribLocation(program, "v_map_coordinates");
+		glEnableVertexAttribArray(tex_coord_loc);
+		glVertexAttribPointer(tex_coord_loc, 2, GL_FLOAT, GL_TRUE, 0, 0);
+
+		GLuint twm_loc = glGetUniformLocation(program, "twm");
+		glUniformMatrix4fv(twm_loc, 1, GL_TRUE, twm);
+
+		GLuint tpc_loc = glGetUniformLocation(program, "tpc");
+		glUniformMatrix4fv(tpc_loc, 1, GL_TRUE, tpc);
+
+		GLuint twm_n_loc = glGetUniformLocation(program, "twm_n");
+		glUniformMatrix4fv(twm_n_loc, 1, GL_TRUE, twm_n);
+
+		bindBufferToProgram(m, program, m->vbos[BT_T_AXES], "t_axis", GL_TRUE);
+		bindBufferToProgram(m, program, m->vbos[BT_B_AXES], "b_axis", GL_TRUE);
+
+		normal_map_loc = glGetUniformLocation(program, "normal_map");
+		glUniform1i(normal_map_loc, 1);
+
+		glBindBuffer(GL_ARRAY_BUFFER, m->vbos[BT_TEXTURES]);
+		GLuint map_coord_loc = glGetAttribLocation(program, "v_map_coordinates");
+		glEnableVertexAttribArray(map_coord_loc);
+		glVertexAttribPointer(map_coord_loc, 2, GL_FLOAT, GL_TRUE, 0, 0);
+
+		glBindTexture(GL_TEXTURE_2D, m->vtos[NORMAL_MAP_VTO]);
 		break;
 	}
 }
