@@ -6,7 +6,7 @@
 #include "Color.h"
 #include "stb_image.h"
 
-#define BUFFERS_COUNT 6
+#define BUFFERS_COUNT 11
 #define TEXTURE_BUFFERS_COUNT 2
 
 #define TEXTURE_VTO 0
@@ -28,7 +28,13 @@ typedef enum {
 	BT_FACE_NORMALS,
 	BT_TEXTURES,
 	BT_T_AXES,
-	BT_B_AXES
+	BT_B_AXES,
+	BT_VERTEX_PAIRS,
+	BT_VERTEX_NORMAL_PAIRS,
+	BT_CENTER_PAIRS,
+	BT_FACE_NORMALS_PAIRS,
+	BT_BOUNDING_BOX
+
 } BufferType;
 
 
@@ -89,6 +95,9 @@ public:
 	void deactivate();
 
 	void draw();
+	void drawNormals(GLuint program);
+	void drawBB();
+
 
 	void genVec4ArrayBuffer(BufferType bt, int tot_size, vec4* buffer);
 	void genVec2ArrayBuffer(BufferType bt, int tot_size, vec2* buffer);

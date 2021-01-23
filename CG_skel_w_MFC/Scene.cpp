@@ -57,6 +57,8 @@ Scene::Scene() {
 	active_shading_method = FLAT_SHADING;
 
 	special_programs[SILHOUETTE] = InitShader("silhouette_vshader.glsl", "silhouette_fshader.glsl");
+	special_programs[NORMAL] = InitShader("normal_vshader.glsl", "normal_fshader.glsl");
+	special_programs[BOUNDING_BOX] = InitShader("bb_vshader.glsl", "normal_fshader.glsl");
 
 	color_animation_programs[SMOOTH] = InitShader("color_animation_smooth_vshader.glsl", "color_animation_smooth_fshader.glsl");
 	color_animation_programs[WAVE] = InitShader("color_animation_wave_vshader.glsl", "color_animation_wave_fshader.glsl");
@@ -139,6 +141,12 @@ void Scene::draw(){
 
 		glDisable(GL_BLEND);
 		glDepthFunc(GL_LESS);
+
+		setupSpecialProgram(m, NORMAL);
+		m->drawNormals(special_programs[NORMAL]);
+
+		setupSpecialProgram(m, BOUNDING_BOX);
+		m->drawBB();
 	}
 
 	//draw cameras:
@@ -355,7 +363,7 @@ void Scene::changeAllModelsActiveness(bool is_active) {
 	}
 }
 
-//==========
+//=======
 
 
 //===Display Toggles===
@@ -767,6 +775,12 @@ void Scene::setupSpecialProgram(MeshModel* m, SpecialShaders shader) {
 		bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
 		bindBufferToProgram(m, program, m->vbos[BT_VERTEX_NORMALS], "v_normal", GL_TRUE);
 		break;
+	case NORMAL:
+		break;
+	case BOUNDING_BOX:
+		bindBufferToProgram(m, program, m->vbos[BT_BOUNDING_BOX], "position", GL_FALSE);
+		GLuint color_loc = glGetUniformLocation(program, "color");
+		glUniform4fv(color_loc, 1, vec4(1));
 	}
 }
 
