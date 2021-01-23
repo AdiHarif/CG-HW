@@ -9,6 +9,7 @@
 #include "InitShader.h"
 #include "GL\freeglut.h"
 #include "Model.h"
+#include "Skybox.h"
 
 #define ALL_MODELS_ACTIVE -1
 #define NO_MODELS_ACTIVE -2
@@ -50,11 +51,13 @@ typedef enum {
 	SUPER_NOVA
 } VertexAnimationMethod;
 
+
 class Scene {
 	AmbientMethod active_ambient_method;
 	ShadingMethod active_shading_method;
 	ColorAnimationMethod active_color_animation_method;
 	VertexAnimationMethod active_vertex_animation_method;
+	Skybox* skybox;
 
 	GLuint ambient_programs[AMBIENT_METHODS_COUNT];
 	GLuint shading_programs[SHADING_METHODS_COUNT];
@@ -63,6 +66,7 @@ class Scene {
 	GLuint color_animation_programs[COLOR_ANIMATIONS_METHODS_COUNT];
 	GLuint vertex_animation_programs[VERTEX_ANIMATIONS_METHODS_COUNT];
 
+	GLuint environment_mapping_program;
 
 	vector<Model*> models;
 	int active_model;
@@ -79,6 +83,8 @@ class Scene {
 
 	bool f_color_animation_active = false;
 	bool f_vertex_animation_active = false;
+
+	bool f_environment_mapping_active = false;
 
 public:
 	//===C'tors / Destructors===
@@ -127,6 +133,7 @@ public:
 	void toggleColorAnimationMethod();
 	void toggleIsColorAnimationActive();
 	void toggleIsVertexAnimationActive();
+	void toggleIsEnvironmentMappingActive();
 
 	//==========
 
@@ -179,6 +186,8 @@ public:
 	void setupSpecialProgram(MeshModel* model, SpecialShaders shader);
 	void setupColorAnimationProgram(MeshModel* m);
 	void setupVertexAnimationProgram(MeshModel* m);
+	void drawSkybox(MeshModel* m);
+	void setupEnvironmentMappingProgram(MeshModel* m);
 	void bindBufferToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized);
 	//void bindAttributeToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized);
 
@@ -197,4 +206,7 @@ public:
 	void resetAllModelsVertexAnimationT();
 	//==========
 
+	//===Environment Mapping===
+
+	//==========
 };

@@ -29,8 +29,10 @@ Scene::Scene() {
 
 	ambient_light_color = { 0.1, 0.1, 0.1 };
 	parallel_sources.push_back(ParallelSource("Parallel Light 0", vec3(0.0, 1.0, 0.0), { 0.4, 0, 0 }));
-	//point_sources.push_back(PointSource("Point Light 0", vec3(4, 4, 4), { 0.3, 0.3, 0.3 }));
+	point_sources.push_back(PointSource("Point Light 0", vec3(4, 4, 4), { 0.3, 0.3, 0.3 }));
 	//point_sources.push_back(PointSource("Point Light 1", vec3(-1, 0, 0), { 0, 0, 1 }));
+
+	skybox = new Skybox();
 
 	ambient_programs[AMBIENT] = InitShader("ambient_vshader.glsl", "ambient_fshader.glsl");
 	ambient_programs[TEXTURE] = InitShader("texture_vshader.glsl", "texture_fshader.glsl");
@@ -53,6 +55,9 @@ Scene::Scene() {
 
 	vertex_animation_programs[SUPER_NOVA] = InitShader("vertex_animation_vshader.glsl", "vertex_animation_fshader.glsl");
 	active_vertex_animation_method = SUPER_NOVA;
+
+	environment_mapping_program = InitShader("environment_mapping_vshader.glsl", "environment_mapping_fshader.glsl");
+	skybox->program = InitShader("skybox_vshader.glsl", "skybox_fshader.glsl");
 }
 
 Scene::~Scene() {
@@ -75,6 +80,18 @@ void Scene::draw(){
 		MeshModel* m = dynamic_cast<MeshModel*> ((*i));
 		if (f_vertex_animation_active) {
 			setupVertexAnimationProgram(m);
+			m->draw();
+			continue;
+		}
+
+		if (f_environment_mapping_active) {
+			//draw skybox
+			/*glDepthFunc(GL_LEQUAL);
+			drawSkybox(m);
+			glDepthFunc(GL_LESS);*/
+
+			//environment mapping
+			setupEnvironmentMappingProgram(m);
 			m->draw();
 			continue;
 		}
@@ -377,6 +394,10 @@ void Scene::toggleIsVertexAnimationActive() {
 	f_vertex_animation_active = !f_vertex_animation_active;
 }
 
+void Scene::toggleIsEnvironmentMappingActive() {
+	f_environment_mapping_active = !f_environment_mapping_active;
+}
+
 //==========
 
 
@@ -549,65 +570,6 @@ void Scene::setupAmbientProgram(MeshModel* m) {
 	}
 }
 
-void Scene::setupColorAnimationProgram(MeshModel* m) {
-	glBindVertexArray(m->vao);
-	GLuint program = color_animation_programs[active_color_animation_method];
-	glUseProgram(program);
-
-	Camera* c = cameras[active_camera];
-
-	mat4 vt = c->tp * c->tc * m->tw * m->tm;
-
-	GLuint vt_loc = glGetUniformLocation(program, "v_transform");
-	glUniformMatrix4fv(vt_loc, 1, GL_TRUE, vt);
-	
-	bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
-
-	switch (active_color_animation_method) {
-	case SMOOTH: {
-		GLuint hsv_color_loc = glGetUniformLocation(program, "hsv_color");
-		glUniform3f(hsv_color_loc, m->hsv_color.r, m->hsv_color.g, m->hsv_color.b);
-		break;
-	}
-	case WAVE: {
-		GLuint color0_loc = glGetUniformLocation(program, "color0");
-		glUniform3f(color0_loc, m->wave_color_0.r, m->wave_color_0.g, m->wave_color_0.b);
-
-		GLuint color1_loc = glGetUniformLocation(program, "color1");
-		glUniform3f(color1_loc, m->wave_color_1.r, m->wave_color_1.g, m->wave_color_1.b);
-
-		GLuint wave_threshold_loc = glGetUniformLocation(program, "wave_threshold");
-		glUniform1f(wave_threshold_loc, m->wave_threshold);
-		break;
-	}
-	}
-}
-
-void Scene::setupVertexAnimationProgram(MeshModel* m) {
-	//cout << "x: " << m->vertex_animation_x << ", t: " << m->vertex_animation_t << endl;
-	glBindVertexArray(m->vao);
-	GLuint program = vertex_animation_programs[active_vertex_animation_method];
-	glUseProgram(program);
-
-	Camera* c = cameras[active_camera];
-
-	mat4 vt = c->tp * c->tc * m->tw * m->tm;
-
-	GLuint vt_loc = glGetUniformLocation(program, "v_transform");
-	glUniformMatrix4fv(vt_loc, 1, GL_TRUE, vt);
-
-	bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
-
-	switch (active_vertex_animation_method) {
-	case SUPER_NOVA:
-		GLuint vertex_animation_t_loc = glGetUniformLocation(program, "vertex_animation_t");
-		glUniform1f(vertex_animation_t_loc, m->vertex_animation_t);
-
-		m->setPolyMode(DrawPref::PolyMode::VERTICES_ONLY);
-		break;
-	}
-}
-
 void Scene::setupShadingProgram(MeshModel* m, Light* l) {
 	glBindVertexArray(m->vao);
 	GLuint program = shading_programs[active_shading_method];
@@ -741,6 +703,122 @@ void Scene::setupSpecialProgram(MeshModel* m, SpecialShaders shader) {
 	}
 }
 
+void Scene::setupColorAnimationProgram(MeshModel* m) {
+	glBindVertexArray(m->vao);
+	GLuint program = color_animation_programs[active_color_animation_method];
+	glUseProgram(program);
+
+	Camera* c = cameras[active_camera];
+
+	mat4 vt = c->tp * c->tc * m->tw * m->tm;
+
+	GLuint vt_loc = glGetUniformLocation(program, "v_transform");
+	glUniformMatrix4fv(vt_loc, 1, GL_TRUE, vt);
+
+	bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
+
+	switch (active_color_animation_method) {
+	case SMOOTH: {
+		GLuint hsv_color_loc = glGetUniformLocation(program, "hsv_color");
+		glUniform3f(hsv_color_loc, m->hsv_color.r, m->hsv_color.g, m->hsv_color.b);
+		break;
+	}
+	case WAVE: {
+		GLuint color0_loc = glGetUniformLocation(program, "color0");
+		glUniform3f(color0_loc, m->wave_color_0.r, m->wave_color_0.g, m->wave_color_0.b);
+
+		GLuint color1_loc = glGetUniformLocation(program, "color1");
+		glUniform3f(color1_loc, m->wave_color_1.r, m->wave_color_1.g, m->wave_color_1.b);
+
+		GLuint wave_threshold_loc = glGetUniformLocation(program, "wave_threshold");
+		glUniform1f(wave_threshold_loc, m->wave_threshold);
+		break;
+	}
+	}
+}
+
+void Scene::setupVertexAnimationProgram(MeshModel* m) {
+	glBindVertexArray(m->vao);
+	GLuint program = vertex_animation_programs[active_vertex_animation_method];
+	glUseProgram(program);
+
+	Camera* c = cameras[active_camera];
+
+	mat4 vt = c->tp * c->tc * m->tw * m->tm;
+
+	GLuint vt_loc = glGetUniformLocation(program, "v_transform");
+	glUniformMatrix4fv(vt_loc, 1, GL_TRUE, vt);
+
+	bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
+
+	switch (active_vertex_animation_method) {
+	case SUPER_NOVA:
+		GLuint vertex_animation_t_loc = glGetUniformLocation(program, "vertex_animation_t");
+		glUniform1f(vertex_animation_t_loc, m->vertex_animation_t);
+		break;
+	}
+}
+
+void Scene::drawSkybox(MeshModel* m) {
+	glBindVertexArray(skybox->vao);
+	GLuint program = skybox->program;
+	glUseProgram(program);
+
+	Camera* c = cameras[active_camera];
+
+	GLuint tp_loc = glGetUniformLocation(program, "tp");
+	glUniformMatrix4fv(tp_loc, 1, GL_TRUE, c->tp);
+
+	GLuint tc_loc = glGetUniformLocation(program, "tc");
+	glUniformMatrix4fv(tc_loc, 1, GL_TRUE, c->tc);
+
+	GLuint tw_loc = glGetUniformLocation(program, "tw");
+	glUniformMatrix4fv(tw_loc, 1, GL_TRUE, m->tw);
+
+	GLuint tm_loc = glGetUniformLocation(program, "tm");
+	glUniformMatrix4fv(tm_loc, 1, GL_TRUE, m->tm);
+
+	GLuint skybox_loc = glGetUniformLocation(program, "skybox");
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->vto);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+}
+
+void Scene::setupEnvironmentMappingProgram(MeshModel* m) {
+	glBindVertexArray(m->vao);
+	GLuint program = environment_mapping_program;
+	glUseProgram(program);
+
+	Camera* c = cameras[active_camera];
+
+	mat4 vt = c->tp * c->tc * m->tw * m->tm;
+
+	GLuint tp_loc = glGetUniformLocation(program, "tp");
+	glUniformMatrix4fv(tp_loc, 1, GL_TRUE, c->tp);
+
+	GLuint tc_loc = glGetUniformLocation(program, "tc");
+	glUniformMatrix4fv(tc_loc, 1, GL_TRUE, c->tc);
+
+	GLuint tw_loc = glGetUniformLocation(program, "tw");
+	glUniformMatrix4fv(tw_loc, 1, GL_TRUE, m->tw);
+
+	GLuint tm_loc = glGetUniformLocation(program, "tm");
+	glUniformMatrix4fv(tm_loc, 1, GL_TRUE, m->tm);
+
+	GLuint vt_loc = glGetUniformLocation(program, "v_transform");
+	glUniformMatrix4fv(vt_loc, 1, GL_TRUE, vt);
+
+	GLuint skybox_loc = glGetUniformLocation(program, "skybox");
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->vto);
+
+	GLuint camera_pos_loc = glGetUniformLocation(program, "camera_pos");
+	glUniform4fv(camera_pos_loc, 1, c->position);
+
+	bindBufferToProgram(m, program, m->vbos[BT_VERTEX_NORMALS], "v_normal", GL_TRUE);
+
+	bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
+}
 
 void Scene::bindBufferToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized) {
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
