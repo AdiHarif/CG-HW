@@ -591,7 +591,6 @@ void Scene::setupVertexAnimationProgram(MeshModel* m) {
 
 	switch (active_vertex_animation_method) {
 	case SUPER_NOVA:
-		cout << m->vertex_animation_t << endl;
 		GLuint vertex_animation_t_loc = glGetUniformLocation(program, "vertex_animation_t");
 		glUniform1f(vertex_animation_t_loc, m->vertex_animation_t);
 

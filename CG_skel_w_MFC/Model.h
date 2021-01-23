@@ -27,7 +27,7 @@ protected:
 	Color wave_color_1 = Color::getRandomColor();
 	float wave_threshold = -1;
 
-	float vertex_animation_x = 1;
+	float vertex_animation_x = VERTEX_ANIMATION_X_MAX;
 	float vertex_animation_t = 0;
 	VertexAnimationDirection current_vertex_animation_dir = VA_IN;
 
@@ -51,7 +51,7 @@ public:
 	void setShininess(GLfloat s) { shininess = s; }
 
 	GLfloat easeInCubic(GLfloat x) { return -x * x * x; }
-	GLfloat easeOutCubic(GLfloat x) { return -2*(1 - pow(1 - x, 3)); }
+	GLfloat easeOutCubic(GLfloat x) { return -10*(1 - pow(1 - x, 3)); }
 
 
 

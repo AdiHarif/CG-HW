@@ -433,7 +433,7 @@ void MeshModel::updateVertexAnimationT() {
 		}
 	}
 	else {
-		if (vertex_animation_x != 0)	vertex_animation_t = easeOutCubic(vertex_animation_x);
+		vertex_animation_t = easeOutCubic(vertex_animation_x);
 		vertex_animation_x += 2*VERTEX_ANIMATION_X_STEP;
 		if (vertex_animation_x > VERTEX_ANIMATION_X_MAX) {
 			vertex_animation_x = VERTEX_ANIMATION_X_MAX;
