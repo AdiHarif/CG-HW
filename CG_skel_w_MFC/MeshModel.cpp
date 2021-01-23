@@ -102,14 +102,14 @@ void MeshModel::loadFile(string fileName)
 	initBoundingBox(min, max);
 	
 	//centering the model to (0,0,0):
-	vec4 middle_offset = vec4((min.x + max.x) / 2, (min.y + max.y) / 2, (min.z + max.z) / 2);
+	/*vec4 middle_offset = vec4((min.x + max.x) / 2, (min.y + max.y) / 2, (min.z + max.z) / 2);
 	mat4 t = translateMat(-middle_offset);
 	for (vector<vec4>::iterator i = vertices.begin(); i != vertices.end(); i++) {
 		(*i) = t * (*i);
 	}
 	for (vector<Edge>::iterator i = bb_edges.begin(); i != bb_edges.end(); i++) {
 		(*i) = t * (*i);
-	}
+	}*/
 
 	for (int i = 0; i < faces.size(); i++) {
 
@@ -213,6 +213,50 @@ void MeshModel::loadFile(string fileName)
 
 	}
 
+	//min = t * min;
+	//max = t * max;
+
+	vec4 bounding_box_buffer[24] = {
+
+		vec4(min.x, min.y, min.z),
+		vec4(min.x, min.y, max.z),
+
+		vec4(max.x, min.y, min.z),
+		vec4(max.x, min.y, max.z),
+
+		vec4(min.x, max.y, min.z),
+		vec4(min.x, max.y, max.z),
+
+		vec4(max.x, max.y, min.z),
+		vec4(max.x, max.y, max.z),
+
+
+		vec4(min.x, min.y, min.z),
+		vec4(min.x, max.y, min.z),
+
+		vec4(max.x, min.y, min.z),
+		vec4(max.x, max.y, min.z),
+
+		vec4(min.x, min.y, max.z),
+		vec4(min.x, max.y, max.z),
+
+		vec4(max.x, min.y, max.z),
+		vec4(max.x, max.y, max.z),
+
+
+		vec4(min.x, min.y, min.z),
+		vec4(max.x, min.y, min.z),
+
+		vec4(min.x, max.y, min.z),
+		vec4(max.x, max.y, min.z),
+
+		vec4(min.x, min.y, max.z),
+		vec4(max.x, min.y, max.z),
+
+		vec4(min.x, max.y, max.z),
+		vec4(max.x, max.y, max.z),
+	};
+
 	genVec4ArrayBuffer(BT_VERTICES, vertex_positions_tot_size, vertex_positions_buff);
 	genVec4ArrayBuffer(BT_VERTEX_NORMALS, vertex_normals_tot_size, vertex_normals_buff);
 	genVec4ArrayBuffer(BT_FACE_NORMALS, face_normals_tot_size, face_normals_buff);
@@ -223,6 +267,7 @@ void MeshModel::loadFile(string fileName)
 	genVec4ArrayBuffer(BT_VERTEX_NORMAL_PAIRS, faces.size() * 6 * sizeof(vec4), vertex_normal_pairs_buff);
 	genVec4ArrayBuffer(BT_CENTER_PAIRS, faces.size() * 2 * sizeof(vec4), center_pairs_buff);
 	genVec4ArrayBuffer(BT_FACE_NORMALS_PAIRS, faces.size() * 2 * sizeof(vec4), face_normals_pairs_buff);
+	genVec4ArrayBuffer(BT_BOUNDING_BOX, 24 * sizeof(vec4), bounding_box_buffer);
 
 
 	//if (has_normals)
@@ -516,6 +561,14 @@ void MeshModel::drawNormals(GLuint program) {
 
 		glDrawArrays(GL_LINES, 0, faces_count * 2);
 		glFlush();
+	}
+}
+
+void MeshModel::drawBB() {
+	if (draw_pref.f_draw_bb) {
+		glDrawArrays(GL_LINES, 0, 24);
+		glFlush();
+
 	}
 }
 

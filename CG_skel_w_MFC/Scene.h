@@ -16,7 +16,7 @@
 
 #define AMBIENT_METHODS_COUNT 4
 #define SHADING_METHODS_COUNT 5
-#define SPECIAL_PROGRAMS_COUNT 2
+#define SPECIAL_PROGRAMS_COUNT 3
 
 #define COLOR_ANIMATIONS_METHODS_COUNT 2
 #define VERTEX_ANIMATIONS_METHODS_COUNT 1
@@ -40,7 +40,8 @@ typedef enum {
 
 typedef enum {
 	SILHOUETTE,
-	NORMAL
+	NORMAL,
+	BOUNDING_BOX
 } SpecialShaders;
 
 typedef enum {
