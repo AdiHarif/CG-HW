@@ -84,10 +84,13 @@ void Scene::draw(){
 		}
 
 		if (f_environment_mapping_active) {
+			glActiveTexture(GL_TEXTURE2);
 			//draw skybox
-			/*glDepthFunc(GL_LEQUAL);
+			//glDepthFunc(GL_LEQUAL);
+			glDepthMask(GL_FALSE);
 			drawSkybox(m);
-			glDepthFunc(GL_LESS);*/
+			glDepthMask(GL_TRUE);
+			//glDepthFunc(GL_LESS);
 
 			//environment mapping
 			setupEnvironmentMappingProgram(m);
@@ -735,7 +738,6 @@ void Scene::drawSkybox(MeshModel* m) {
 	glUniformMatrix4fv(tm_loc, 1, GL_TRUE, m->tm);
 
 	GLuint skybox_loc = glGetUniformLocation(program, "skybox");
-	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->vto);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
@@ -765,7 +767,6 @@ void Scene::setupEnvironmentMappingProgram(MeshModel* m) {
 	glUniformMatrix4fv(vt_loc, 1, GL_TRUE, vt);
 
 	GLuint skybox_loc = glGetUniformLocation(program, "skybox");
-	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->vto);
 
 	GLuint camera_pos_loc = glGetUniformLocation(program, "camera_pos");

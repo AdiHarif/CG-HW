@@ -99,7 +99,6 @@ void MeshModel::loadFile(string fileName)
 		}
 	}
 	
-	
 	initBoundingBox(min, max);
 	
 	//centering the model to (0,0,0):
