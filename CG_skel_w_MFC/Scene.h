@@ -34,8 +34,8 @@ typedef enum {
 	FLAT_SHADING,
 	GOURAUD_SHADING,
 	PHONG_SHADING,
-	NORMAL_MAP_SHADING,
-	TOON_SHADING
+	TOON_SHADING,
+	NORMAL_MAP_SHADING
 } ShadingMethod;
 
 typedef enum {
@@ -188,6 +188,7 @@ public:
 	void setupVertexAnimationProgram(MeshModel* m);
 	void drawSkybox(MeshModel* m);
 	void setupEnvironmentMappingProgram(MeshModel* m);
+	void drawCameras();
 	void bindBufferToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized);
 	//void bindAttributeToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized);
 

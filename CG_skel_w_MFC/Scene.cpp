@@ -27,7 +27,7 @@ Scene::Scene() {
 	Camera* def_cam = new Camera(vec4(0.0, 0.0, 10.0));
 	addCamera(def_cam);
 
-	ambient_light_color = { 0.1, 0.1, 0.1 };
+	ambient_light_color = { 0.4, 0.4, 0.4 };
 	parallel_sources.push_back(ParallelSource("Parallel Light 0", vec3(0.0, 1.0, 0.0), { 0.4, 0, 0 }));
 	point_sources.push_back(PointSource("Point Light 0", vec3(4, 4, 4), { 0.3, 0.3, 0.3 }));
 	//point_sources.push_back(PointSource("Point Light 1", vec3(-1, 0, 0), { 0, 0, 1 }));
@@ -127,6 +127,9 @@ void Scene::draw(){
 
 		glDisable(GL_BLEND);
 		glDepthFunc(GL_LESS);
+
+		//draw cameras:
+
 	}
 
 	glutSwapBuffers();
@@ -542,8 +545,17 @@ void Scene::setupAmbientProgram(MeshModel* m) {
 	GLuint model_texture_loc;
 
 	switch (active_ambient_method) {
-	case AMBIENT:
+	case AMBIENT: {
+		GLuint model_emit_loc = glGetUniformLocation(program, "model_emit_color");
+		glUniform4fv(model_emit_loc, 1, vec4(m->emit_color.r, m->emit_color.g, m->emit_color.b, 1));
+
+		GLuint model_ambient_loc = glGetUniformLocation(program, "model_ambient_color");
+		glUniform4fv(model_ambient_loc, 1, vec4(m->ambient_color.r, m->ambient_color.g, m->ambient_color.b, 1));
+
+		GLuint scene_ambient_loc = glGetUniformLocation(program, "scene_ambient_color");
+		glUniform4fv(scene_ambient_loc, 1, vec4(ambient_light_color.r, ambient_light_color.g, ambient_light_color.b, 1));
 		break;
+	}
 	case TEXTURE: {
 		model_texture_loc = glGetUniformLocation(program, "modelTexture");
 		glUniform1i(model_texture_loc, 0);
@@ -819,6 +831,10 @@ void Scene::setupEnvironmentMappingProgram(MeshModel* m) {
 	bindBufferToProgram(m, program, m->vbos[BT_VERTEX_NORMALS], "v_normal", GL_TRUE);
 
 	bindBufferToProgram(m, program, m->vbos[BT_VERTICES], "v_position", GL_FALSE);
+}
+
+void Scene::drawCameras() {
+
 }
 
 void Scene::bindBufferToProgram(MeshModel* model, GLuint program, GLuint vbo, GLchar* variable_name, boolean is_normalized) {
