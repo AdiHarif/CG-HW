@@ -2,9 +2,11 @@
 
 out vec4 fColor;
 
-uniform vec4 ambient_color;
+uniform vec4 model_emit_color;
+uniform vec4 model_ambient_color;
+uniform vec4 scene_ambient_color;
 
 void main() 
 {
-	fColor = vec4(0.4,0,0.4,1);
-} 
+	fColor = model_ambient_color * scene_ambient_color + model_emit_color;
+}
